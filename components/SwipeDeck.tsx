@@ -263,9 +263,10 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
               <span>Proof to win</span>
             </div>
           </div>
-
-          <Challenger id={card.id} topic={card.topic} />
         </article>
+
+        {/* The challenger stands in the ring; the card is swiped behind them. */}
+        <Challenger key={card.id} id={card.id} topic={card.topic} className="mm-fighter" />
       </div>
 
       <div className="mm-actions">

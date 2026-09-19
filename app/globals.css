@@ -177,46 +177,48 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-nav { color: var(--muted); font-size: 14px; font-weight: 600; }
 .mm-nav:hover { color: var(--mm-blade); }
 
-.mm-deck, .mm-detail, .mm-empty { width: min(460px, 100%); margin: auto 0; }
+.mm-deck { width: min(560px, 100%); margin: auto 0; }
+.mm-detail, .mm-empty { width: min(460px, 100%); margin: auto 0; }
 .mm-meter { display: flex; align-items: center; justify-content: flex-end; padding: 6px 4px 10px; }
 .mm-count { color: var(--muted); font-size: 13px; font-style: italic; }
 
-.mm-ratings { display: flex; gap: 6px; padding: 0 4px 10px; }
+.mm-ratings { display: flex; gap: 6px; padding: 0 4px 6px; }
 .mm-rating { display: inline-flex; align-items: center; gap: 5px; flex: 1; justify-content: center; padding: 7px 4px; border: 1px solid var(--mm-edge); border-radius: 3px; background: rgba(250, 241, 220, .55); color: var(--muted); font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: color .15s, background .15s, border-color .15s; }
 .mm-rating:hover { color: var(--ink); }
 .mm-rating-on { background: rgba(184, 134, 59, .28); border-color: rgba(120, 80, 30, .7); color: var(--ink); box-shadow: 1px 2px 0 rgba(72, 54, 33, .25); }
 .mm-rating-topic { font-size: 14px; opacity: .85; }
 
 /* The card is the quiet part: the challenger stands in front of it. */
-.mm-stack { position: relative; height: 520px; margin-top: 18px; }
-.mm-card { position: absolute; inset: 170px 0 0; display: flex; align-items: flex-end; border: 1px solid var(--mm-edge); border-radius: 4px; background: var(--mm-card); box-shadow: 3px 5px 0 rgba(72, 54, 33, .18); }
+.mm-stack { position: relative; height: min(660px, 74svh); margin-top: 2px; }
+.mm-card { position: absolute; inset: 0 5% 26%; display: flex; align-items: flex-start; border: 1px solid var(--mm-edge); border-radius: 4px; background: var(--mm-card); box-shadow: 3px 5px 0 rgba(72, 54, 33, .18); }
 .mm-card-behind { background: rgba(244, 233, 209, .5); opacity: .6; filter: saturate(.7); transform-origin: top center; }
 .mm-card-top { cursor: grab; touch-action: none; user-select: none; }
 .mm-card-top:active { cursor: grabbing; }
-.mm-card-body { position: relative; z-index: 2; width: 100%; padding: 22px 24px 24px; }
+.mm-card-body { position: relative; z-index: 2; width: 100%; padding: 16px 22px 18px; }
 .mm-card-top-row { display: flex; align-items: center; justify-content: space-between; }
-.mm-card h2 { margin: 12px 0 6px; font-size: 29px; font-weight: 700; letter-spacing: -.01em; }
+.mm-card h2 { margin: 9px 0 5px; font-size: 24px; font-weight: 700; letter-spacing: -.01em; }
 .mm-level { margin-left: 10px; font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; vertical-align: middle; }
 .mm-source { margin: -10px 0 18px; color: var(--muted); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
 .mm-chip { display: inline-block; padding: 4px 11px; border: 1px solid var(--mm-edge); border-radius: 2px; background: rgba(236, 220, 184, .85); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .mm-elo { color: var(--mm-blade); font-size: 16px; font-weight: 800; letter-spacing: .02em; }
 .mm-elo::before { content: "ELO "; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .12em; }
-.mm-bio { margin: 0; color: #4a3b29; font-size: 16px; font-style: italic; line-height: 1.5; }
-.mm-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; color: var(--muted); font-size: 12px; }
+.mm-bio { margin: 0; color: #4a3b29; font-size: 14px; font-style: italic; line-height: 1.5; }
+.mm-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 11px; color: var(--muted); font-size: 11px; }
 .mm-tags span { padding: 4px 10px; border: 1px dashed var(--mm-edge); border-radius: 2px; }
 
-/* Challenger portrait: oversized, standing on the arena floor in front of the card. */
-.mm-portrait { position: absolute; top: -176px; left: 50%; z-index: 3; width: 300px; height: 340px; transform: translateX(-50%); pointer-events: none; animation: mm-bob 4.5s ease-in-out infinite; }
+/* Challenger portrait: life-size in the ring, the card hanging behind them. */
+.mm-portrait { position: absolute; bottom: 0; left: 50%; z-index: 3; height: 74%; width: auto; aspect-ratio: 1; transform: translateX(-50%); pointer-events: none; animation: mm-bob 4.5s ease-in-out infinite; }
+.mm-fighter { height: 84%; bottom: -2%; }
 .mm-portrait img { width: 100%; height: 100%; object-fit: contain; object-position: bottom; filter: drop-shadow(0 12px 10px rgba(72, 54, 33, .35)); }
-.mm-portrait::after { content: ""; position: absolute; bottom: -6px; left: 50%; width: 180px; height: 22px; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(72, 54, 33, .28), transparent); }
+.mm-portrait::after { content: ""; position: absolute; bottom: -10px; left: 50%; width: 55%; height: 26px; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(72, 54, 33, .28), transparent); }
 .mm-card-behind .mm-portrait { animation: none; }
 @keyframes mm-bob { 50% { transform: translate(-50%, -9px); } }
 /* On the proof page the challenger stands beside the title you are duelling. */
 .duel-header { position: relative; padding-right: 220px; }
-.mm-portrait-duel { top: auto; bottom: -10px; left: auto; right: 0; width: 200px; height: 220px; transform: none; animation: none; }
+.mm-portrait-duel { bottom: -10px; aspect-ratio: auto; left: auto; right: 0; width: 200px; height: 220px; transform: none; animation: none; }
 .mm-portrait-duel::after { display: none; }
 @media (max-width: 760px) { .duel-header { padding-right: 0; } .mm-portrait-duel { display: none; } }
-.mm-portrait-detail { position: static; display: block; width: 210px; height: 230px; margin: 0 auto -6px; transform: none; animation: none; }
+.mm-portrait-detail { position: static; display: block; width: 210px; height: 230px; aspect-ratio: auto; margin: 0 auto -6px; transform: none; animation: none; }
 .mm-portrait-detail::after { display: none; }
 .mm-watermark { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); color: rgba(72, 54, 33, .12); font-size: 140px; line-height: 1; pointer-events: none; }
 
@@ -227,7 +229,7 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-fly-left { transform: translate(-640px, 40px) rotate(-28deg); transition: transform .26s ease-in; }
 .mm-fly-right { transform: translate(640px, 40px) rotate(28deg); transition: transform .26s ease-in; }
 
-.mm-actions { display: flex; justify-content: center; gap: 26px; padding: 26px 0 10px; }
+.mm-actions { display: flex; justify-content: center; gap: 26px; padding: 14px 0 8px; }
 .mm-round { display: grid; width: 66px; height: 66px; place-items: center; border: 2px solid var(--mm-edge); border-radius: 50%; background: rgba(250, 241, 220, .9); box-shadow: 2px 4px 0 rgba(72, 54, 33, .25); color: var(--ink); cursor: pointer; font-size: 28px; transition: transform .15s ease, background .15s ease; }
 .mm-round:hover:not(:disabled) { transform: translateY(-2px) scale(1.06); background: #fdf6e6; }
 .mm-round:disabled { cursor: not-allowed; opacity: .4; }
@@ -249,8 +251,7 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-footer { width: min(460px, 100%); padding-top: 18px; color: var(--muted); font-size: 12px; font-style: italic; text-align: center; }
 
 @media (max-width: 480px) {
-  .mm-stack { height: 470px; }
-  .mm-portrait { width: 250px; height: 290px; top: -150px; }
+  .mm-stack { height: min(520px, 64svh); }
 }
 
 .mm-hero { width: min(600px, 100%); margin: auto 0; text-align: center; }
