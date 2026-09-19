@@ -27,9 +27,7 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
 
       <div className="problem-header">
         <div className="eyebrow">
-          {problem.set === "AMC 8 2023"
-            ? problem.set
-            : `${problem.set} · ${problem.topic}`}
+          {`${problem.set} · ${problem.topic}`}
         </div>
         <h1>Problem {problem.number}</h1>
         <a

@@ -38,7 +38,7 @@ pnpm build
 
 The proof grader sends a selected problem and a student's proof to the OpenAI Chat Completions API. Copy `.env.example` to a local environment file and set `OPENAI_API_KEY`; the model and rigor level are chosen in the UI, while `OPENAI_MODEL` sets the default model. The browser submits proofs to `POST /api/grade` with `{ "problemId": "...", "proof": "...", "rigor": 3, "model": "o4-mini" }`.
 
-The library also includes AMC 8 2023; regenerate its data with `python3 scripts/convert_amc8.py` using AoPS raw wikitext, an answer key, and per-problem pages as inputs.
+The AMC 8 2023 and IMO 2023 Shortlist sets have been removed; HARP is the only bundled problem source. `scripts/convert_amc8.py` and `scripts/extract_shortlist.py` remain if those sets are reinstated.
 
 ## HARP problem dataset
 

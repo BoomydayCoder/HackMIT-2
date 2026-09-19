@@ -18,7 +18,7 @@ export default function Home() {
         </p>
         <div className="hero-actions">
           <Link className="cta-link" href="/problems">
-            Try AMC 8 2023 or the IMO shortlist{" "}
+            Browse the problem library{" "}
             <span aria-hidden="true">→</span>
           </Link>
           <div className="status">The first version is taking shape.</div>
