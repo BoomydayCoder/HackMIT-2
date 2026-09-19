@@ -1,5 +1,6 @@
 import Link from "next/link";
 import AccountMenu from "@/components/AccountMenu";
+import BattleLobby from "@/components/BattleLobby";
 
 export const dynamic = "force-dynamic";
 
@@ -22,13 +23,7 @@ export default function BattlePage() {
           Ten cards, ratings hidden, fifteen minutes. Claim a card with a 4/5 sketch and it vanishes
           from your opponent&rsquo;s board; six cards wins the duel on the spot.
         </p>
-        <p className="mm-count">
-          The lists are still being raked — link with players from your{" "}
-          <Link className="mm-nav" href="/profile">
-            profile
-          </Link>{" "}
-          and you will be able to challenge them here.
-        </p>
+        <BattleLobby />
       </div>
     </main>
   );

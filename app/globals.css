@@ -382,3 +382,22 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-friend-list a:hover { color: var(--mm-blade); }
 .mm-friend-list button { padding: 6px 13px; border: 1px solid var(--mm-edge); border-radius: 999px; background: rgba(184, 134, 59, .25); color: var(--ink); cursor: pointer; font: inherit; font-size: 13px; font-weight: 700; }
 .mm-friend-list button:hover { background: rgba(184, 134, 59, .45); }
+.mm-duel-actions { display: flex; gap: 8px; }
+
+.mm-duel { gap: 18px; width: min(760px, 100%); }
+.mm-duel-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.mm-duel-score { font-size: 20px; color: var(--muted); }
+.mm-duel-score strong { color: var(--ink); font-size: 16px; }
+.mm-duel-clock { padding: 4px 14px; border: 1px solid var(--mm-edge); border-radius: 999px; background: rgba(184, 134, 59, .2); font-size: 22px; font-variant-numeric: tabular-nums; font-weight: 700; }
+.mm-duel-clock.is-done { font-size: 15px; }
+.mm-duel-result { margin: 0; text-align: center; font-size: 18px; font-weight: 700; color: var(--mm-blade); }
+.mm-duel-board { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+.mm-duel-card { display: grid; gap: 4px; width: 100%; padding: 16px 12px; border: 1px solid var(--mm-card-edge); border-radius: 4px; background: rgba(243, 231, 204, .55); color: var(--ink); cursor: pointer; font: inherit; text-align: left; }
+.mm-duel-card:hover:not(:disabled) { border-color: var(--mm-blade); background: rgba(243, 231, 204, .9); }
+.mm-duel-card:disabled { cursor: default; opacity: .55; }
+.mm-duel-card.is-mine { border-color: var(--mm-blade); background: rgba(184, 134, 59, .28); }
+.mm-duel-card.is-theirs { filter: grayscale(.6); }
+.mm-duel-card-no { font-size: 26px; font-weight: 700; color: var(--mm-blade); }
+.mm-duel-card-topic { text-transform: capitalize; font-weight: 700; }
+.mm-duel-cardbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.mm-duel-cardbar button { padding: 6px 13px; border: 1px solid var(--mm-edge); border-radius: 999px; background: rgba(184, 134, 59, .25); color: var(--ink); cursor: pointer; font: inherit; font-size: 13px; font-weight: 700; }

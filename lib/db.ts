@@ -40,6 +40,35 @@ const STATEMENTS = [
      primary key (requester, addressee)
    )`,
   `create index if not exists friendships_addressee on friendships (addressee)`,
+  /** cards is the dealt order of problem ids; their ratings stay server-side. */
+  `create table if not exists duels (
+     id text primary key,
+     challenger text not null references users(username) on delete cascade,
+     opponent text not null references users(username) on delete cascade,
+     status text not null check (status in ('pending', 'active', 'finished', 'declined')),
+     cards jsonb not null default '[]'::jsonb,
+     created_at timestamptz not null default now(),
+     ends_at timestamptz,
+     finished_at timestamptz
+   )`,
+  `create index if not exists duels_players on duels (challenger, opponent, status)`,
+  /** One row per card: the primary key is what makes a claim atomic. */
+  `create table if not exists duel_claims (
+     duel_id text not null references duels(id) on delete cascade,
+     card text not null,
+     username text not null references users(username) on delete cascade,
+     claimed_at timestamptz not null default now(),
+     primary key (duel_id, card)
+   )`,
+  `create table if not exists duel_attempts (
+     id bigserial primary key,
+     duel_id text not null references duels(id) on delete cascade,
+     card text not null,
+     username text not null references users(username) on delete cascade,
+     score integer not null,
+     created_at timestamptz not null default now()
+   )`,
+  `create index if not exists duel_attempts_card on duel_attempts (duel_id, card, username)`,
 ];
 
 let migrated: Promise<void> | undefined;
