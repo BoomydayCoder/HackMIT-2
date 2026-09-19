@@ -195,7 +195,7 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
             {rating === null
               ? "Already graded \u2014 your rating stands."
               : `Your ${topic} rating is now ${rating}.`}
-            <button type="button" onClick={() => router.push("/match")}>
+            <button type="button" onClick={() => router.push("/deck")}>
               Back to the deck
             </button>
           </div>

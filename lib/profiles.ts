@@ -1,7 +1,7 @@
 import type { DeckCard } from "@/lib/problems";
 
 /**
- * Tinder-style "profile" for a problem card: a playful display name shown in
+ * Card-facing "profile" for a problem: a memorable display name shown in
  * place of the contest source. The official statement is never rewritten —
  * only the headline around it is playful.
  */
@@ -9,7 +9,7 @@ export type ProblemProfile = {
   name: string;
   /** Difficulty level (1–9). */
   level: number;
-  /** Dating-profile blurb: what the problem is about and what it takes, no spoilers. */
+  /** One-paragraph blurb: what the problem is about and what it takes, no spoilers. */
   bio: string;
 };
 
@@ -120,7 +120,7 @@ const BIOS: Record<string, string> = {
   "HARP-AJHSME-1985-20":
     "Calendar nerd. I know exactly how many of each weekday a month can hold, and I'm hoping you can work backwards from that to the day it all started.",
   "HARP-AJHSME-1995-2":
-    "Three friends, three ages, two clues. I'm the gentle first date of the deck — follow the chain from Inez to Zack to Jose and we'll get along fine.",
+    "Three friends, three ages, two clues. The gentlest problem in the deck — follow the chain from Inez to Zack to Jose and it falls right out.",
   "HARP-AMC_8-2006-18":
     "A 3×3×3 cube with black cubes tucked into every corner. I care about surface area, not volume, so count the faces you can actually see.",
   "HARP-AMC_8-2007-14":
@@ -262,7 +262,7 @@ const BIOS: Record<string, string> = {
   "HARP-AIME_II-2006-13":
     "Numbers under 1000 that are a sum of consecutive odd integers in exactly five ways. Divisor-counting wearing a sequence's clothes.",
   "HARP-USAJMO-2014-2":
-    "Angle A is 60°, and O and H are in a relationship. Prove where line OH lands, then bound the area of a pentagon it creates.",
+    "Angle A is 60°, and O and H are tied together. Prove where line OH lands, then bound the area of a pentagon it creates.",
   "HARP-USAMO-1977-4":
     "A skew quadrilateral with congruent opposite sides. Prove the midpoint line of the diagonals is perpendicular to both — and the converse.",
   "HARP-USAMO-1978-4":
@@ -316,7 +316,7 @@ const BIOS: Record<string, string> = {
   "HARP-USAMO-2009-6":
     "Two nonconstant rational sequences linked by a recurrence. Prove the ratio of consecutive gaps is a square — algebraic number theory in miniature.",
   "HARP-USAMO-2017-3":
-    "Scalene triangle, incenter, circumcircle, and a circle on diameter DM. Prove two circles are tangent — the final boss of the deck.",
+    "Scalene triangle, incenter, circumcircle, and a circle on diameter DM. Prove two circles are tangent — the hardest problem in the deck.",
 };
 
 function fallbackName(problem: Pick<DeckCard, "topic" | "number">): string {

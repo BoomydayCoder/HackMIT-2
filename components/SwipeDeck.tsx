@@ -61,7 +61,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
     () => pickCards(pool, ratings, [...solved, ...seen], turn, topics),
     [pool, ratings, solved, seen, turn, topics],
   );
-  // A match you haven't solved yet stays at the front of the deck.
+  // A problem you picked but haven't solved yet stays at the front of the deck.
   const pinnedCard = useMemo(
     () => pool.find((entry) => entry.id === pinned && !solved.includes(entry.id)) ?? null,
     [pool, pinned, solved],
@@ -192,7 +192,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
     return (
       <section className="mm-empty">
         {topicFilter}
-        <h2>You&apos;ve seen everyone.</h2>
+        <h2>You&apos;ve seen every problem.</h2>
         <p>Pick another topic above, or run the deck again.</p>
         <button className="mm-btn mm-btn-primary" type="button" onClick={() => setSeen([])}>
           Start over
@@ -202,8 +202,8 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   }
 
   const rotation = drag.x / 18;
-  const liking = drag.x > 60;
-  const noping = drag.x < -60;
+  const trying = drag.x > 60;
+  const skipping = drag.x < -60;
 
   return (
     <section className="mm-deck">
@@ -242,8 +242,8 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         >
-          <span className={`mm-stamp mm-stamp-like${liking ? " mm-stamp-on" : ""}`}>MATCH</span>
-          <span className={`mm-stamp mm-stamp-nope${noping ? " mm-stamp-on" : ""}`}>PASS</span>
+          <span className={`mm-stamp mm-stamp-try${trying ? " mm-stamp-on" : ""}`}>TRY THIS</span>
+          <span className={`mm-stamp mm-stamp-skip${skipping ? " mm-stamp-on" : ""}`}>SKIP</span>
 
           <span className="mm-watermark">{TOPIC_GLYPHS[card.topic] ?? "∞"}</span>
 
@@ -262,7 +262,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
                 {card.set} · #{card.number}
               </span>
               <span>Proof required</span>
-              {pinnedCard && <span className="mm-tag-on">Your match — unsolved</span>}
+              {pinnedCard && <span className="mm-tag-on">Your pick — unsolved</span>}
             </div>
           </div>
         </article>
@@ -270,20 +270,20 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
 
       <div className="mm-actions">
         <button
-          className="mm-round mm-round-nope"
+          className="mm-round mm-round-skip"
           type="button"
           onClick={pass}
-          aria-label="Pass"
+          aria-label="Skip"
         >
           ✕
         </button>
-        <button className="mm-round mm-round-like" type="button" onClick={match} aria-label="Match">
-          ♥
+        <button className="mm-round mm-round-try" type="button" onClick={match} aria-label="Try this">
+          ✓
         </button>
       </div>
 
       <p className="mm-hint">
-        Drag the card, or use ← to pass and → to match.
+        Drag the card, or use ← to skip and → to try it.
       </p>
     </section>
   );

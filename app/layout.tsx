@@ -5,7 +5,7 @@ import AccountSession from "@/components/AccountSession";
 
 export const metadata: Metadata = {
   title: "MathMatch",
-  description: "Swipe through olympiad problems and prove the ones you match with.",
+  description: "Browse olympiad problems at your level and prove the ones you pick.",
 };
 
 export default function RootLayout({

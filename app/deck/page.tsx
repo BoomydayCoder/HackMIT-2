@@ -3,14 +3,11 @@ import AccountMenu from "@/components/AccountMenu";
 import SwipeDeck from "@/components/SwipeDeck";
 import { getDeck } from "@/lib/problems";
 
-export default function MatchPage() {
+export default function DeckPage() {
   return (
     <main className="mm-page">
       <header className="mm-header">
         <Link className="mm-logo" href="/" aria-label="MathMatch home">
-          <span className="mm-flame" aria-hidden="true">
-            ♥
-          </span>
           MathMatch
         </Link>
         <nav className="mm-header-links">

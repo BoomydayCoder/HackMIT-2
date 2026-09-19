@@ -31,8 +31,8 @@ export function parseSolved(raw: string): string[] {
 }
 
 /**
- * The problem you last matched with: it stays at the front of the deck until
- * you solve it or pass on it.
+ * The problem you last picked: it stays at the front of the deck until you
+ * solve it or skip it.
  */
 export function readPinned(): string {
   if (typeof window === "undefined") return "";

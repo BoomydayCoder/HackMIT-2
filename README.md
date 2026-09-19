@@ -1,8 +1,9 @@
 # MathMatch
 
-A dating app for math problems, built for HackMIT. Cards show only a topic, an
-Elo and a one-line bio; swipe left to pass, swipe right to match and reveal the
-full problem, then write a proof and have it graded.
+A card-deck problem picker for competition math, built for HackMIT. Cards show
+only a topic, an Elo and a one-line blurb; swipe left to skip, swipe right to
+pick the problem and reveal the full statement, then write a proof and have it
+graded.
 
 ## How the deck works
 
@@ -11,11 +12,11 @@ full problem, then write a proof and have it graded.
 - You carry a separate Elo per topic (algebra, combinatorics, geometry, number
   theory), stored in the browser. A graded proof moves that topic's rating by
   how well it scored — 5/5 earns the full gain, 3/5 is par, below that costs
-  you — and passing on a card nudges it down a little. Only the first grading
+  you — and skipping a card nudges it down a little. Only the first grading
   of a problem counts.
 - Cards are served one at a time, closest to your rating in the topics you have
-  selected in the top bar. A match you have not solved stays at the front of the
-  deck until you solve it or pass on it.
+  selected in the top bar. A problem you picked but have not solved stays at the
+  front of the deck until you solve it or skip it.
 - Regenerate the pool with `python3 scripts/build_harp_deck.py 100 mixed`
   (`easy` and `proof` modes are also available).
 
@@ -40,7 +41,7 @@ file private; it is gitignored and must not be committed. Then start the app:
 pnpm dev
 ```
 
-Open http://localhost:3000/match.
+Open http://localhost:3000/deck.
 
 ## Checks
 

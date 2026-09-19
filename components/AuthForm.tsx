@@ -22,7 +22,7 @@ export default function AuthForm() {
     try {
       if (mode === "signup") await signUp(username.trim(), password);
       else await signIn(username.trim(), password);
-      router.push("/match");
+      router.push("/deck");
     } catch (authError) {
       setError(authError instanceof Error ? authError.message : "Something went wrong.");
     } finally {
@@ -34,8 +34,8 @@ export default function AuthForm() {
     return (
       <section className="mm-auth">
         <h1>Hi, {account.username}.</h1>
-        <p>Your matches, solves and ratings are saved to this account.</p>
-        <button className="mm-btn mm-btn-primary" type="button" onClick={() => router.push("/match")}>
+        <p>Your picks, solves and ratings are saved to this account.</p>
+        <button className="mm-btn mm-btn-primary" type="button" onClick={() => router.push("/deck")}>
           Back to the deck
         </button>
       </section>

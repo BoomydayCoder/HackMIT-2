@@ -62,7 +62,7 @@ export function recordGrade(topic: string, problemElo: number, score: number): n
   return write(topic, current + delta);
 }
 
-/** A pass nudges the topic rating down so the deck drifts towards easier problems. */
+/** Skipping a problem nudges the topic rating down so the deck drifts towards easier problems. */
 export function recordPass(topic: string): number {
   const current = ratingFor(parseRatings(readRatingsRaw()), topic);
   return write(topic, current - PASS_PENALTY);
