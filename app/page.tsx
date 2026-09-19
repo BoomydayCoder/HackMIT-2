@@ -2,33 +2,31 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="page">
-      <header className="header">
-        <Link className="wordmark" href="/" aria-label="rigor.ai home">
-          rigor<span>.</span>ai
+    <main className="mm-page mm-landing">
+      <header className="mm-header">
+        <span className="mm-logo">
+          <span className="mm-flame" aria-hidden="true">
+            ♥
+          </span>
+          MathMatch
+        </span>
+        <Link className="mm-nav" href="/problems">
+          Library
         </Link>
-        <span className="header-note">Built for serious practice</span>
       </header>
 
-      <section className="hero" aria-labelledby="hero-title">
-        <div className="eyebrow">Olympiad training, with direction</div>
-        <h1 id="hero-title">Put your reasoning to work.</h1>
-        <p className="intro">
-          A place to practice, reflect, and grow with a community of problem solvers.
+      <section className="mm-hero">
+        <h1>Swipe right on your next proof.</h1>
+        <p>
+          Olympiad problems as cards. Pass on the ones that don&apos;t fit, match
+          the ones that do, and write the proof.
         </p>
-        <div className="hero-actions">
-          <Link className="cta-link" href="/problems">
-            Try AMC 8 2023 or the IMO shortlist{" "}
-            <span aria-hidden="true">→</span>
-          </Link>
-          <div className="status">The first version is taking shape.</div>
-        </div>
+        <Link className="mm-btn mm-btn-primary mm-cta" href="/match">
+          Start matching
+        </Link>
       </section>
 
-      <footer className="footer">
-        <span>rigor.ai</span>
-        <span>Made for HackMIT</span>
-      </footer>
+      <footer className="mm-footer">Problems from HARP (Yue et al., 2024)</footer>
     </main>
   );
 }
