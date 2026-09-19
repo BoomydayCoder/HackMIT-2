@@ -2,6 +2,7 @@ import Link from "next/link";
 import AccountMenu from "@/components/AccountMenu";
 import { notFound } from "next/navigation";
 import Math from "@/components/Math";
+import ForYou from "@/components/ForYou";
 import ProofEditor from "@/components/ProofEditor";
 import SimilarProblems from "@/components/SimilarProblems";
 import StarRating from "@/components/StarRating";
@@ -56,6 +57,7 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
           </div>
           <StarRating problemId={problem.id} />
           <SimilarProblems pool={deck} target={card} />
+          <ForYou pool={deck} />
         </article>
         <ProofEditor
           problemId={problem.id}

@@ -182,7 +182,8 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-card-top { cursor: grab; touch-action: none; user-select: none; }
 .mm-card-top:active { cursor: grabbing; }
 .mm-card-body { width: 100%; padding: 26px; background: linear-gradient(to top, rgba(0,0,0,.72), transparent); }
-.mm-card-top-row { display: flex; align-items: center; justify-content: space-between; }
+.mm-card-top-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mm-taste { flex: 1; text-align: center; color: #ffd27a; font-size: 12px; font-weight: 700; white-space: nowrap; }
 .mm-card h2 { margin: 14px 0 6px; font-size: 30px; font-weight: 700; letter-spacing: -.02em; }
 .mm-level { margin-left: 10px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,.65); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; vertical-align: middle; }
 .mm-source { margin: -10px 0 18px; color: rgba(255,255,255,.55); font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
