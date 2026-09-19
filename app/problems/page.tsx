@@ -21,7 +21,12 @@ function ProblemCard({ problem }: { problem: Problem }) {
         <span>{meta}</span>
         <span>{problem.proposer}</span>
       </div>
-      <h3 className="card-name">{profile.name}</h3>
+      <h3 className="card-name">
+        {profile.name}
+        <span className="card-level" title={`Elo ${problem.elo}`}>
+          Level: {profile.level}
+        </span>
+      </h3>
       <p className="card-tagline">{profile.bio}</p>
       <p>{excerpt(problem.statement)}</p>
       <span className="card-arrow" aria-hidden="true">
