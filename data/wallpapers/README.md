@@ -1,19 +1,19 @@
-# MathMatch notebook-world wallpaper
+# MathMatch wallpapers
 
-![Notebook world](notebook-world.png)
+## Current direction: whimsical meadow
 
-A warm whimsical stationery landscape matching the character collection: ruler bridges, set-square roofs, compass arches, folded solids, counting tokens and brass keys. No characters or faces; quiet centre for the card deck.
+![Whimsical meadow](whimsical-meadow.png)
 
-- File: `notebook-world.png`
-- Dimensions: 1672 × 941 pixels (approximately 16:9).
-- Format: opaque RGB PNG, 2,719,980 bytes.
-- Generated using OpenAI built-in imagegen; handmade sketch aesthetic, not a claim of human authorship.
-- Source image preserved without postprocessing.
+`whimsical-meadow.png` is the revised wallpaper: simple wonky hills, oversized flowers, a little path, a crooked flag, sun and clouds. Broad flat colours and loose outlines, a quiet cream centre, no mathematical props or characters. 1672 × 941 RGB PNG. Original generated file preserved without postprocessing.
+
+The earlier `notebook-world.png` is retained as a superseded concept; use the meadow for the revised direction.
 
 ## For Devin
 
-This is an asset addition only. Import it statically or copy it to `public/wallpapers/` during integration; `data/` paths are not public URLs. Use centred `background-size: cover` and a warm ivory fallback. Narrow screens will crop the decorative edges. Keep proof panels opaque enough for text contrast; adapt the existing dark UI text colours if placing text directly on this light wallpaper. Optimize delivery during integration.
+Asset-only change. Import statically or copy to `public/wallpapers/` when integrating; `data/` does not expose browser URLs. Preserve aspect ratio, use centred `cover` for full-screen backgrounds, and expect side cropping on phones. Use dark text on this light background and readable panels over decorative edges. Optimize delivery during integration.
 
-## Generation prompt
+## Generation
 
-Create a landscape 16:9 wallpaper for MathMatch, a whimsical handmade mathematics duelling game. No characters, no faces, no creatures, nothing creepy. Art direction: charming student sketchbook meets handmade board-game map, scratchy imperfect black and sepia pen lines, restrained crosshatching, flat faded watercolor/colored-pencil fills, warm ivory paper texture. Composition: very quiet mostly blank central 55 percent of image for game cards and text, very faint graph-paper grid, decorative scenery concentrated around outer corners and edges. Lower left a small whimsical architectural cluster made of ruler bridges, set-square rooftops, compass archway, with no inhabitants; lower right scattered wooden counting tokens, brass keys, a tiny abacus and paper folded geometric solids. Upper edges sparse curved compass construction arcs, a few stars drawn in pencil, folded paper pennants, delicate sketched paths connect outer scenery. Muted brick red, mustard gold, bottle green and faded purple accents echo existing MathMatch character families; predominately warm light paper. Thoughtfully irregular asymmetry, playful tactile stationery world, intentionally modest drawing rather than overworked fantasy art. Keep mathematical motifs simple, accurate shapes rather than dense random equations. No text, lettering, logo, UI, watermark, giant symbols, scary faces, gradients, glow, glossy 3D or cinematic effects. Full bleed opaque wallpaper, no transparent areas. Clean attractive readable backdrop with sufficient empty space; foreground artwork should not compete with UI. Use wide landscape composition.
+Generated with OpenAI built-in imagegen; deliberately handmade visual aesthetic. Prompt:
+
+Create a very simple whimsical illustrated landscape wallpaper for an indie game. Wide 16:9 composition. Art direction: a funny little drawing made with a chunky black felt pen and four flat gouache colours, charmingly awkward and intentionally sparse. Warm clean cream background, no aged parchment, no graph grid, no all-over texture. Along ONLY the bottom fifth: three lopsided rolling hills, a tiny meandering footpath, three oversized wonky daisies on long bent stems, one absurdly small crooked red flag. At far left one squat irregular tree shaped like a broccoli floret; far right one tall skinny leaning tree with just five oversized leaves. In upper left a small imperfect orange sun, upper right exactly two lumpy flat pale-blue clouds. Centre and middle upper 65 percent completely clear cream space for game cards. Gentle muted grass green, faded coral red, buttery yellow, pale blue. Broad flat shapes, minimal black pen detail, naive playful illustration, lots of negative space, visually confident and economical. No characters or faces. No mathematics, tools, symbols, numbers, geometry objects, castles, architecture, tokens, keys, books, stars, pennant strings, borders, text or UI. No crosshatching, shading, gradients, elaborate scenery, fine detail, watercolor washes, paper grain, 3D, polish or photorealism. The trees and flowers should feel amusing and individually drawn, not repeated clipart. Strong simple silhouettes, imperfect slightly wobbly outlines. A quiet silly little world, not an epic fantasy map.
