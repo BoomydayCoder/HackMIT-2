@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import Math from "@/components/Math";
 import ProofEditor from "@/components/ProofEditor";
@@ -19,12 +18,10 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
   return (
     <main className="page">
       <header className="header">
-        <Link className="wordmark" href="/" aria-label="MathMatch home">
+        <span className="wordmark">
           Math<span>♥</span>Match
-        </Link>
-        <Link className="back-link" href="/match">
-          Back to the deck
-        </Link>
+        </span>
+        <span className="back-link">Solve it or give up to leave</span>
       </header>
 
       <div className="problem-header">

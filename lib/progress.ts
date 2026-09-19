@@ -1,4 +1,5 @@
 const SOLVED_KEY = "mathmatch:solved";
+const RETIRED_KEY = "mathmatch:retired";
 const GRADED_KEY = "mathmatch:graded";
 const PINNED_KEY = "mathmatch:pinned";
 
@@ -51,6 +52,21 @@ export function markSolved(problemId: string) {
   if (readPinned() === problemId) writePinned("");
   if (solved.includes(problemId)) return;
   window.localStorage.setItem(SOLVED_KEY, JSON.stringify([...solved, problemId]));
+  notifyProgress();
+}
+
+/** Raw JSON of the ids you gave up on; they leave the deck like a solve does. */
+export function readRetiredRaw(): string {
+  if (typeof window === "undefined") return "[]";
+  return window.localStorage.getItem(RETIRED_KEY) ?? "[]";
+}
+
+/** Records a surrender, taking the problem out of the deck and off the pin. */
+export function markRetired(problemId: string) {
+  const retired = parseSolved(readRetiredRaw());
+  if (readPinned() === problemId) writePinned("");
+  if (retired.includes(problemId)) return;
+  window.localStorage.setItem(RETIRED_KEY, JSON.stringify([...retired, problemId]));
   notifyProgress();
 }
 

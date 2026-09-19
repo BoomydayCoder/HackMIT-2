@@ -6,6 +6,7 @@ export const STARTING_RATING = 1000;
 
 const RATINGS_KEY = "mathmatch:ratings";
 const PASS_PENALTY = 8;
+const GIVE_UP_PENALTY = 40;
 const MIN_SOLVE_GAIN = 20;
 const MAX_SOLVE_GAIN = 90;
 /** A score of 3/5 is par: below it the grade costs rating, above it earns some. */
@@ -67,6 +68,12 @@ export function recordGrade(topic: string, problemElo: number, score: number): n
 export function recordPass(topic: string): number {
   const current = ratingFor(parseRatings(readRatingsRaw()), topic);
   return write(topic, current - PASS_PENALTY);
+}
+
+/** Surrendering a match costs far more than declining it in the first place. */
+export function recordGiveUp(topic: string): number {
+  const current = ratingFor(parseRatings(readRatingsRaw()), topic);
+  return write(topic, current - GIVE_UP_PENALTY);
 }
 
 type Rateable = { id: string; topic: string; elo: number };

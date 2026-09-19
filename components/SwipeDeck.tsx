@@ -15,6 +15,7 @@ import { getProfile } from "@/lib/profiles";
 import {
   parseSolved,
   readPinned,
+  readRetiredRaw,
   readSolvedRaw,
   subscribeProgress,
   writePinned,
@@ -48,6 +49,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   const [seen, setSeen] = useState<string[]>([]);
   const [topics, setTopics] = useState<string[]>([...TOPICS]);
   const solvedRaw = useSyncExternalStore(subscribeProgress, readSolvedRaw, () => "[]");
+  const retiredRaw = useSyncExternalStore(subscribeProgress, readRetiredRaw, () => "[]");
   const ratingsRaw = useSyncExternalStore(subscribeProgress, readRatingsRaw, () => "{}");
   const pinned = useSyncExternalStore(subscribeProgress, readPinned, () => "");
   const [matched, setMatched] = useState<DeckCard | null>(null);
@@ -57,21 +59,19 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
 
   const ratings = useMemo(() => parseRatings(ratingsRaw), [ratingsRaw]);
   const solved = useMemo(() => parseSolved(solvedRaw), [solvedRaw]);
+  const retired = useMemo(() => parseSolved(retiredRaw), [retiredRaw]);
+  const settled = useMemo(() => [...solved, ...retired], [solved, retired]);
   const suggestion = useMemo(
-    () => pickCards(pool, ratings, [...solved, ...seen], turn, topics),
-    [pool, ratings, solved, seen, turn, topics],
+    () => pickCards(pool, ratings, [...settled, ...seen], turn, topics),
+    [pool, ratings, settled, seen, turn, topics],
   );
-  // A match you haven't solved yet stays at the front of the deck.
+  // The match you are committed to: nothing else is served until it is settled.
   const pinnedCard = useMemo(
-    () => pool.find((entry) => entry.id === pinned && !solved.includes(entry.id)) ?? null,
-    [pool, pinned, solved],
+    () => pool.find((entry) => entry.id === pinned && !settled.includes(entry.id)) ?? null,
+    [pool, pinned, settled],
   );
-  const card = pinnedCard ?? suggestion.card;
-  const upcoming = pinnedCard
-    ? [suggestion.card, ...suggestion.upcoming].filter(
-        (entry): entry is DeckCard => entry !== null && entry.id !== pinnedCard.id,
-      )
-    : suggestion.upcoming;
+  const card = suggestion.card;
+  const upcoming = suggestion.upcoming;
   const outOfCards = !card;
 
   /** Tapping a topic filters the deck; the last selected topic can't be turned off. */
@@ -98,17 +98,16 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   }, []);
 
   const pass = useCallback(() => {
-    if (!card || matched || flyOut) return;
-    if (card.id === pinned) writePinned("");
+    if (!card || matched || pinnedCard || flyOut) return;
     recordPass(card.topic);
     advance("left", card);
-  }, [card, matched, flyOut, pinned, advance]);
+  }, [card, matched, pinnedCard, flyOut, advance]);
 
   const match = useCallback(() => {
-    if (!card || matched || flyOut) return;
+    if (!card || matched || pinnedCard || flyOut) return;
     writePinned(card.id);
     advance("right", card);
-  }, [card, matched, flyOut, advance]);
+  }, [card, matched, pinnedCard, flyOut, advance]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -141,30 +140,30 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
     else setDrag({ x: 0, y: 0 });
   }
 
-  if (matched) {
+  // A match is binding: the only ways out are a passing grade or giving up.
+  const committed = matched ?? pinnedCard;
+  if (committed) {
     return (
       <section className="mm-detail">
         <div className="mm-detail-head">
-          <span className="mm-chip">{matched.topic}</span>
-          <span className="mm-elo">{matched.elo}</span>
+          <span className="mm-chip">{committed.topic}</span>
+          <span className="mm-elo">{committed.elo}</span>
         </div>
-        <h2 className="mm-name">
-          {getProfile(matched).name}
-        </h2>
+        <h2 className="mm-name">{getProfile(committed).name}</h2>
         <p className="mm-source">
-          {matched.set} · Problem {matched.number}
+          {committed.set} · Problem {committed.number}
         </p>
         <div className="mm-statement">
-          <MathText text={matched.statement} />
+          <MathText text={committed.statement} />
         </div>
         <div className="mm-detail-actions">
-          <Link className="mm-btn mm-btn-primary" href={`/problems/${matched.id}`}>
+          <Link className="mm-btn mm-btn-primary" href={`/problems/${committed.id}`}>
             Write a proof
           </Link>
-          <button className="mm-btn" type="button" onClick={() => setMatched(null)}>
-            Back to deck
-          </button>
         </div>
+        <p className="mm-hint">
+          You matched with this one. Solve it or give up to get back to the deck.
+        </p>
       </section>
     );
   }
@@ -260,7 +259,6 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
                 {card.set} · #{card.number}
               </span>
               <span>Proof required</span>
-              {pinnedCard && <span className="mm-tag-on">Your match — unsolved</span>}
             </div>
           </div>
         </article>
