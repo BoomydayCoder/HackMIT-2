@@ -51,7 +51,7 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
     );
   }, []);
   const dictation = useDictation(appendTranscript);
-  const listening = dictation.status !== "idle";
+  const listening = dictation.status === "listening";
 
   async function gradeProof() {
     setLoading(true);
@@ -99,18 +99,19 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
           className={listening ? "mic-button listening" : "mic-button"}
           onClick={listening ? dictation.stop : dictation.start}
           aria-pressed={listening}
-          disabled={dictation.status === "starting"}
+          disabled={dictation.status === "transcribing"}
         >
           <span className="mic-dot" aria-hidden="true" />
-          {dictation.status === "starting"
-            ? "Opening the mic…"
+          {dictation.status === "transcribing"
+            ? "Transcribing…"
             : listening
               ? "Stop dictating"
               : "Speak your proof"}
         </button>
         <span className="dictation-interim">
-          {dictation.interim ||
-            (listening ? "Listening…" : "Spoken text lands in the box below.")}
+          {listening
+            ? "Listening — stop when you have finished the thought."
+            : "Spoken text lands in the box below."}
         </span>
       </div>
       {dictation.error && <div className="error-panel">{dictation.error}</div>}

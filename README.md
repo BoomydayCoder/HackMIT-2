@@ -56,13 +56,12 @@ The proof grader sends a selected problem and a student's proof to the OpenAI Ch
 
 ## Dictation
 
-The proof editor can take spoken proofs. `POST /api/deepgram-token` mints a
-short-lived Deepgram token, and the browser streams microphone audio straight to
-Deepgram's `nova-3` model over a WebSocket, appending each finalised phrase to
-the proof box; `DEEPGRAM_API_KEY` never leaves the server, and the key needs
-Member permissions to mint tokens. Spoken mathematics transcribes loosely, so
-read the text back before grading. Without the key the rest of the app is
-unaffected and the mic button reports that dictation is unavailable.
+The proof editor can take spoken proofs. The mic button records in the browser
+and posts the clip to `POST /api/transcribe`, which forwards it to Deepgram's
+`nova-3` model and returns the text to append to the proof box, so
+`DEEPGRAM_API_KEY` never leaves the server. Spoken mathematics transcribes
+loosely, so read the text back before grading. Without the key the rest of the
+app is unaffected and the mic button reports that dictation is unavailable.
 
 The AMC 8 2023 and IMO 2023 Shortlist sets have been removed; HARP is the only bundled problem source. `scripts/convert_amc8.py` and `scripts/extract_shortlist.py` remain if those sets are reinstated.
 
