@@ -9,7 +9,9 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
+import Image from "next/image";
 import MathText from "@/components/Math";
+import { characterFor } from "@/lib/characters";
 import type { DeckCard } from "@/lib/problems";
 import { getProfile } from "@/lib/profiles";
 import {
@@ -43,6 +45,17 @@ type SwipeDeckProps = {
 };
 
 type Drag = { x: number; y: number };
+
+/** The opponent you are duelling: a topic character, or the topic glyph when none exists. */
+function CardPortrait({ card, className = "" }: { card: DeckCard; className?: string }) {
+  const character = characterFor(card.id, card.topic);
+  if (!character) return <span className="mm-watermark">{TOPIC_GLYPHS[card.topic] ?? "\u221e"}</span>;
+  return (
+    <span className={`mm-portrait ${className}`.trim()}>
+      <Image src={character.image} alt={character.alt} title={character.name} sizes="240px" priority={false} />
+    </span>
+  );
+}
 
 export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   const [turn, setTurn] = useState(0);
@@ -145,6 +158,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   if (committed) {
     return (
       <section className="mm-detail">
+        <CardPortrait card={committed} className="mm-portrait-detail" />
         <div className="mm-detail-head">
           <span className="mm-chip">{committed.topic}</span>
           <span className="mm-elo">{committed.elo}</span>
@@ -231,7 +245,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
               }}
               aria-hidden="true"
             >
-              <span className="mm-watermark">{TOPIC_GLYPHS[next.topic] ?? "∞"}</span>
+              <CardPortrait card={next} />
             </article>
           ))}
 
@@ -246,7 +260,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
           <span className={`mm-stamp mm-stamp-like${liking ? " mm-stamp-on" : ""}`}>FIGHT</span>
           <span className={`mm-stamp mm-stamp-nope${noping ? " mm-stamp-on" : ""}`}>FLEE</span>
 
-          <span className="mm-watermark">{TOPIC_GLYPHS[card.topic] ?? "∞"}</span>
+          <CardPortrait card={card} />
 
           <div className="mm-card-body">
             <div className="mm-card-top-row">
