@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "katex/dist/katex.min.css";
 import "./globals.css";
 import AccountSession from "@/components/AccountSession";
+import Arena from "@/components/Arena";
 
 export const metadata: Metadata = {
   title: "MathMatch",
@@ -14,6 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <Arena />
         <AccountSession />
         {children}
       </body>
