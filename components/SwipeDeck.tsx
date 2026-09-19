@@ -9,6 +9,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
+import Challenger from "@/components/Challenger";
 import MathText from "@/components/Math";
 import type { DeckCard } from "@/lib/problems";
 import { getProfile } from "@/lib/profiles";
@@ -165,6 +166,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   if (committed) {
     return (
       <section className="mm-detail">
+        <Challenger id={committed.id} topic={committed.topic} className="mm-portrait-detail" />
         <div className="mm-detail-head">
           <span className="mm-chip">{committed.topic}</span>
           <span className="mm-elo">{committed.elo}</span>
@@ -243,7 +245,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
           .slice()
           .reverse()
           .map((next, position) => (
-            <article
+            <div
               className="mm-card mm-card-behind"
               key={next.id}
               style={{
@@ -252,9 +254,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
                 })`,
               }}
               aria-hidden="true"
-            >
-              <span className="mm-watermark">{TOPIC_GLYPHS[next.topic] ?? "∞"}</span>
-            </article>
+            />
           ))}
 
         <article
@@ -267,8 +267,6 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
         >
           <span className={`mm-stamp mm-stamp-like${liking ? " mm-stamp-on" : ""}`}>FIGHT</span>
           <span className={`mm-stamp mm-stamp-nope${noping ? " mm-stamp-on" : ""}`}>FLEE</span>
-
-          <span className="mm-watermark">{TOPIC_GLYPHS[card.topic] ?? "∞"}</span>
 
           <div className="mm-card-body">
             <div className="mm-card-top-row">
@@ -288,25 +286,35 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
             </div>
           </div>
         </article>
+
+        {/* The challenger stands in the ring; the card is swiped behind them. */}
+        <Challenger key={card.id} id={card.id} topic={card.topic} className="mm-fighter" />
       </div>
 
       <div className="mm-actions">
-        <button
-          className="mm-round mm-round-nope"
-          type="button"
-          onClick={pass}
-          aria-label="Flee"
-        >
-          ⚑
-        </button>
-        <button className="mm-round mm-round-like" type="button" onClick={match} aria-label="Fight">
-          ⚔
-        </button>
+        <div className="mm-call">
+          <button
+            className="mm-round mm-round-nope"
+            type="button"
+            onClick={pass}
+            aria-label="Flee"
+          >
+            ⚑
+          </button>
+          <span className="mm-call-label">← Flee</span>
+        </div>
+        <div className="mm-call">
+          <button
+            className="mm-round mm-round-like"
+            type="button"
+            onClick={match}
+            aria-label="Fight"
+          >
+            ⚔
+          </button>
+          <span className="mm-call-label">Fight →</span>
+        </div>
       </div>
-
-      <p className="mm-hint">
-        Drag the card, or use ← to flee and → to fight.
-      </p>
     </section>
   );
 }
