@@ -13,9 +13,11 @@ import MathText from "@/components/Math";
 import type { DeckCard } from "@/lib/problems";
 import { getProfile } from "@/lib/profiles";
 import {
+  parseReviews,
   parseSolved,
   readPinned,
   readRetiredRaw,
+  readReviewsRaw,
   readSolvedRaw,
   subscribeProgress,
   writePinned,
@@ -52,18 +54,20 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   const retiredRaw = useSyncExternalStore(subscribeProgress, readRetiredRaw, () => "[]");
   const ratingsRaw = useSyncExternalStore(subscribeProgress, readRatingsRaw, () => "{}");
   const pinned = useSyncExternalStore(subscribeProgress, readPinned, () => "");
+  const reviewsRaw = useSyncExternalStore(subscribeProgress, readReviewsRaw, () => "{}");
   const [matched, setMatched] = useState<DeckCard | null>(null);
   const [drag, setDrag] = useState<Drag>({ x: 0, y: 0 });
   const [flyOut, setFlyOut] = useState<"left" | "right" | null>(null);
   const origin = useRef<Drag | null>(null);
 
   const ratings = useMemo(() => parseRatings(ratingsRaw), [ratingsRaw]);
+  const reviews = useMemo(() => parseReviews(reviewsRaw), [reviewsRaw]);
   const solved = useMemo(() => parseSolved(solvedRaw), [solvedRaw]);
   const retired = useMemo(() => parseSolved(retiredRaw), [retiredRaw]);
   const settled = useMemo(() => [...solved, ...retired], [solved, retired]);
   const suggestion = useMemo(
-    () => pickCards(pool, ratings, [...settled, ...seen], turn, topics),
-    [pool, ratings, settled, seen, turn, topics],
+    () => pickCards(pool, ratings, [...settled, ...seen], turn, topics, reviews),
+    [pool, ratings, settled, seen, turn, topics, reviews],
   );
   // The match you are committed to: nothing else is served until it is settled.
   const pinnedCard = useMemo(

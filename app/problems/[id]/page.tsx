@@ -3,7 +3,9 @@ import AccountMenu from "@/components/AccountMenu";
 import { notFound } from "next/navigation";
 import Math from "@/components/Math";
 import ProofEditor from "@/components/ProofEditor";
-import { getProblem } from "@/lib/problems";
+import SimilarProblems from "@/components/SimilarProblems";
+import StarRating from "@/components/StarRating";
+import { getDeck, getProblem } from "@/lib/problems";
 import { getProfile } from "@/lib/profiles";
 
 type ProblemPageProps = {
@@ -16,6 +18,8 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
 
   if (!problem) notFound();
   const profile = getProfile(problem);
+  const deck = getDeck();
+  const card = deck.find((entry) => entry.id === problem.id) ?? deck[0];
 
   return (
     <main className="page">
@@ -50,6 +54,8 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
           <div className="statement-copy">
             <Math text={problem.statement} />
           </div>
+          <StarRating problemId={problem.id} />
+          <SimilarProblems pool={deck} target={card} />
         </article>
         <ProofEditor
           problemId={problem.id}

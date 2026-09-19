@@ -3,6 +3,9 @@ const RETIRED_KEY = "mathmatch:retired";
 const RATED_KEY = "mathmatch:graded";
 const PINNED_KEY = "mathmatch:pinned";
 export const RATINGS_KEY = "mathmatch:ratings";
+export const REVIEWS_KEY = "mathmatch:reviews";
+
+export const MAX_STARS = 5;
 
 const listeners = new Set<() => void>();
 
@@ -84,6 +87,44 @@ export function markRated(problemId: string): boolean {
   return true;
 }
 
+/** Star reviews (1–5) a player has given problems, keyed by problem id. */
+export type Reviews = Record<string, number>;
+
+/** Raw JSON of the star reviews; a stable string so it can back a store snapshot. */
+export function readReviewsRaw(): string {
+  if (typeof window === "undefined") return "{}";
+  return window.localStorage.getItem(REVIEWS_KEY) ?? "{}";
+}
+
+export function parseReviews(raw: unknown): Reviews {
+  let parsed: unknown = raw;
+  if (typeof raw === "string") {
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      return {};
+    }
+  }
+  const reviews: Reviews = {};
+  if (!parsed || typeof parsed !== "object") return reviews;
+  for (const [id, stars] of Object.entries(parsed as Record<string, unknown>)) {
+    if (typeof stars === "number" && Number.isInteger(stars) && stars >= 1 && stars <= MAX_STARS) {
+      reviews[id] = stars;
+    }
+  }
+  return reviews;
+}
+
+/** Rates a problem 1–5 stars; 0 removes the review. */
+export function rateProblem(problemId: string, stars: number) {
+  if (typeof window === "undefined") return;
+  const reviews = parseReviews(readReviewsRaw());
+  if (stars >= 1 && stars <= MAX_STARS) reviews[problemId] = Math.round(stars);
+  else delete reviews[problemId];
+  window.localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews));
+  notifyProgress();
+}
+
 /** Everything that makes up a player's progress, in the shape the account API stores. */
 export type Progress = {
   solved: string[];
@@ -91,10 +132,11 @@ export type Progress = {
   graded: string[];
   pinned: string;
   ratings: Record<string, number>;
+  reviews: Reviews;
 };
 
 export function emptyProgress(): Progress {
-  return { solved: [], retired: [], graded: [], pinned: "", ratings: {} };
+  return { solved: [], retired: [], graded: [], pinned: "", ratings: {}, reviews: {} };
 }
 
 export function parseProgress(value: unknown): Progress {
@@ -112,6 +154,7 @@ export function parseProgress(value: unknown): Progress {
       if (typeof rating === "number" && Number.isFinite(rating)) progress.ratings[topic] = rating;
     }
   }
+  progress.reviews = parseReviews(record.reviews);
   return progress;
 }
 
@@ -129,6 +172,7 @@ export function readProgress(): Progress {
     graded: parseSolved(window.localStorage.getItem(RATED_KEY) ?? "[]"),
     pinned: readPinned(),
     ratings: parseProgress({ ratings }).ratings,
+    reviews: parseReviews(readReviewsRaw()),
   };
 }
 
@@ -141,6 +185,7 @@ export function writeProgress(progress: Progress) {
   if (progress.pinned) window.localStorage.setItem(PINNED_KEY, progress.pinned);
   else window.localStorage.removeItem(PINNED_KEY);
   window.localStorage.setItem(RATINGS_KEY, JSON.stringify(progress.ratings));
+  window.localStorage.setItem(REVIEWS_KEY, JSON.stringify(progress.reviews));
   notifyProgress();
 }
 
@@ -150,8 +195,8 @@ export function clearProgress() {
 
 /**
  * Combines what this browser has done with what an account has saved: solves,
- * surrenders and grades are unioned, saved ratings win over local ones, and
- * the local pin is kept if there is one.
+ * surrenders and grades are unioned, saved ratings win over local ones, the
+ * local pin is kept if there is one, and local reviews win over saved ones.
  */
 export function mergeProgress(local: Progress, saved: Progress): Progress {
   return {
@@ -160,5 +205,6 @@ export function mergeProgress(local: Progress, saved: Progress): Progress {
     graded: [...new Set([...saved.graded, ...local.graded])],
     pinned: local.pinned || saved.pinned,
     ratings: { ...local.ratings, ...saved.ratings },
+    reviews: { ...saved.reviews, ...local.reviews },
   };
 }
