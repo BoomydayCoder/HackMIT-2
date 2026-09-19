@@ -242,3 +242,22 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
   font-weight: 700;
   cursor: pointer;
 }
+
+/* Accounts */
+.mm-header-links, .header-links { display: flex; align-items: center; gap: 18px; }
+.account-menu { display: inline-flex; align-items: center; gap: 10px; }
+.account-signout { padding: 0; border: 0; background: none; cursor: pointer; font: inherit; }
+.mm-nav.account-signout { color: rgba(255,255,255,.62); }
+.mm-nav.account-signout:hover { color: #fff; }
+.account-signout:disabled { opacity: .5; cursor: wait; }
+
+.mm-auth { width: min(400px, 100%); margin: auto 0; }
+.mm-auth h1 { margin: 22px 0 10px; font-size: 34px; line-height: 1.1; letter-spacing: -.03em; }
+.mm-auth p { margin: 0 0 24px; color: rgba(255,255,255,.65); line-height: 1.5; }
+.mm-auth-tabs { display: flex; gap: 6px; }
+.mm-auth-form { display: grid; gap: 16px; }
+.mm-auth-form label { display: grid; gap: 6px; color: rgba(255,255,255,.7); font-size: 13px; font-weight: 600; }
+.mm-auth-form input { padding: 13px 14px; border: 1px solid rgba(255,255,255,.18); border-radius: 10px; background: rgba(255,255,255,.06); color: #fff; font: inherit; font-size: 16px; outline: none; }
+.mm-auth-form input:focus { border-color: var(--mm-pink); box-shadow: 0 0 0 3px rgba(253,38,125,.2); }
+.mm-auth-error { margin: 0; padding: 10px 12px; border: 1px solid rgba(255,68,88,.5); border-radius: 10px; background: rgba(255,68,88,.12); color: #ffb3bb; font-size: 14px; }
+.mm-auth-form .mm-btn { margin-top: 4px; }
