@@ -21,4 +21,6 @@ pnpm typecheck
 pnpm build
 ```
 
-This starter contains only the App Router shell and landing page. Problem content, accounts, submissions, grading, and data storage have not been wired up yet.
+## Grading
+
+The proof grader sends a selected shortlist problem and a student's proof to the OpenAI Chat Completions API. Copy `.env.example` to a local environment file and set `OPENAI_API_KEY`; `OPENAI_MODEL` defaults to `gpt-4o-mini`. The browser submits proofs to `POST /api/grade` with `{ "problemId": "...", "proof": "..." }`.

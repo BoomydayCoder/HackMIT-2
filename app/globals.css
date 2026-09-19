@@ -43,11 +43,67 @@ a { color: inherit; text-decoration: none; }
 .eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
 h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-height: .99; letter-spacing: -.075em; }
 .intro { max-width: 580px; color: var(--muted); font-size: clamp(19px, 2.2vw, 24px); line-height: 1.45; }
-.status { display: inline-block; margin-top: 34px; padding: 12px 17px; border: 1px solid #cbd9d1; border-radius: 999px; color: var(--accent); font-size: 14px; font-weight: 600; }
+.hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; margin-top: 34px; }
+.status { display: inline-block; padding: 12px 17px; border: 1px solid #cbd9d1; border-radius: 999px; color: var(--accent); font-size: 14px; font-weight: 600; }
+.cta-link { display: inline-flex; align-items: center; gap: 22px; padding: 14px 18px; border-radius: 8px; background: var(--ink); color: var(--paper); font-size: 14px; font-weight: 700; transition: transform .2s ease, background .2s ease; }
+.cta-link:hover { background: var(--accent); transform: translateY(-2px); }
+
+.back-link, .source-link { color: var(--accent); font-size: 13px; font-weight: 700; }
+.back-link:hover, .source-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+.listing-intro { padding: 46px 0 70px; }
+.listing-intro h1, .problem-header h1 { margin: 18px 0 20px; font-size: clamp(52px, 8vw, 92px); }
+.topic-groups { display: grid; gap: 58px; padding-bottom: 90px; }
+.topic-heading { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; border-bottom: 1px solid #dfe5dd; padding-bottom: 13px; }
+.topic-letter { color: var(--accent); font-size: 14px; font-weight: 800; }
+.topic-heading h2 { margin: 0; font-size: 25px; letter-spacing: -.04em; text-transform: capitalize; }
+.topic-count { margin-left: auto; color: var(--muted); font-size: 12px; }
+.problem-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.problem-card { position: relative; min-height: 230px; padding: 23px; border: 1px solid #dfe5dd; border-radius: 10px; background: rgba(255,255,255,.34); transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease; }
+.problem-card:hover { border-color: var(--accent); box-shadow: 0 12px 30px rgba(21,39,35,.08); transform: translateY(-3px); }
+.card-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }
+.problem-card h3 { margin: 40px 0 11px; font-size: 25px; letter-spacing: -.04em; }
+.problem-card p { max-width: 33em; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.card-arrow { position: absolute; right: 22px; bottom: 20px; color: var(--accent); font-size: 22px; }
+.problem-header { padding: 40px 0 56px; }
+.problem-header h1 { margin-bottom: 18px; }
+.workspace { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: start; gap: 25px; padding-bottom: 90px; }
+.statement-card, .proof-editor { border: 1px solid #dfe5dd; border-radius: 10px; background: rgba(255,255,255,.4); }
+.statement-card { padding: 30px; }
+.card-label, .editor-label-row, .result-kicker { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+.statement-copy { padding-top: 42px; font-size: 20px; line-height: 1.75; }
+.math-content { white-space: pre-wrap; }
+.math-display { display: block; margin: 18px 0; overflow-x: auto; }
+.proof-editor { padding: 22px; }
+.editor-label-row { display: flex; justify-content: space-between; margin-bottom: 12px; }
+.editor-label-row label { color: var(--ink); font-size: inherit; }
+.editor-label-row span { font-weight: 400; letter-spacing: 0; text-transform: none; }
+.proof-editor textarea { display: block; width: 100%; min-height: 340px; resize: vertical; padding: 16px; border: 1px solid #cbd9d1; border-radius: 6px; outline: none; background: #fcfdf9; color: var(--ink); font: 15px/1.65 "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+.proof-editor textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(45,118,92,.1); }
+.grade-button { width: 100%; margin-top: 13px; padding: 14px; border: 0; border-radius: 6px; background: var(--accent); color: white; cursor: pointer; font: inherit; font-weight: 700; transition: opacity .2s ease, transform .2s ease; }
+.grade-button:hover:not(:disabled) { transform: translateY(-1px); }
+.grade-button:disabled { cursor: not-allowed; opacity: .45; }
+.error-panel { margin-top: 14px; padding: 14px 16px; border: 1px solid #e5bcb5; border-radius: 6px; background: #fff4f1; color: #8b3a2f; font-size: 14px; line-height: 1.5; }
+.result-panel { margin-top: 25px; padding-top: 25px; border-top: 1px solid #dfe5dd; }
+.result-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.score { margin-top: 7px; color: var(--ink); font-size: 64px; font-weight: 800; letter-spacing: -.08em; line-height: 1; }
+.score span { margin-left: 7px; color: var(--muted); font-size: 20px; letter-spacing: -.03em; }
+.verdict-badge { margin-top: 3px; padding: 8px 11px; border-radius: 999px; background: #dcece3; color: var(--accent); font-size: 12px; font-weight: 700; }
+.result-summary { margin: 24px 0; color: var(--muted); font-size: 15px; line-height: 1.6; }
+.result-panel h3 { margin: 24px 0 10px; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+.feedback-list { display: grid; gap: 9px; margin: 0; padding-left: 19px; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.official-solution { margin-top: 28px; border-top: 1px solid #dfe5dd; padding-top: 17px; }
+.official-solution summary { cursor: pointer; color: var(--accent); font-size: 14px; font-weight: 700; }
+.solution-copy { margin-top: 20px; color: var(--muted); font-size: 14px; line-height: 1.7; }
 
 .footer { gap: 20px; padding: 25px 0; border-top: 1px solid #dfe5dd; color: var(--muted); font-size: 12px; }
 
 @media (max-width: 520px) {
   .header-note { display: none; }
   .hero { padding: 70px 0; }
+}
+
+@media (max-width: 760px) {
+  .problem-grid, .workspace { grid-template-columns: 1fr; }
+  .listing-intro { padding-top: 25px; }
+  .problem-header { padding-top: 25px; }
 }

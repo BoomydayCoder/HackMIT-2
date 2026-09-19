@@ -16,7 +16,12 @@ export default function Home() {
         <p className="intro">
           A place to practice, reflect, and grow with a community of problem solvers.
         </p>
-        <div className="status">The first version is taking shape.</div>
+        <div className="hero-actions">
+          <Link className="cta-link" href="/problems">
+            Try the proof grader <span aria-hidden="true">→</span>
+          </Link>
+          <div className="status">The first version is taking shape.</div>
+        </div>
       </section>
 
       <footer className="footer">
