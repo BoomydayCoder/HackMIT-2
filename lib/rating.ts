@@ -1,6 +1,6 @@
 import { MAX_SCORE, PASS_SCORE } from "@/lib/grader";
 import { notifyProgress, RATINGS_KEY, type Reviews, subscribeProgress } from "@/lib/progress";
-import { affinity, tasteVector } from "@/lib/recommend";
+import { affinity, tasteProfile } from "@/lib/recommend";
 
 export const TOPICS = ["algebra", "combinatorics", "geometry", "number theory"] as const;
 export const STARTING_RATING = 1000;
@@ -92,7 +92,7 @@ export function pickCards<T extends Rateable>(
   reviews: Reviews = {},
 ): { card: T | null; upcoming: T[] } {
   const gap = (entry: T) => Math.abs(entry.elo - ratingFor(ratings, entry.topic));
-  const taste = tasteVector(cards, reviews);
+  const taste = tasteProfile(cards, reviews);
   const score = (entry: T) => gap(entry) - TASTE_WEIGHT * affinity(entry, taste);
   const shortlist = cards
     .filter((entry) => topics.includes(entry.topic) && !excluded.includes(entry.id))

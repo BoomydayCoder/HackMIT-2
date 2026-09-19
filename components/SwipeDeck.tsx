@@ -24,7 +24,7 @@ import {
   subscribeProgress,
   writePinned,
 } from "@/lib/progress";
-import { affinity, tasteVector } from "@/lib/recommend";
+import { matchPercent, tasteProfile } from "@/lib/recommend";
 import {
   parseRatings,
   pickCards,
@@ -66,7 +66,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
 
   const ratings = useMemo(() => parseRatings(ratingsRaw), [ratingsRaw]);
   const reviews = useMemo(() => parseReviews(reviewsRaw), [reviewsRaw]);
-  const taste = useMemo(() => tasteVector(pool, reviews), [pool, reviews]);
+  const taste = useMemo(() => tasteProfile(pool, reviews), [pool, reviews]);
   const solved = useMemo(() => parseSolved(solvedRaw), [solvedRaw]);
   const retired = useMemo(() => parseSolved(retiredRaw), [retiredRaw]);
   const settled = useMemo(() => [...solved, ...retired], [solved, retired]);
@@ -278,8 +278,8 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
             <div className="mm-card-top-row">
               <span className="mm-chip">{card.topic}</span>
               {taste && (
-                <span className="mm-taste" title="Similarity to the problems you rated highly">
-                  ♥ {Math.round(affinity(card, taste) * 100)}% your taste
+                <span className="mm-taste" title="Predicted from the problems you have rated; 50% is neutral">
+                  ♥ {matchPercent(card, taste)}% your taste
                 </span>
               )}
               <span className="mm-elo">{card.elo}</span>

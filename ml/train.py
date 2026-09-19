@@ -71,9 +71,7 @@ def evaluate(
         vectors = embed(features)
         for _ in range(rounds):
             ids, labels, mask, targets, target_labels = leave_one_out(histories, index, rng, explicit_only=True)
-            taste = TasteModel.taste(vectors[ids], labels, mask)
-            score = F.cosine_similarity(taste, vectors[targets], dim=-1, eps=1e-6)
-            predictions.append(score)
+            predictions.append(TasteModel.predict(vectors[ids], labels, mask, vectors[targets]))
             truths.append(target_labels)
     predicted = torch.cat(predictions)
     truth = torch.cat(truths)

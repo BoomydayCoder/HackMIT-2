@@ -1,11 +1,11 @@
 """Two-tower taste model.
 
 Problem tower: an MLP over the hand-made content features, producing a unit
-embedding per problem. User tower: parameter-free, the label-weighted sum of the
-embeddings of the problems the user has interacted with. Scoring is the cosine
-between the two. Keeping the user tower parameter-free means the exported
-problem embeddings plug straight into lib/recommend.ts, whose `tasteVector` and
-`affinity` are exactly this user tower and scorer.
+embedding per problem. Scorer: parameter-free kernel regression over the user's
+history: the similarity-weighted (clamped cosine) average of their labels,
+shrunk toward neutral by PRIOR_WEIGHT. Keeping the scorer parameter-free means
+the exported problem embeddings plug straight into lib/recommend.ts, whose
+`predictStars` is exactly this scorer (in stars rather than centred labels).
 """
 
 import torch
@@ -13,6 +13,8 @@ from torch import nn
 from torch.nn import functional as F
 
 from ml.features import FEATURE_DIM
+
+PRIOR_WEIGHT = 1.0
 
 
 class ProblemTower(nn.Module):
@@ -36,14 +38,16 @@ class TasteModel(nn.Module):
     def __init__(self, embedding_dim: int = 32, hidden_dim: int = 128, dropout: float = 0.1):
         super().__init__()
         self.problems = ProblemTower(embedding_dim, hidden_dim, dropout)
-        # Cosine lives in [-1, 1]; the label scale lets the fit use the full range.
-        self.scale = nn.Parameter(torch.tensor(2.0))
 
     @staticmethod
-    def taste(embeddings: torch.Tensor, labels: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
-        """labels/mask: (batch, history); embeddings: (batch, history, dim)."""
-        weights = (labels * mask).unsqueeze(-1)
-        return (weights * embeddings).sum(dim=1)
+    def predict(
+        history: torch.Tensor, labels: torch.Tensor, mask: torch.Tensor, target: torch.Tensor
+    ) -> torch.Tensor:
+        """Predicted centred label of `target` (batch, dim) from a history of
+        embeddings (batch, n, dim) with labels/mask (batch, n). Neutral is 0."""
+        similarity = F.cosine_similarity(history, target.unsqueeze(1), dim=-1, eps=1e-6)
+        weight = similarity.clamp(min=0) * mask
+        return (weight * labels).sum(dim=1) / (PRIOR_WEIGHT + weight.sum(dim=1))
 
     def forward(
         self,
@@ -54,5 +58,4 @@ class TasteModel(nn.Module):
     ) -> torch.Tensor:
         """Predicts the label of `target` from a user's history. Shapes:
         history (batch, n, FEATURE_DIM), history_labels/mask (batch, n), target (batch, FEATURE_DIM)."""
-        taste = self.taste(self.problems(history), history_labels, history_mask)
-        return self.scale * F.cosine_similarity(taste, self.problems(target), dim=-1, eps=1e-6)
+        return self.predict(self.problems(history), history_labels, history_mask, self.problems(target))

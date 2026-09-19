@@ -5,7 +5,7 @@ import { useMemo, useSyncExternalStore } from "react";
 import type { DeckCard } from "@/lib/problems";
 import { getProfile } from "@/lib/profiles";
 import { parseReviews, readReviewsRaw, subscribeProgress } from "@/lib/progress";
-import { affinity, recommend, tasteVector } from "@/lib/recommend";
+import { matchPercent, recommend, tasteProfile } from "@/lib/recommend";
 
 type ForYouProps = {
   pool: DeckCard[];
@@ -16,7 +16,7 @@ type ForYouProps = {
 export default function ForYou({ pool, limit = 3 }: ForYouProps) {
   const reviewsRaw = useSyncExternalStore(subscribeProgress, readReviewsRaw, () => "{}");
   const reviews = useMemo(() => parseReviews(reviewsRaw), [reviewsRaw]);
-  const taste = useMemo(() => tasteVector(pool, reviews), [pool, reviews]);
+  const taste = useMemo(() => tasteProfile(pool, reviews), [pool, reviews]);
   const picks = useMemo(() => recommend(pool, reviews, limit), [pool, reviews, limit]);
   const reviewed = Object.keys(reviews).length;
 
@@ -25,7 +25,7 @@ export default function ForYou({ pool, limit = 3 }: ForYouProps) {
       <div className="card-label">Picked for you</div>
       {picks.length === 0 ? (
         <p className="star-rating-label">
-          Rate a problem above (or below) three stars and picks will appear here.
+          Rate a problem and picks will appear here.
         </p>
       ) : (
         <>
@@ -38,7 +38,7 @@ export default function ForYou({ pool, limit = 3 }: ForYouProps) {
                 <Link href={`/problems/${problem.id}`}>
                   <strong>{getProfile(problem).name}</strong>
                   <span>
-                    {problem.topic} · Level {problem.level} · {Math.round(affinity(problem, taste) * 100)}% match
+                    {problem.topic} · Level {problem.level} · {matchPercent(problem, taste)}% match
                   </span>
                 </Link>
               </li>

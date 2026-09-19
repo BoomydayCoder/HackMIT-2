@@ -8,14 +8,19 @@ import { TOPICS } from "@/lib/rating";
  * Every problem gets a vector: either a learned embedding exported by
  * `ml/train.py` into data/problem-embeddings.json, or, when the model has not
  * been trained yet, hand-made content features (topic, level, Elo and a hashed
- * bag of words of the statement). A player's taste is the review-weighted sum
- * of the vectors of the problems they have rated, and problems are ranked by
- * cosine similarity to that taste. `ml/features.py` mirrors the hand-made
- * features exactly so the trained model consumes the same inputs.
+ * bag of words of the statement). A player's taste is the list of problems
+ * they have rated, and a candidate's predicted stars are the similarity-
+ * weighted average of those ratings, shrunk toward neutral by a prior so a
+ * single lukewarm review moves it less than a rave. `ml/features.py` mirrors
+ * the features and `ml/model.py` the scorer, so the trained model produces
+ * embeddings this file consumes unchanged.
  */
 
 export const TEXT_DIM = 64;
 export const NEUTRAL_STARS = 3;
+export const MAX_STARS = 5;
+/** Weight of the neutral prior, in units of similarity; mirrored by ml/model.py. */
+export const PRIOR_WEIGHT = 1;
 export const MAX_LEVEL = 9;
 export const ELO_SCALE = 2500;
 
@@ -79,41 +84,58 @@ export function cosine(a: number[], b: number[]): number {
   return normA && normB ? dot / Math.sqrt(normA * normB) : 0;
 }
 
-/**
- * The taste vector: problems rated above neutral pull it toward them, problems
- * rated below push it away. Null until the player has reviewed something.
- */
-export function tasteVector<T extends Embeddable>(problems: T[], reviews: Reviews): number[] | null {
-  let taste: number[] | null = null;
+/** A player's taste: every problem they have rated, with its vector. Null until they rate one. */
+export type Taste = { vector: number[]; stars: number }[];
+
+export function tasteProfile<T extends Embeddable>(problems: T[], reviews: Reviews): Taste | null {
+  const taste: Taste = [];
   for (const problem of problems) {
     const stars = reviews[problem.id];
-    if (!stars || stars === NEUTRAL_STARS) continue;
-    const weight = stars - NEUTRAL_STARS;
-    const vector = problemVector(problem);
-    if (!taste) taste = new Array<number>(vector.length).fill(0);
-    if (vector.length !== taste.length) continue;
-    for (let index = 0; index < vector.length; index += 1) taste[index] += weight * vector[index];
+    if (stars) taste.push({ vector: problemVector(problem), stars });
   }
-  return taste && taste.some((value) => value !== 0) ? taste : null;
+  return taste.length > 0 ? taste : null;
 }
 
-/** Cosine affinity of a problem to the taste vector; 0 when there is no taste yet. */
-export function affinity(problem: Embeddable, taste: number[] | null): number {
-  return taste ? cosine(problemVector(problem), taste) : 0;
+/**
+ * Predicted stars for a problem: the average of the player's ratings weighted
+ * by (non-negative) similarity, pulled toward neutral by the prior. Neutral
+ * when there is no taste yet.
+ */
+export function predictStars(problem: Embeddable, taste: Taste | null): number {
+  if (!taste) return NEUTRAL_STARS;
+  const vector = problemVector(problem);
+  let weighted = PRIOR_WEIGHT * NEUTRAL_STARS;
+  let total = PRIOR_WEIGHT;
+  for (const entry of taste) {
+    const similarity = Math.max(0, cosine(vector, entry.vector));
+    weighted += similarity * entry.stars;
+    total += similarity;
+  }
+  return weighted / total;
 }
 
-/** Highest-affinity problems to the taste vector, excluding those already reviewed. */
+/** Predicted stars rescaled to [-1, 1]: negative for problems the player would dislike. */
+export function affinity(problem: Embeddable, taste: Taste | null): number {
+  return (predictStars(problem, taste) - NEUTRAL_STARS) / (MAX_STARS - NEUTRAL_STARS);
+}
+
+/** Predicted stars as a 0–100 match percentage; 50 is neutral. */
+export function matchPercent(problem: Embeddable, taste: Taste | null): number {
+  return Math.round(((predictStars(problem, taste) - 1) / (MAX_STARS - 1)) * 100);
+}
+
+/** Highest predicted-star problems, excluding those already reviewed. */
 export function recommend<T extends Embeddable>(
   problems: T[],
   reviews: Reviews,
   limit: number,
   excluded: string[] = [],
 ): T[] {
-  const taste = tasteVector(problems, reviews);
+  const taste = tasteProfile(problems, reviews);
   if (!taste) return [];
   return problems
     .filter((problem) => !(problem.id in reviews) && !excluded.includes(problem.id))
-    .map((problem) => ({ problem, score: affinity(problem, taste) }))
+    .map((problem) => ({ problem, score: predictStars(problem, taste) }))
     .sort((a, b) => b.score - a.score || a.problem.id.localeCompare(b.problem.id))
     .slice(0, limit)
     .map((entry) => entry.problem);
