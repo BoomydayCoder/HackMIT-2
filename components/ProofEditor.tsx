@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Math from "@/components/Math";
 import { awardLifeline, MAX_LIFELINES, PASS_SCORE } from "@/lib/lifelines";
+import { recordSolve } from "@/lib/rating";
 import {
   DEFAULT_MODEL,
   DEFAULT_RIGOR,
@@ -16,6 +17,8 @@ import {
 
 type ProofEditorProps = {
   problemId: string;
+  topic: string;
+  elo: number;
   solution: string;
 };
 
@@ -29,10 +32,11 @@ type GradeResult = {
   rigor: RigorLevel;
 };
 
-export default function ProofEditor({ problemId, solution }: ProofEditorProps) {
+export default function ProofEditor({ problemId, topic, elo, solution }: ProofEditorProps) {
   const router = useRouter();
   const [proof, setProof] = useState("");
   const [lifelines, setLifelines] = useState<number | null>(null);
+  const [rating, setRating] = useState<number | null>(null);
   const [rigor, setRigor] = useState<RigorLevel>(DEFAULT_RIGOR);
   const [model, setModel] = useState<ModelId>(DEFAULT_MODEL);
   const [result, setResult] = useState<GradeResult | null>(null);
@@ -62,6 +66,7 @@ export default function ProofEditor({ problemId, solution }: ProofEditorProps) {
       setResult(graded);
       if (graded.score >= PASS_SCORE) {
         setLifelines(awardLifeline(problemId));
+        setRating(recordSolve(topic, elo));
       }
     } catch (gradingError) {
       setError(
@@ -162,7 +167,8 @@ export default function ProofEditor({ problemId, solution }: ProofEditorProps) {
                 ? `Already credited \u2014 no extra lifeline.`
                 : lifelines >= MAX_LIFELINES
                   ? `Lifelines are full at ${MAX_LIFELINES}.`
-                  : `+1 lifeline \u2014 you now have ${lifelines}.`}
+                  : `+1 lifeline \u2014 you now have ${lifelines}.`}{" "}
+              {rating !== null && `Your ${topic} rating is now ${rating}.`}
               <button type="button" onClick={() => router.push("/match")}>
                 Back to the deck
               </button>

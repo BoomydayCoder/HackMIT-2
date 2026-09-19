@@ -47,7 +47,12 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
             <Math text={problem.statement} />
           </div>
         </article>
-        <ProofEditor problemId={problem.id} solution={problem.solution} />
+        <ProofEditor
+          problemId={problem.id}
+          topic={problem.topic}
+          elo={problem.elo}
+          solution={problem.solution}
+        />
       </div>
 
       <footer className="footer">

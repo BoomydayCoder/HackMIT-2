@@ -17,9 +17,17 @@ import {
   readLifelines,
   readSolvedRaw,
   STARTING_LIFELINES,
-  subscribeLifelines,
+  subscribeProgress,
   writeLifelines,
 } from "@/lib/lifelines";
+import {
+  parseRatings,
+  pickCards,
+  ratingFor,
+  readRatingsRaw,
+  recordPass,
+  TOPICS,
+} from "@/lib/rating";
 
 const SWIPE_THRESHOLD = 110;
 
@@ -36,15 +44,13 @@ type SwipeDeckProps = {
 
 type Drag = { x: number; y: number };
 
-export default function SwipeDeck({ cards: allCards }: SwipeDeckProps) {
-  const [index, setIndex] = useState(0);
-  const solvedRaw = useSyncExternalStore(subscribeLifelines, readSolvedRaw, () => "[]");
-  const cards = useMemo(() => {
-    const solved = parseSolved(solvedRaw);
-    return allCards.filter((entry) => !solved.includes(entry.id));
-  }, [allCards, solvedRaw]);
+export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
+  const [turn, setTurn] = useState(0);
+  const [seen, setSeen] = useState<string[]>([]);
+  const solvedRaw = useSyncExternalStore(subscribeProgress, readSolvedRaw, () => "[]");
+  const ratingsRaw = useSyncExternalStore(subscribeProgress, readRatingsRaw, () => "{}");
   const lifelines = useSyncExternalStore(
-    subscribeLifelines,
+    subscribeProgress,
     readLifelines,
     () => STARTING_LIFELINES,
   );
@@ -53,9 +59,13 @@ export default function SwipeDeck({ cards: allCards }: SwipeDeckProps) {
   const [flyOut, setFlyOut] = useState<"left" | "right" | null>(null);
   const origin = useRef<Drag | null>(null);
 
-  const card = cards[index];
-  const upcoming = cards.slice(index + 1, index + 4);
-  const outOfCards = index >= cards.length;
+  const ratings = useMemo(() => parseRatings(ratingsRaw), [ratingsRaw]);
+  const solved = useMemo(() => parseSolved(solvedRaw), [solvedRaw]);
+  const { card, upcoming } = useMemo(
+    () => pickCards(pool, ratings, [...solved, ...seen], turn),
+    [pool, ratings, solved, seen, turn],
+  );
+  const outOfCards = !card;
   const canPass = lifelines > 0;
 
   const advance = useCallback((direction: "left" | "right", swiped: DeckCard) => {
@@ -63,7 +73,8 @@ export default function SwipeDeck({ cards: allCards }: SwipeDeckProps) {
     window.setTimeout(() => {
       setFlyOut(null);
       setDrag({ x: 0, y: 0 });
-      setIndex((value) => value + 1);
+      setTurn((value) => value + 1);
+      setSeen((value) => [...value, swiped.id]);
       if (direction === "right") setMatched(swiped);
     }, 260);
   }, []);
@@ -71,6 +82,7 @@ export default function SwipeDeck({ cards: allCards }: SwipeDeckProps) {
   const pass = useCallback(() => {
     if (!card || matched || flyOut || lifelines <= 0) return;
     writeLifelines(lifelines - 1);
+    recordPass(card.topic);
     advance("left", card);
   }, [card, matched, flyOut, lifelines, advance]);
 
@@ -138,7 +150,7 @@ export default function SwipeDeck({ cards: allCards }: SwipeDeckProps) {
       <section className="mm-empty">
         <h2>You&apos;ve seen everyone.</h2>
         <p>Come back later, or run the deck again.</p>
-        <button className="mm-btn mm-btn-primary" type="button" onClick={() => setIndex(0)}>
+        <button className="mm-btn mm-btn-primary" type="button" onClick={() => setSeen([])}>
           Start over
         </button>
       </section>
@@ -159,8 +171,20 @@ export default function SwipeDeck({ cards: allCards }: SwipeDeckProps) {
           </span>
         </span>
         <span className="mm-count">
-          {index + 1} / {cards.length}
+          {solved.length} solved · {pool.length - solved.length - seen.length} left
         </span>
+      </div>
+
+      <div className="mm-ratings">
+        {TOPICS.map((topic) => (
+          <span
+            className={`mm-rating${topic === card.topic ? " mm-rating-on" : ""}`}
+            key={topic}
+          >
+            <span className="mm-rating-topic">{TOPIC_GLYPHS[topic]}</span>
+            {ratingFor(ratings, topic)}
+          </span>
+        ))}
       </div>
 
       <div className="mm-stack">

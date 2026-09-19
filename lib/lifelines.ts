@@ -15,15 +15,20 @@ export function readLifelines(): number {
 
 const listeners = new Set<() => void>();
 
-export function subscribeLifelines(listener: () => void) {
+/** Shared store subscription for every piece of locally persisted progress. */
+export function subscribeProgress(listener: () => void) {
   listeners.add(listener);
   return () => listeners.delete(listener);
+}
+
+export function notifyProgress() {
+  listeners.forEach((listener) => listener());
 }
 
 export function writeLifelines(value: number) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(LIFELINES_KEY, String(Math.min(MAX_LIFELINES, Math.max(0, value))));
-  listeners.forEach((listener) => listener());
+  notifyProgress();
 }
 
 /** Raw JSON of the solved-problem ids; a stable string so it can back a store snapshot. */

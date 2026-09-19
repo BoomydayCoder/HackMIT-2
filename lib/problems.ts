@@ -5,6 +5,7 @@ export type Problem = {
   number: string;
   set: string;
   topic: string;
+  level: number;
   elo: number;
   bio: string;
   statement: string;
@@ -30,6 +31,7 @@ export function getDeck(): DeckCard[] {
     number: problem.number,
     set: problem.set,
     topic: problem.topic,
+    level: problem.level,
     elo: problem.elo,
     bio: problem.bio,
     statement: problem.statement,
