@@ -191,13 +191,13 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 
 /* The card is the quiet part: the challenger stands in front of it. */
 .mm-stack { position: relative; height: min(660px, 74svh); margin-top: 2px; }
-.mm-card { position: absolute; inset: 14% 34% 30% 0; display: flex; align-items: flex-start; border: 1px solid var(--mm-card-edge); border-radius: 4px; background: var(--mm-card); box-shadow: 2px 3px 0 rgba(72, 54, 33, .07); }
-.mm-card-behind { background: rgba(243, 231, 204, .22); border-color: rgba(94, 74, 48, .14); opacity: .8; transform-origin: top center; }
+.mm-card { position: absolute; top: 0; right: 6%; left: 6%; display: flex; align-items: flex-start; border: 1px solid var(--mm-card-edge); border-radius: 4px; background: var(--mm-card); box-shadow: 2px 3px 0 rgba(72, 54, 33, .07); }
+.mm-card-behind { min-height: 150px; background: rgba(243, 231, 204, .22); border-color: rgba(94, 74, 48, .14); opacity: .8; transform-origin: top center; }
 .mm-card-top { cursor: grab; touch-action: none; user-select: none; }
 .mm-card-top:active { cursor: grabbing; }
-.mm-card-body { position: relative; z-index: 2; width: 100%; padding: 14px 18px 16px; }
+.mm-card-body { position: relative; z-index: 2; width: 100%; padding: 16px 22px 18px; }
 .mm-card-top-row { display: flex; align-items: center; justify-content: space-between; }
-.mm-card h2 { margin: 9px 0 5px; font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
+.mm-card h2 { margin: 9px 0 5px; font-size: 24px; font-weight: 700; letter-spacing: -.01em; }
 .mm-level { margin-left: 10px; font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; vertical-align: middle; }
 .mm-source { margin: -10px 0 18px; color: var(--muted); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
 .mm-chip { display: inline-block; padding: 4px 11px; border: 1px solid var(--mm-card-edge); border-radius: 2px; background: rgba(236, 220, 184, .5); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
@@ -209,7 +209,8 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 
 /* Challenger portrait: life-size in the ring, the card hanging behind them. */
 .mm-portrait { position: absolute; bottom: 0; left: 50%; z-index: 3; height: 74%; width: auto; aspect-ratio: 1; transform: translateX(-50%); pointer-events: none; animation: mm-bob 4.5s ease-in-out infinite; }
-.mm-fighter { height: 86%; bottom: -9%; left: 58%; }
+/* Small enough to stand clear of the card, low enough to touch the ring. */
+.mm-fighter { height: 58%; bottom: -3%; z-index: 1; }
 .mm-portrait img { width: 100%; height: 100%; object-fit: contain; object-position: bottom; filter: drop-shadow(0 12px 10px rgba(72, 54, 33, .35)); }
 .mm-portrait::after { content: ""; position: absolute; bottom: -10px; left: 50%; width: 55%; height: 26px; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(72, 54, 33, .28), transparent); }
 .mm-card-behind .mm-portrait { animation: none; }
