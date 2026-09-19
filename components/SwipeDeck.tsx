@@ -43,6 +43,7 @@ type Drag = { x: number; y: number };
 export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   const [turn, setTurn] = useState(0);
   const [seen, setSeen] = useState<string[]>([]);
+  const [topics, setTopics] = useState<string[]>([...TOPICS]);
   const solvedRaw = useSyncExternalStore(subscribeProgress, readSolvedRaw, () => "[]");
   const ratingsRaw = useSyncExternalStore(subscribeProgress, readRatingsRaw, () => "{}");
   const [matched, setMatched] = useState<DeckCard | null>(null);
@@ -53,10 +54,28 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   const ratings = useMemo(() => parseRatings(ratingsRaw), [ratingsRaw]);
   const solved = useMemo(() => parseSolved(solvedRaw), [solvedRaw]);
   const { card, upcoming } = useMemo(
-    () => pickCards(pool, ratings, [...solved, ...seen], turn),
-    [pool, ratings, solved, seen, turn],
+    () => pickCards(pool, ratings, [...solved, ...seen], turn, topics),
+    [pool, ratings, solved, seen, turn, topics],
   );
   const outOfCards = !card;
+  const remaining = pool.filter(
+    (entry) =>
+      topics.includes(entry.topic) &&
+      !solved.includes(entry.id) &&
+      !seen.includes(entry.id),
+  ).length;
+
+  /** Tapping a topic filters the deck; the last selected topic can't be turned off. */
+  const toggleTopic = useCallback((topic: string) => {
+    setTopics((current) =>
+      current.includes(topic)
+        ? current.length > 1
+          ? current.filter((entry) => entry !== topic)
+          : current
+        : [...current, topic],
+    );
+    setTurn(0);
+  }, []);
 
   const advance = useCallback((direction: "left" | "right", swiped: DeckCard) => {
     setFlyOut(direction);
@@ -134,11 +153,30 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
     );
   }
 
+  const topicFilter = (
+    <div className="mm-ratings">
+      {TOPICS.map((topic) => (
+        <button
+          type="button"
+          className={`mm-rating${topics.includes(topic) ? " mm-rating-on" : ""}`}
+          key={topic}
+          onClick={() => toggleTopic(topic)}
+          aria-pressed={topics.includes(topic)}
+          aria-label={`${topic} rating ${ratingFor(ratings, topic)}`}
+        >
+          <span className="mm-rating-topic">{TOPIC_GLYPHS[topic]}</span>
+          {ratingFor(ratings, topic)}
+        </button>
+      ))}
+    </div>
+  );
+
   if (outOfCards) {
     return (
       <section className="mm-empty">
+        {topicFilter}
         <h2>You&apos;ve seen everyone.</h2>
-        <p>Come back later, or run the deck again.</p>
+        <p>Pick another topic above, or run the deck again.</p>
         <button className="mm-btn mm-btn-primary" type="button" onClick={() => setSeen([])}>
           Start over
         </button>
@@ -154,21 +192,11 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
     <section className="mm-deck">
       <div className="mm-meter">
         <span className="mm-count">
-          {solved.length} solved · {pool.length - solved.length - seen.length} left
+          {solved.length} solved · {remaining} left
         </span>
       </div>
 
-      <div className="mm-ratings">
-        {TOPICS.map((topic) => (
-          <span
-            className={`mm-rating${topic === card.topic ? " mm-rating-on" : ""}`}
-            key={topic}
-          >
-            <span className="mm-rating-topic">{TOPIC_GLYPHS[topic]}</span>
-            {ratingFor(ratings, topic)}
-          </span>
-        ))}
-      </div>
+      {topicFilter}
 
       <div className="mm-stack">
         {upcoming

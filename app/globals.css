@@ -147,8 +147,9 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-count { color: rgba(255,255,255,.5); font-size: 13px; font-weight: 600; }
 
 .mm-ratings { display: flex; gap: 6px; padding: 0 4px 12px; }
-.mm-rating { display: inline-flex; align-items: center; gap: 5px; flex: 1; justify-content: center; padding: 6px 4px; border-radius: 999px; background: rgba(255,255,255,.05); color: rgba(255,255,255,.55); font-size: 12px; font-weight: 700; }
-.mm-rating-on { background: rgba(253,38,125,.16); color: #fff; }
+.mm-rating { display: inline-flex; align-items: center; gap: 5px; flex: 1; justify-content: center; padding: 7px 4px; border: 1px solid transparent; border-radius: 999px; background: rgba(255,255,255,.05); color: rgba(255,255,255,.35); font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; transition: color .15s, background .15s, border-color .15s; }
+.mm-rating:hover { color: rgba(255,255,255,.7); }
+.mm-rating-on { background: rgba(253,38,125,.16); border-color: rgba(253,38,125,.45); color: #fff; }
 .mm-rating-topic { font-size: 13px; opacity: .8; }
 
 .mm-stack { position: relative; height: 430px; }

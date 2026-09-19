@@ -67,10 +67,11 @@ export function pickCards<T extends Rateable>(
   ratings: Ratings,
   excluded: string[],
   turn: number,
+  topics: readonly string[],
 ): { card: T | null; upcoming: T[] } {
   const gap = (entry: T) => Math.abs(entry.elo - ratingFor(ratings, entry.topic));
   const shortlist = cards
-    .filter((entry) => !excluded.includes(entry.id))
+    .filter((entry) => topics.includes(entry.topic) && !excluded.includes(entry.id))
     .sort((a, b) => gap(a) - gap(b) || a.id.localeCompare(b.id))
     .slice(0, 5);
 
