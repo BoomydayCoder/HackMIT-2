@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Math from "@/components/Math";
 import ProofEditor from "@/components/ProofEditor";
 import { getProblem } from "@/lib/problems";
+import { getProfile } from "@/lib/profiles";
 
 type ProblemPageProps = {
   params: Promise<{ id: string }>;
@@ -13,6 +14,7 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
   const problem = getProblem(id);
 
   if (!problem) notFound();
+  const profile = getProfile(problem);
 
   return (
     <main className="page">
@@ -30,8 +32,10 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
           {problem.set === "AMC 8 2023"
             ? problem.set
             : `${problem.set} · ${problem.topic}`}
+          {" · Problem "}
+          {problem.number}
         </div>
-        <h1>Problem {problem.number}</h1>
+        <h1>{profile.name}</h1>
         <a
           className="source-link"
           href={problem.sourceUrl}

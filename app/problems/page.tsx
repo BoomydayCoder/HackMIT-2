@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PROBLEMS, SETS, type Problem } from "@/lib/problems";
+import { getProfile } from "@/lib/profiles";
 
 const topicOrder: string[] = [
   "algebra",
@@ -32,6 +33,7 @@ function ProblemCard({ problem }: { problem: Problem }) {
     problem.set === "AMC 8 2023"
       ? `AMC 8 · #${problem.number}`
       : `Shortlist ${problem.number}`;
+  const profile = getProfile(problem);
 
   return (
     <Link
@@ -43,7 +45,16 @@ function ProblemCard({ problem }: { problem: Problem }) {
         <span>{meta}</span>
         <span>{problem.proposer}</span>
       </div>
-      <h3>Problem {problem.number}</h3>
+      <h3 className="card-name">
+        {profile.name}
+        <span
+          className="card-age"
+          title={`Estimated difficulty ${profile.difficulty}/10`}
+        >
+          {profile.difficulty}
+        </span>
+      </h3>
+      <p className="card-tagline">{profile.tagline}</p>
       <p>{excerpt(problem.statement)}</p>
       <span className="card-arrow" aria-hidden="true">
         →
