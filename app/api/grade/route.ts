@@ -5,6 +5,7 @@ import {
   graderSystemPrompt,
   isModelId,
   isRigorLevel,
+  MAX_SCORE,
   type ModelId,
   type RigorLevel,
 } from "@/lib/grader";
@@ -14,7 +15,7 @@ export const runtime = "nodejs";
 const gradeSchema = {
   type: "object",
   properties: {
-    score: { type: "integer", minimum: 0, maximum: 7 },
+    score: { type: "integer", minimum: 0, maximum: MAX_SCORE },
     verdict: { type: "string" },
     summary: { type: "string" },
     feedback: { type: "array", items: { type: "string" } },

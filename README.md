@@ -9,8 +9,10 @@ full problem, then write a proof and have it graded.
 - `data/harp-deck.json` holds a 100-problem pool sampled across HARP difficulty
   levels 1–9; each card's Elo comes from its stored HARP level and contest.
 - You carry a separate Elo per topic (algebra, combinatorics, geometry, number
-  theory), stored in the browser. Solving a problem is worth a lot in that
-  topic, passing nudges it down a little.
+  theory), stored in the browser. A graded proof moves that topic's rating by
+  how well it scored — 5/5 earns the full gain, 3/5 is par, below that costs
+  you — and passing on a card nudges it down a little. Only the first grading
+  of a problem counts.
 - Cards are served one at a time, closest to your rating in the topics you have
   selected in the top bar. A match you have not solved stays at the front of the
   deck until you solve it or pass on it.
@@ -49,7 +51,7 @@ pnpm build
 
 ## Grading
 
-The proof grader sends a selected problem and a student's proof to the OpenAI Chat Completions API, and only on an explicit submission. The model and rigor level are chosen in the UI; `gpt-4o-mini` is the default and `OPENAI_MODEL` overrides it. The browser submits proofs to `POST /api/grade` with `{ "problemId": "...", "proof": "...", "rigor": 3, "model": "gpt-4o-mini" }`, and a score of 5/7 or better counts as solved.
+The proof grader sends a selected problem and a student's proof to the OpenAI Chat Completions API, and only on an explicit submission. The model and rigor level are chosen in the UI; `gpt-4o-mini` is the default and `OPENAI_MODEL` overrides it. The browser submits proofs to `POST /api/grade` with `{ "problemId": "...", "proof": "...", "rigor": 3, "model": "gpt-4o-mini" }`, and proofs are scored out of 5, with 4 or better counting as solved.
 
 The AMC 8 2023 and IMO 2023 Shortlist sets have been removed; HARP is the only bundled problem source. `scripts/convert_amc8.py` and `scripts/extract_shortlist.py` remain if those sets are reinstated.
 
