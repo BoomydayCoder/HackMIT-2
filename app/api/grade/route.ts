@@ -1,5 +1,13 @@
 import { getProblem } from "@/lib/problems";
-import { GRADER_SYSTEM_PROMPT } from "@/lib/grader";
+import {
+  DEFAULT_MODEL,
+  DEFAULT_RIGOR,
+  graderSystemPrompt,
+  isModelId,
+  isRigorLevel,
+  type ModelId,
+  type RigorLevel,
+} from "@/lib/grader";
 
 export const runtime = "nodejs";
 
@@ -50,6 +58,10 @@ export async function POST(request: Request) {
       : undefined;
   const proof =
     body && typeof body === "object" && "proof" in body ? body.proof : undefined;
+  const requestedRigor =
+    body && typeof body === "object" && "rigor" in body ? body.rigor : undefined;
+  const requestedModel =
+    body && typeof body === "object" && "model" in body ? body.model : undefined;
 
   if (
     typeof problemId !== "string" ||
@@ -61,6 +73,24 @@ export async function POST(request: Request) {
       { error: "problemId and proof are required; proof must be 1–20,000 characters" },
       { status: 400 },
     );
+  }
+
+  if (
+    body &&
+    typeof body === "object" &&
+    "rigor" in body &&
+    !isRigorLevel(requestedRigor)
+  ) {
+    return Response.json({ error: "rigor must be 1–5" }, { status: 400 });
+  }
+
+  if (
+    body &&
+    typeof body === "object" &&
+    "model" in body &&
+    !isModelId(requestedModel)
+  ) {
+    return Response.json({ error: "unknown model" }, { status: 400 });
   }
 
   const problem = getProblem(problemId);
@@ -75,7 +105,14 @@ export async function POST(request: Request) {
     );
   }
 
-  const model = process.env.OPENAI_MODEL ?? "gpt-4o-mini";
+  const rigor: RigorLevel = isRigorLevel(requestedRigor)
+    ? requestedRigor
+    : DEFAULT_RIGOR;
+  const model: ModelId = isModelId(requestedModel)
+    ? requestedModel
+    : isModelId(process.env.OPENAI_MODEL)
+      ? process.env.OPENAI_MODEL
+      : DEFAULT_MODEL;
   const officialAnswer = problem.answer
     ? `OFFICIAL ANSWER
 ---
@@ -104,6 +141,27 @@ STUDENT PROOF
 ${proof}
 ---`;
 
+  const completionRequest = {
+    model,
+    max_completion_tokens: 4000,
+    response_format: {
+      type: "json_schema",
+      json_schema: {
+        name: "grade",
+        strict: true,
+        schema: gradeSchema,
+      },
+    },
+    messages: [
+      { role: "system", content: graderSystemPrompt(rigor) },
+      { role: "user", content: userMessage },
+    ],
+  };
+  const openAIRequest =
+    model === "gpt-4o-mini"
+      ? { ...completionRequest, temperature: 0 }
+      : completionRequest;
+
   let response: Response;
   try {
     response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -112,23 +170,7 @@ ${proof}
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        model,
-        temperature: 0,
-        max_tokens: 1200,
-        response_format: {
-          type: "json_schema",
-          json_schema: {
-            name: "grade",
-            strict: true,
-            schema: gradeSchema,
-          },
-        },
-        messages: [
-          { role: "system", content: GRADER_SYSTEM_PROMPT },
-          { role: "user", content: userMessage },
-        ],
-      }),
+      body: JSON.stringify(openAIRequest),
     });
   } catch {
     return Response.json({ error: "Unable to reach the grading service" }, { status: 502 });
@@ -160,7 +202,7 @@ ${proof}
       feedback: string[];
       gaps: string[];
     };
-    return Response.json({ ...grade, model });
+    return Response.json({ ...grade, model, rigor });
   } catch {
     return Response.json({ error: "OpenAI returned an invalid grading response" }, { status: 502 });
   }
