@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AccountMenu from "@/components/AccountMenu";
 
 export default function Home() {
   return (
@@ -10,9 +11,12 @@ export default function Home() {
           </span>
           MathMatch
         </span>
-        <Link className="mm-nav" href="/problems">
-          Library
-        </Link>
+        <nav className="mm-header-links">
+          <Link className="mm-nav" href="/problems">
+            Library
+          </Link>
+          <AccountMenu className="mm-nav" />
+        </nav>
       </header>
 
       <section className="mm-hero">

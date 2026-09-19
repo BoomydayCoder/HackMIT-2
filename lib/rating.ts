@@ -1,10 +1,9 @@
 import { MAX_SCORE, PASS_SCORE } from "@/lib/grader";
-import { notifyProgress, subscribeProgress } from "@/lib/progress";
+import { notifyProgress, RATINGS_KEY, subscribeProgress } from "@/lib/progress";
 
 export const TOPICS = ["algebra", "combinatorics", "geometry", "number theory"] as const;
 export const STARTING_RATING = 1000;
 
-const RATINGS_KEY = "mathmatch:ratings";
 const PASS_PENALTY = 8;
 const GIVE_UP_PENALTY = 40;
 const MIN_SOLVE_GAIN = 20;

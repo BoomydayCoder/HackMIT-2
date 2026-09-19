@@ -149,7 +149,10 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
           <span className="mm-chip">{committed.topic}</span>
           <span className="mm-elo">{committed.elo}</span>
         </div>
-        <h2 className="mm-name">{getProfile(committed).name}</h2>
+        <h2 className="mm-name">
+          {getProfile(committed).name}
+          <span className="mm-level">Level: {committed.level}</span>
+        </h2>
         <p className="mm-source">
           {committed.set} · Problem {committed.number}
         </p>
@@ -252,6 +255,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
             </div>
             <h2 className="mm-name">
               {getProfile(card).name}
+              <span className="mm-level">Level: {card.level}</span>
             </h2>
             <p className="mm-bio">{getProfile(card).bio}</p>
             <div className="mm-tags">

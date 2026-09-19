@@ -1,9 +1,7 @@
 import Link from "next/link";
-import AccountMenu from "@/components/AccountMenu";
-import SwipeDeck from "@/components/SwipeDeck";
-import { getDeck } from "@/lib/problems";
+import AuthForm from "@/components/AuthForm";
 
-export default function MatchPage() {
+export default function AccountPage() {
   return (
     <main className="mm-page">
       <header className="mm-header">
@@ -13,15 +11,12 @@ export default function MatchPage() {
           </span>
           MathMatch
         </Link>
-        <nav className="mm-header-links">
-          <Link className="mm-nav" href="/problems">
-            Library
-          </Link>
-          <AccountMenu className="mm-nav" />
-        </nav>
+        <Link className="mm-nav" href="/match">
+          Back to the deck
+        </Link>
       </header>
 
-      <SwipeDeck cards={getDeck()} />
+      <AuthForm />
 
       <footer className="mm-footer">Problems from HARP (Yue et al., 2024)</footer>
     </main>

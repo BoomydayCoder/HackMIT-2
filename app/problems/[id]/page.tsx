@@ -1,3 +1,5 @@
+import Link from "next/link";
+import AccountMenu from "@/components/AccountMenu";
 import { notFound } from "next/navigation";
 import Math from "@/components/Math";
 import ProofEditor from "@/components/ProofEditor";
@@ -18,10 +20,13 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
   return (
     <main className="page">
       <header className="header">
-        <span className="wordmark">
+        <Link className="wordmark" href="/" aria-label="MathMatch home">
           Math<span>♥</span>Match
-        </span>
-        <span className="back-link">Solve it or give up to leave</span>
+        </Link>
+        <nav className="header-links">
+          <span className="back-link">Solve it or give up to leave</span>
+          <AccountMenu className="back-link" />
+        </nav>
       </header>
 
       <div className="problem-header">

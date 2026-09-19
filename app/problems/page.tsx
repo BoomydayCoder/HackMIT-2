@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AccountMenu from "@/components/AccountMenu";
 import { PROBLEMS, SETS, type Problem } from "@/lib/problems";
 import { getProfile } from "@/lib/profiles";
 
@@ -21,7 +22,12 @@ function ProblemCard({ problem }: { problem: Problem }) {
         <span>{meta}</span>
         <span>{problem.proposer}</span>
       </div>
-      <h3 className="card-name">{profile.name}</h3>
+      <h3 className="card-name">
+        {profile.name}
+        <span className="card-level" title={`Elo ${problem.elo}`}>
+          Level: {profile.level}
+        </span>
+      </h3>
       <p className="card-tagline">{profile.bio}</p>
       <p>{excerpt(problem.statement)}</p>
       <span className="card-arrow" aria-hidden="true">
@@ -38,9 +44,12 @@ export default function ProblemsPage() {
         <Link className="wordmark" href="/" aria-label="MathMatch home">
           Math<span>♥</span>Match
         </Link>
-        <Link className="back-link" href="/match">
-          Back to the deck
-        </Link>
+        <nav className="header-links">
+          <Link className="back-link" href="/match">
+            Back to the deck
+          </Link>
+          <AccountMenu className="back-link" />
+        </nav>
       </header>
 
       <section className="listing-intro">

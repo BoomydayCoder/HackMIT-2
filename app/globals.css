@@ -68,6 +68,7 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .card-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }
 .problem-card h3 { margin: 40px 0 11px; font-size: 25px; letter-spacing: -.04em; }
 .card-name { line-height: 1.15; }
+.card-level { margin-left: 10px; font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; vertical-align: middle; }
 .problem-card .card-tagline { margin: 0 0 8px; color: var(--ink); font-size: 14px; font-style: italic; }
 .problem-card p { max-width: 33em; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
 .card-arrow { position: absolute; right: 22px; bottom: 20px; color: var(--accent); font-size: 22px; }
@@ -171,6 +172,7 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-card-body { width: 100%; padding: 26px; background: linear-gradient(to top, rgba(0,0,0,.72), transparent); }
 .mm-card-top-row { display: flex; align-items: center; justify-content: space-between; }
 .mm-card h2 { margin: 14px 0 6px; font-size: 30px; font-weight: 700; letter-spacing: -.02em; }
+.mm-level { margin-left: 10px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,.65); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; vertical-align: middle; }
 .mm-source { margin: -10px 0 18px; color: rgba(255,255,255,.55); font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
 .mm-chip { display: inline-block; padding: 5px 12px; border-radius: 999px; background: rgba(255,255,255,.14); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .mm-elo { font-size: 15px; font-weight: 800; background: var(--mm-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
@@ -247,3 +249,22 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .give-up-row button:hover { border-color: #c8443a; color: #8b3a2f; }
 .give-up-row .give-up-button { border-color: #e5bcb5; background: #fff4f1; color: #8b3a2f; }
 .stuck-note { margin-left: auto; color: var(--muted); font-size: 13px; }
+
+/* Accounts */
+.mm-header-links, .header-links { display: flex; align-items: center; gap: 18px; }
+.account-menu { display: inline-flex; align-items: center; gap: 10px; }
+.account-signout { padding: 0; border: 0; background: none; cursor: pointer; font: inherit; }
+.mm-nav.account-signout { color: rgba(255,255,255,.62); }
+.mm-nav.account-signout:hover { color: #fff; }
+.account-signout:disabled { opacity: .5; cursor: wait; }
+
+.mm-auth { width: min(400px, 100%); margin: auto 0; }
+.mm-auth h1 { margin: 22px 0 10px; font-size: 34px; line-height: 1.1; letter-spacing: -.03em; }
+.mm-auth p { margin: 0 0 24px; color: rgba(255,255,255,.65); line-height: 1.5; }
+.mm-auth-tabs { display: flex; gap: 6px; }
+.mm-auth-form { display: grid; gap: 16px; }
+.mm-auth-form label { display: grid; gap: 6px; color: rgba(255,255,255,.7); font-size: 13px; font-weight: 600; }
+.mm-auth-form input { padding: 13px 14px; border: 1px solid rgba(255,255,255,.18); border-radius: 10px; background: rgba(255,255,255,.06); color: #fff; font: inherit; font-size: 16px; outline: none; }
+.mm-auth-form input:focus { border-color: var(--mm-pink); box-shadow: 0 0 0 3px rgba(253,38,125,.2); }
+.mm-auth-error { margin: 0; padding: 10px 12px; border: 1px solid rgba(255,68,88,.5); border-radius: 10px; background: rgba(255,68,88,.12); color: #ffb3bb; font-size: 14px; }
+.mm-auth-form .mm-btn { margin-top: 4px; }
