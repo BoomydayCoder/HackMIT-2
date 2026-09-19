@@ -1,5 +1,6 @@
 import Link from "next/link";
 import AccountMenu from "@/components/AccountMenu";
+import Challenger from "@/components/Challenger";
 import { notFound } from "next/navigation";
 import Math from "@/components/Math";
 import ProofEditor from "@/components/ProofEditor";
@@ -29,7 +30,8 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
         </nav>
       </header>
 
-      <div className="problem-header">
+      <div className="problem-header duel-header">
+        <Challenger id={problem.id} topic={problem.topic} className="mm-portrait-duel" />
         <div className="eyebrow">
           {`${problem.set} · Problem ${problem.number} · ${problem.topic}`}
         </div>
