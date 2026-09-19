@@ -3,6 +3,8 @@ const RETIRED_KEY = "mathmatch:retired";
 const RATED_KEY = "mathmatch:graded";
 const PINNED_KEY = "mathmatch:pinned";
 export const RATINGS_KEY = "mathmatch:ratings";
+/** Ratings as the deck last showed them, so a gain earned elsewhere can be celebrated on return. */
+export const RATINGS_SEEN_KEY = "mathmatch:ratings-seen";
 
 const listeners = new Set<() => void>();
 

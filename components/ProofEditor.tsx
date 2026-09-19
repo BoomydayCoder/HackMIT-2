@@ -3,9 +3,16 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import Math from "@/components/Math";
+import RatingGain from "@/components/RatingGain";
 import { useDictation } from "@/lib/dictation";
 import { markRated, markRetired, markSolved } from "@/lib/progress";
-import { recordGiveUp, recordSolve } from "@/lib/rating";
+import {
+  parseRatings,
+  ratingFor,
+  readRatingsRaw,
+  recordGiveUp,
+  recordSolve,
+} from "@/lib/rating";
 import {
   DEFAULT_MODEL,
   DEFAULT_RIGOR,
@@ -39,6 +46,7 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
   const router = useRouter();
   const [proof, setProof] = useState("");
   const [rating, setRating] = useState<number | null>(null);
+  const [ratingBefore, setRatingBefore] = useState<number | null>(null);
   const [rigor, setRigor] = useState<RigorLevel>(DEFAULT_RIGOR);
   const [model, setModel] = useState<ModelId>(DEFAULT_MODEL);
   const [result, setResult] = useState<GradeResult | null>(null);
@@ -81,7 +89,10 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
       // proof can be revised and regraded.
       if (graded.score >= PASS_SCORE) {
         markSolved(problemId);
-        if (markRated(problemId)) setRating(recordSolve(topic, elo, graded.score));
+        if (markRated(problemId)) {
+          setRatingBefore(ratingFor(parseRatings(readRatingsRaw()), topic));
+          setRating(recordSolve(topic, elo, graded.score));
+        }
       }
     } catch (gradingError) {
       setError(
@@ -254,11 +265,16 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
           </div>
           <div className="solved-panel">
             <strong>{solvedThis ? "Victory." : "Still standing."}</strong>{" "}
-            {rating !== null
-              ? `Your ${topic} rating is now ${rating}.`
-              : solvedThis
-                ? "Already rated \u2014 your rating stands."
-                : "That attempt was free. Revise it and grade again."}
+            {rating !== null ? (
+              <>
+                {`Your ${topic} rating is now `}
+                <RatingGain from={ratingBefore ?? rating} to={rating} />
+              </>
+            ) : solvedThis ? (
+              "Already rated \u2014 your rating stands."
+            ) : (
+              "That attempt was free. Revise it and grade again."
+            )}
             {solvedThis ? (
               <button type="button" onClick={() => router.push("/match")}>
                 Back to the arena

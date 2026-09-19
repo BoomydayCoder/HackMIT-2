@@ -312,3 +312,32 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-auth-form input:focus { border-color: var(--mm-blade); box-shadow: 0 0 0 3px rgba(140,47,42,.15); }
 .mm-auth-error { margin: 0; padding: 10px 12px; border: 1px solid rgba(140,47,42,.45); border-radius: 3px; background: rgba(200,68,58,.1); color: #8c2f2a; font-size: 14px; }
 .mm-auth-form .mm-btn { margin-top: 4px; }
+
+/* A won duel counts your rating up in gold. */
+.rating-gain { display: inline-flex; align-items: baseline; gap: 8px; }
+.rating-gain-value { font-variant-numeric: tabular-nums; font-weight: 800; color: var(--mm-gold); animation: rating-pop .5s ease-out; }
+.rating-gain-delta { color: var(--mm-blade); font-size: 13px; font-weight: 800; animation: rating-rise 1.6s ease-out forwards; }
+.mm-rating-up { animation: rating-flash 1s ease-out; }
+
+@keyframes rating-pop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.35); text-shadow: 0 0 14px rgba(184, 134, 59, .7); }
+  100% { transform: scale(1); }
+}
+
+@keyframes rating-rise {
+  0% { opacity: 0; transform: translateY(6px); }
+  20% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-22px); }
+}
+
+@keyframes rating-flash {
+  0% { background: rgba(184, 134, 59, .18); }
+  35% { background: rgba(184, 134, 59, .55); box-shadow: 0 0 18px rgba(184, 134, 59, .45); }
+  100% { background: rgba(184, 134, 59, .18); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rating-gain-value, .rating-gain-delta, .mm-rating-up { animation: none; }
+  .rating-gain-delta { opacity: 1; }
+}
