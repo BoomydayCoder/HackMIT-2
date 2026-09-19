@@ -15,6 +15,7 @@ import { getProfile } from "@/lib/profiles";
 import {
   parseSolved,
   readPinned,
+  RATINGS_SEEN_KEY,
   readRetiredRaw,
   readSolvedRaw,
   subscribeProgress,
@@ -53,6 +54,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   const ratingsRaw = useSyncExternalStore(subscribeProgress, readRatingsRaw, () => "{}");
   const pinned = useSyncExternalStore(subscribeProgress, readPinned, () => "");
   const [matched, setMatched] = useState<DeckCard | null>(null);
+  const [risen, setRisen] = useState<string[]>([]);
   const [drag, setDrag] = useState<Drag>({ x: 0, y: 0 });
   const [flyOut, setFlyOut] = useState<"left" | "right" | null>(null);
   const origin = useRef<Drag | null>(null);
@@ -73,6 +75,22 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   const card = suggestion.card;
   const upcoming = suggestion.upcoming;
   const outOfCards = !card;
+
+  /** Flashes the chips of topics whose rating climbed since the deck last showed it. */
+  useEffect(() => {
+    const previous = parseRatings(window.localStorage.getItem(RATINGS_SEEN_KEY) ?? "{}");
+    window.localStorage.setItem(RATINGS_SEEN_KEY, ratingsRaw);
+    const climbed = TOPICS.filter(
+      (topic) => ratingFor(ratings, topic) > ratingFor(previous, topic),
+    );
+    if (climbed.length === 0) return;
+    const flash = window.requestAnimationFrame(() => setRisen(climbed));
+    const clear = window.setTimeout(() => setRisen([]), 1000);
+    return () => {
+      window.cancelAnimationFrame(flash);
+      window.clearTimeout(clear);
+    };
+  }, [ratings, ratingsRaw]);
 
   /** Tapping a topic filters the deck; the last selected topic can't be turned off. */
   const toggleTopic = useCallback((topic: string) => {
@@ -176,7 +194,9 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
       {TOPICS.map((topic) => (
         <button
           type="button"
-          className={`mm-rating${topics.includes(topic) ? " mm-rating-on" : ""}`}
+          className={`mm-rating${topics.includes(topic) ? " mm-rating-on" : ""}${
+            risen.includes(topic) ? " mm-rating-up" : ""
+          }`}
           key={topic}
           onClick={() => toggleTopic(topic)}
           aria-pressed={topics.includes(topic)}
