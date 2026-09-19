@@ -8,14 +8,14 @@ export default function MatchPage() {
     <main className="mm-page">
       <header className="mm-header">
         <Link className="mm-logo" href="/" aria-label="MathMatch home">
-          <span className="mm-flame" aria-hidden="true">
-            ♥
+          <span className="mm-swords" aria-hidden="true">
+            ⚔
           </span>
           MathMatch
         </Link>
         <nav className="mm-header-links">
           <Link className="mm-nav" href="/problems">
-            Library
+            Roster
           </Link>
           <AccountMenu className="mm-nav" />
         </nav>

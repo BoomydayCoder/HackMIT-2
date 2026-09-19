@@ -140,7 +140,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
     else setDrag({ x: 0, y: 0 });
   }
 
-  // A match is binding: the only ways out are a passing grade or giving up.
+  // A duel is binding: the only ways out are a passing grade or yielding.
   const committed = matched ?? pinnedCard;
   if (committed) {
     return (
@@ -165,7 +165,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
           </Link>
         </div>
         <p className="mm-hint">
-          You matched with this one. Solve it or give up to get back to the deck.
+          You&apos;re locked in this duel. Win it or yield to face anyone else.
         </p>
       </section>
     );
@@ -193,8 +193,8 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
     return (
       <section className="mm-empty">
         {topicFilter}
-        <h2>You&apos;ve seen everyone.</h2>
-        <p>Pick another topic above, or run the deck again.</p>
+        <h2>No challengers left.</h2>
+        <p>Pick another discipline above, or reopen the roster.</p>
         <button className="mm-btn mm-btn-primary" type="button" onClick={() => setSeen([])}>
           Start over
         </button>
@@ -210,7 +210,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
     <section className="mm-deck">
       <div className="mm-meter">
         <span className="mm-count">
-          {solved.length} solved
+          {solved.length} won
         </span>
       </div>
 
@@ -243,8 +243,8 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         >
-          <span className={`mm-stamp mm-stamp-like${liking ? " mm-stamp-on" : ""}`}>MATCH</span>
-          <span className={`mm-stamp mm-stamp-nope${noping ? " mm-stamp-on" : ""}`}>PASS</span>
+          <span className={`mm-stamp mm-stamp-like${liking ? " mm-stamp-on" : ""}`}>FIGHT</span>
+          <span className={`mm-stamp mm-stamp-nope${noping ? " mm-stamp-on" : ""}`}>FLEE</span>
 
           <span className="mm-watermark">{TOPIC_GLYPHS[card.topic] ?? "∞"}</span>
 
@@ -262,7 +262,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
               <span>
                 {card.set} · #{card.number}
               </span>
-              <span>Proof required</span>
+              <span>Proof to win</span>
             </div>
           </div>
         </article>
@@ -273,17 +273,17 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
           className="mm-round mm-round-nope"
           type="button"
           onClick={pass}
-          aria-label="Pass"
+          aria-label="Flee"
         >
-          ✕
+          ⚑
         </button>
-        <button className="mm-round mm-round-like" type="button" onClick={match} aria-label="Match">
-          ♥
+        <button className="mm-round mm-round-like" type="button" onClick={match} aria-label="Fight">
+          ⚔
         </button>
       </div>
 
       <p className="mm-hint">
-        Drag the card, or use ← to pass and → to match.
+        Drag the card, or use ← to flee and → to fight.
       </p>
     </section>
   );

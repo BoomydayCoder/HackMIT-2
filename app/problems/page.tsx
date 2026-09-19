@@ -42,27 +42,27 @@ export default function ProblemsPage() {
     <main className="page">
       <header className="header">
         <Link className="wordmark" href="/" aria-label="MathMatch home">
-          Math<span>♥</span>Match
+          Math<span>⚔</span>Match
         </Link>
         <nav className="header-links">
           <Link className="back-link" href="/match">
-            Back to the deck
+            Back to the arena
           </Link>
           <AccountMenu className="back-link" />
         </nav>
       </header>
 
       <section className="listing-intro">
-        <div className="eyebrow">Problem library</div>
-        <h1>Every problem in the deck.</h1>
+        <div className="eyebrow">Challenger roster</div>
+        <h1>Every opponent in the arena.</h1>
         <p className="intro">
-          Browse past the swiping: pick a problem, write the proof you believe
-          in, and get a focused read from an AI grader.
+          Browse past the swiping: pick a fight, write the proof you believe in,
+          and get a focused read from an AI grader.
         </p>
       </section>
 
       {PROBLEMS.length === 0 ? (
-        <p className="intro">No problem sets are loaded yet.</p>
+        <p className="intro">No challengers are loaded yet.</p>
       ) : (
         <div className="topic-groups">
           {SETS.map((set) => {

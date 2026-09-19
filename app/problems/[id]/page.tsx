@@ -21,10 +21,10 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
     <main className="page">
       <header className="header">
         <Link className="wordmark" href="/" aria-label="MathMatch home">
-          Math<span>♥</span>Match
+          Math<span>⚔</span>Match
         </Link>
         <nav className="header-links">
-          <span className="back-link">Solve it or give up to leave</span>
+          <span className="back-link">Win the duel or yield to leave</span>
           <AccountMenu className="back-link" />
         </nav>
       </header>

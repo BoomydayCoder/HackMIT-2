@@ -1,22 +1,22 @@
 # MathMatch
 
-A dating app for math problems, built for HackMIT. Cards show only a topic, an
-Elo and a one-line bio; swipe left to pass, swipe right to match and reveal the
-full problem, then write a proof and have it graded.
+A duelling app for math problems, built for HackMIT. Challenger cards show only
+a topic, an Elo and a one-line taunt; swipe left to flee, swipe right to fight
+and reveal the full problem, then write a proof and have it graded.
 
-## How the deck works
+## How the arena works
 
 - `data/harp-deck.json` holds a 100-problem pool sampled across HARP difficulty
   levels 1–9; each card's Elo comes from its stored HARP level and contest.
 - You carry a separate Elo per topic (algebra, combinatorics, geometry, number
   theory), stored in the browser. A passing proof earns that topic's rating by
-  how well it scored (5/5 the full gain, 4/5 half of it), passing on a card
-  nudges it down a little, and failing grades are free. Only the first outcome
-  on a problem counts.
+  how well it scored (5/5 the full gain, 4/5 half of it), fleeing a card nudges
+  it down a little, and failing grades are free. Only the first outcome on a
+  problem counts.
 - Cards are served one at a time, closest to your rating in the topics you have
-  selected in the top bar. Matching is binding: the deck serves nothing else
-  until you pass the problem or take "Give up & view solution", which reveals
-  the official solution and costs more rating than passing on a card.
+  selected in the top bar. Fighting is binding: the roster serves nothing else
+  until you win the duel or take "Yield & view solution", which reveals the
+  official solution and costs more rating than fleeing.
 - Regenerate the pool with `python3 scripts/build_harp_deck.py 100 mixed`
   (`easy` and `proof` modes are also available).
 

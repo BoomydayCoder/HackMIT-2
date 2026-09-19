@@ -34,9 +34,9 @@ export default function AuthForm() {
     return (
       <section className="mm-auth">
         <h1>Hi, {account.username}.</h1>
-        <p>Your matches, solves and ratings are saved to this account.</p>
+        <p>Your duels, wins and ratings are saved to this account.</p>
         <button className="mm-btn mm-btn-primary" type="button" onClick={() => router.push("/match")}>
-          Back to the deck
+          Back to the arena
         </button>
       </section>
     );
@@ -65,7 +65,7 @@ export default function AuthForm() {
       <h1>{mode === "signin" ? "Welcome back." : "Save your progress."}</h1>
       <p>
         {mode === "signin"
-          ? "Pick up your deck, solves and ratings on any device."
+          ? "Pick up your roster, wins and ratings on any device."
           : "Anything you've already done in this browser comes with you."}
       </p>
 
