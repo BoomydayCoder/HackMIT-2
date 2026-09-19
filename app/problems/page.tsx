@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AccountMenu from "@/components/AccountMenu";
 import { PROBLEMS, SETS, type Problem } from "@/lib/problems";
 import { getProfile } from "@/lib/profiles";
 
@@ -43,9 +44,12 @@ export default function ProblemsPage() {
         <Link className="wordmark" href="/" aria-label="MathMatch home">
           Math<span>♥</span>Match
         </Link>
-        <Link className="back-link" href="/match">
-          Back to the deck
-        </Link>
+        <nav className="header-links">
+          <Link className="back-link" href="/match">
+            Back to the deck
+          </Link>
+          <AccountMenu className="back-link" />
+        </nav>
       </header>
 
       <section className="listing-intro">

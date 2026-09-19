@@ -1,6 +1,7 @@
 const SOLVED_KEY = "mathmatch:solved";
 const GRADED_KEY = "mathmatch:graded";
 const PINNED_KEY = "mathmatch:pinned";
+export const RATINGS_KEY = "mathmatch:ratings";
 
 const listeners = new Set<() => void>();
 
@@ -63,5 +64,80 @@ export function markGraded(problemId: string): boolean {
   const graded = parseSolved(window.localStorage.getItem(GRADED_KEY) ?? "[]");
   if (graded.includes(problemId)) return false;
   window.localStorage.setItem(GRADED_KEY, JSON.stringify([...graded, problemId]));
+  notifyProgress();
   return true;
+}
+
+/** Everything that makes up a player's progress, in the shape the account API stores. */
+export type Progress = {
+  solved: string[];
+  graded: string[];
+  pinned: string;
+  ratings: Record<string, number>;
+};
+
+export function emptyProgress(): Progress {
+  return { solved: [], graded: [], pinned: "", ratings: {} };
+}
+
+export function parseProgress(value: unknown): Progress {
+  const progress = emptyProgress();
+  if (!value || typeof value !== "object") return progress;
+  const record = value as Record<string, unknown>;
+  const ids = (list: unknown) =>
+    Array.isArray(list) ? list.filter((id): id is string => typeof id === "string") : [];
+  progress.solved = ids(record.solved);
+  progress.graded = ids(record.graded);
+  if (typeof record.pinned === "string") progress.pinned = record.pinned;
+  if (record.ratings && typeof record.ratings === "object") {
+    for (const [topic, rating] of Object.entries(record.ratings as Record<string, unknown>)) {
+      if (typeof rating === "number" && Number.isFinite(rating)) progress.ratings[topic] = rating;
+    }
+  }
+  return progress;
+}
+
+export function readProgress(): Progress {
+  if (typeof window === "undefined") return emptyProgress();
+  let ratings: unknown = {};
+  try {
+    ratings = JSON.parse(window.localStorage.getItem(RATINGS_KEY) ?? "{}");
+  } catch {
+    // unreadable ratings count as none
+  }
+  return {
+    solved: parseSolved(readSolvedRaw()),
+    graded: parseSolved(window.localStorage.getItem(GRADED_KEY) ?? "[]"),
+    pinned: readPinned(),
+    ratings: parseProgress({ ratings }).ratings,
+  };
+}
+
+/** Replaces the locally stored progress wholesale (used when an account loads). */
+export function writeProgress(progress: Progress) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(SOLVED_KEY, JSON.stringify(progress.solved));
+  window.localStorage.setItem(GRADED_KEY, JSON.stringify(progress.graded));
+  if (progress.pinned) window.localStorage.setItem(PINNED_KEY, progress.pinned);
+  else window.localStorage.removeItem(PINNED_KEY);
+  window.localStorage.setItem(RATINGS_KEY, JSON.stringify(progress.ratings));
+  notifyProgress();
+}
+
+export function clearProgress() {
+  writeProgress(emptyProgress());
+}
+
+/**
+ * Combines what this browser has done with what an account has saved: solves
+ * and grades are unioned, saved ratings win over local ones, and the local pin
+ * is kept if there is one.
+ */
+export function mergeProgress(local: Progress, saved: Progress): Progress {
+  return {
+    solved: [...new Set([...saved.solved, ...local.solved])],
+    graded: [...new Set([...saved.graded, ...local.graded])],
+    pinned: local.pinned || saved.pinned,
+    ratings: { ...local.ratings, ...saved.ratings },
+  };
 }

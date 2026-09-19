@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "katex/dist/katex.min.css";
 import "./globals.css";
+import AccountSession from "@/components/AccountSession";
 
 export const metadata: Metadata = {
   title: "MathMatch",
@@ -12,7 +13,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AccountSession />
+        {children}
+      </body>
     </html>
   );
 }
