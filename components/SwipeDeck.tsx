@@ -270,22 +270,29 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
       </div>
 
       <div className="mm-actions">
-        <button
-          className="mm-round mm-round-nope"
-          type="button"
-          onClick={pass}
-          aria-label="Flee"
-        >
-          ⚑
-        </button>
-        <button className="mm-round mm-round-like" type="button" onClick={match} aria-label="Fight">
-          ⚔
-        </button>
+        <div className="mm-call">
+          <button
+            className="mm-round mm-round-nope"
+            type="button"
+            onClick={pass}
+            aria-label="Flee"
+          >
+            ⚑
+          </button>
+          <span className="mm-call-label">← Flee</span>
+        </div>
+        <div className="mm-call">
+          <button
+            className="mm-round mm-round-like"
+            type="button"
+            onClick={match}
+            aria-label="Fight"
+          >
+            ⚔
+          </button>
+          <span className="mm-call-label">Fight →</span>
+        </div>
       </div>
-
-      <p className="mm-hint">
-        Drag the card, or use ← to flee and → to fight.
-      </p>
     </section>
   );
 }
