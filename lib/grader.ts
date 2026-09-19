@@ -12,13 +12,13 @@ export const RIGOR_LABELS: Record<RigorLevel, { name: string; hint: string }> = 
 };
 
 export const MODELS = [
-  { id: "o4-mini", label: "o4-mini (reasoning, default)" },
-  { id: "gpt-5.6-terra", label: "gpt-5.6-terra (strongest)" },
+  { id: "gpt-4o-mini", label: "gpt-4o-mini (fastest, cheapest, default)" },
+  { id: "o4-mini", label: "o4-mini (reasoning)" },
   { id: "gpt-5-mini", label: "gpt-5-mini (reasoning, cheap)" },
-  { id: "gpt-4o-mini", label: "gpt-4o-mini (fastest, cheapest)" },
+  { id: "gpt-5.6-terra", label: "gpt-5.6-terra (strongest)" },
 ] as const;
 export type ModelId = (typeof MODELS)[number]["id"];
-export const DEFAULT_MODEL: ModelId = "o4-mini";
+export const DEFAULT_MODEL: ModelId = "gpt-4o-mini";
 
 const COMMON = `You are grading a student's written solution to a competition mathematics problem on a 0–7 scale. You are given the problem statement, the official solution (and, for short-answer contests, the official answer), and the student's submission. Compare against the official solution but fully accept different valid approaches. Never give credit for a step that is false, and if the argument contains a genuine mathematical error, cap the score according to how much of the remaining argument survives without it. Make each feedback item concise and specific, quoting the exact step in question. Return only the requested JSON object.`;
 

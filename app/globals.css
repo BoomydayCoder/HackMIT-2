@@ -200,3 +200,26 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-card-behind { filter: saturate(.6); }
 .mm-card-behind { transform-origin: top center; }
 .mm-stack { margin-top: 42px; }
+
+.solved-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 14px 0 4px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(253, 38, 125, .08);
+  border: 1px solid rgba(253, 38, 125, .3);
+}
+
+.solved-panel button {
+  margin-left: auto;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--mm-grad);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}

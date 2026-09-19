@@ -1,7 +1,9 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Math from "@/components/Math";
+import { awardLifeline, MAX_LIFELINES, PASS_SCORE } from "@/lib/lifelines";
 import {
   DEFAULT_MODEL,
   DEFAULT_RIGOR,
@@ -28,7 +30,9 @@ type GradeResult = {
 };
 
 export default function ProofEditor({ problemId, solution }: ProofEditorProps) {
+  const router = useRouter();
   const [proof, setProof] = useState("");
+  const [lifelines, setLifelines] = useState<number | null>(null);
   const [rigor, setRigor] = useState<RigorLevel>(DEFAULT_RIGOR);
   const [model, setModel] = useState<ModelId>(DEFAULT_MODEL);
   const [result, setResult] = useState<GradeResult | null>(null);
@@ -54,7 +58,11 @@ export default function ProofEditor({ problemId, solution }: ProofEditorProps) {
         throw new Error(data.error ?? "Unable to grade this proof.");
       }
 
-      setResult(data as GradeResult);
+      const graded = data as GradeResult;
+      setResult(graded);
+      if (graded.score >= PASS_SCORE) {
+        setLifelines(awardLifeline(problemId));
+      }
     } catch (gradingError) {
       setError(
         gradingError instanceof Error
@@ -147,6 +155,19 @@ export default function ProofEditor({ problemId, solution }: ProofEditorProps) {
             </div>
             <div className="verdict-badge">{result.verdict}</div>
           </div>
+          {result.score >= PASS_SCORE && (
+            <div className="solved-panel">
+              <strong>Solved.</strong>{" "}
+              {lifelines === null
+                ? `Already credited \u2014 no extra lifeline.`
+                : lifelines >= MAX_LIFELINES
+                  ? `Lifelines are full at ${MAX_LIFELINES}.`
+                  : `+1 lifeline \u2014 you now have ${lifelines}.`}
+              <button type="button" onClick={() => router.push("/match")}>
+                Back to the deck
+              </button>
+            </div>
+          )}
           <p className="result-summary">{result.summary}</p>
           <h3>Feedback</h3>
           <ul className="feedback-list">

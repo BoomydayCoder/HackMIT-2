@@ -1,12 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import MathText from "@/components/Math";
 import type { DeckCard } from "@/lib/problems";
+import {
+  MAX_LIFELINES,
+  parseSolved,
+  readLifelines,
+  readSolvedRaw,
+  STARTING_LIFELINES,
+  subscribeLifelines,
+  writeLifelines,
+} from "@/lib/lifelines";
 
-const STARTING_LIFELINES = 5;
-const MAX_LIFELINES = 10;
 const SWIPE_THRESHOLD = 110;
 
 const TOPIC_GLYPHS: Record<string, string> = {
@@ -22,9 +36,18 @@ type SwipeDeckProps = {
 
 type Drag = { x: number; y: number };
 
-export default function SwipeDeck({ cards }: SwipeDeckProps) {
+export default function SwipeDeck({ cards: allCards }: SwipeDeckProps) {
   const [index, setIndex] = useState(0);
-  const [lifelines, setLifelines] = useState(STARTING_LIFELINES);
+  const solvedRaw = useSyncExternalStore(subscribeLifelines, readSolvedRaw, () => "[]");
+  const cards = useMemo(() => {
+    const solved = parseSolved(solvedRaw);
+    return allCards.filter((entry) => !solved.includes(entry.id));
+  }, [allCards, solvedRaw]);
+  const lifelines = useSyncExternalStore(
+    subscribeLifelines,
+    readLifelines,
+    () => STARTING_LIFELINES,
+  );
   const [matched, setMatched] = useState<DeckCard | null>(null);
   const [drag, setDrag] = useState<Drag>({ x: 0, y: 0 });
   const [flyOut, setFlyOut] = useState<"left" | "right" | null>(null);
@@ -47,7 +70,7 @@ export default function SwipeDeck({ cards }: SwipeDeckProps) {
 
   const pass = useCallback(() => {
     if (!card || matched || flyOut || lifelines <= 0) return;
-    setLifelines((value) => value - 1);
+    writeLifelines(lifelines - 1);
     advance("left", card);
   }, [card, matched, flyOut, lifelines, advance]);
 
@@ -131,7 +154,9 @@ export default function SwipeDeck({ cards }: SwipeDeckProps) {
       <div className="mm-meter">
         <span className="mm-hearts" aria-label={`${lifelines} of ${MAX_LIFELINES} lifelines`}>
           {"♥".repeat(lifelines)}
-          <span className="mm-hearts-spent">{"♥".repeat(Math.max(0, STARTING_LIFELINES - lifelines))}</span>
+          <span className="mm-hearts-spent">
+            {"♥".repeat(Math.max(0, STARTING_LIFELINES - lifelines))}
+          </span>
         </span>
         <span className="mm-count">
           {index + 1} / {cards.length}
