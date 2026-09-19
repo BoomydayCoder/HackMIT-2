@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Math from "@/components/Math";
+import { useDictation } from "@/lib/dictation";
 import { markGraded, markSolved } from "@/lib/progress";
 import { recordGrade } from "@/lib/rating";
 import {
@@ -44,6 +45,14 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const appendTranscript = useCallback((text: string) => {
+    setProof((current) =>
+      current.trim() ? `${current.replace(/\s+$/, "")} ${text}` : text,
+    );
+  }, []);
+  const dictation = useDictation(appendTranscript);
+  const listening = dictation.status !== "idle";
+
   async function gradeProof() {
     setLoading(true);
     setError("");
@@ -84,6 +93,27 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
         <label htmlFor="proof">Your proof</label>
         <span>{proof.length.toLocaleString()} / 20,000</span>
       </div>
+      <div className="dictation-row">
+        <button
+          type="button"
+          className={listening ? "mic-button listening" : "mic-button"}
+          onClick={listening ? dictation.stop : dictation.start}
+          aria-pressed={listening}
+          disabled={dictation.status === "starting"}
+        >
+          <span className="mic-dot" aria-hidden="true" />
+          {dictation.status === "starting"
+            ? "Opening the mic…"
+            : listening
+              ? "Stop dictating"
+              : "Speak your proof"}
+        </button>
+        <span className="dictation-interim">
+          {dictation.interim ||
+            (listening ? "Listening…" : "Spoken text lands in the box below.")}
+        </span>
+      </div>
+      {dictation.error && <div className="error-panel">{dictation.error}</div>}
       <div className="editor-controls">
         <div className="rigor-control">
           <div className="rigor-heading">
