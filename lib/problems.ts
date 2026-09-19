@@ -1,11 +1,13 @@
-import imoProblems from "@/data/imo-2023-shortlist.json";
-import amc8Problems from "@/data/amc8-2023.json";
+import harpDeck from "@/data/harp-deck.json";
 
 export type Problem = {
   id: string;
   number: string;
-  set: "IMO 2023 Shortlist" | "AMC 8 2023";
+  set: string;
   topic: string;
+  level: number;
+  elo: number;
+  bio: string;
   statement: string;
   solution: string;
   answer?: string;
@@ -13,18 +15,27 @@ export type Problem = {
   sourceUrl: string;
 };
 
-export type ShortlistProblem = Problem;
+export type DeckCard = Omit<Problem, "solution" | "answer">;
 
-const imo = imoProblems as Omit<Problem, "set">[];
-const amc8 = amc8Problems as Problem[];
+export const PROBLEMS: Problem[] = harpDeck as Problem[];
 
-export const PROBLEMS: Problem[] = [
-  ...imo.map((problem) => ({ ...problem, set: "IMO 2023 Shortlist" as const })),
-  ...amc8,
-];
-
-export const SETS = ["AMC 8 2023", "IMO 2023 Shortlist"] as const;
+export const SETS: string[] = [...new Set(PROBLEMS.map((problem) => problem.set))];
 
 export function getProblem(id: string): Problem | undefined {
   return PROBLEMS.find((problem) => problem.id === id);
+}
+
+export function getDeck(): DeckCard[] {
+  return PROBLEMS.map((problem) => ({
+    id: problem.id,
+    number: problem.number,
+    set: problem.set,
+    topic: problem.topic,
+    level: problem.level,
+    elo: problem.elo,
+    bio: problem.bio,
+    statement: problem.statement,
+    proposer: problem.proposer,
+    sourceUrl: problem.sourceUrl,
+  }));
 }

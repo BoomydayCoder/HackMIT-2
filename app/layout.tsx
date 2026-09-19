@@ -3,8 +3,8 @@ import "katex/dist/katex.min.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "rigor.ai",
-  description: "A home for focused Olympiad practice.",
+  title: "MathMatch",
+  description: "Swipe through olympiad problems and prove the ones you match with.",
 };
 
 export default function RootLayout({
