@@ -1,54 +1,35 @@
 import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
-import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
-import path from "node:path";
 import { cookies } from "next/headers";
+import { db, ready } from "@/lib/db";
 import { emptyProgress, parseProgress, type Progress } from "@/lib/progress";
 
-/**
- * Accounts live in a single JSON file (MATHMATCH_DATA_DIR, default `.data/`).
- * That is plenty for a hackathon deployment on one box; swap `load`/`save`
- * for a database call if the app ever runs on more than one instance.
- */
-const DATA_DIR = process.env.MATHMATCH_DATA_DIR ?? path.join(process.cwd(), ".data");
-const STORE_PATH = path.join(DATA_DIR, "accounts.json");
 const SESSION_COOKIE = "mathmatch_session";
 const SESSION_DAYS = 30;
 
 export const USERNAME_PATTERN = /^[a-z0-9_]{3,20}$/i;
 export const MIN_PASSWORD_LENGTH = 8;
+export const MAX_BIO_LENGTH = 240;
 
-type UserRecord = {
+type UserRow = {
   username: string;
+  display_name: string;
   salt: string;
   hash: string;
-  createdAt: string;
-  progress: Progress;
-};
-
-type SessionRecord = { username: string; expiresAt: string };
-
-type Store = {
-  users: Record<string, UserRecord>;
-  sessions: Record<string, SessionRecord>;
+  bio: string;
+  avatar: string;
+  progress: unknown;
 };
 
 export type PublicUser = { username: string };
 
-function load(): Store {
-  try {
-    const parsed = JSON.parse(readFileSync(STORE_PATH, "utf8")) as Partial<Store>;
-    return { users: parsed.users ?? {}, sessions: parsed.sessions ?? {} };
-  } catch {
-    return { users: {}, sessions: {} };
-  }
-}
-
-function save(store: Store) {
-  mkdirSync(DATA_DIR, { recursive: true });
-  const tmp = `${STORE_PATH}.${process.pid}.tmp`;
-  writeFileSync(tmp, JSON.stringify(store));
-  renameSync(tmp, STORE_PATH);
-}
+/** A player as everyone else sees them. */
+export type PublicProfile = {
+  username: string;
+  bio: string;
+  avatar: string;
+  ratings: Record<string, number>;
+  solved: number;
+};
 
 const key = (username: string) => username.toLowerCase();
 
@@ -56,20 +37,23 @@ function hashPassword(password: string, salt: string): string {
   return scryptSync(password, salt, 64).toString("hex");
 }
 
-function pruneSessions(store: Store) {
-  const now = Date.now();
-  for (const [token, session] of Object.entries(store.sessions)) {
-    if (new Date(session.expiresAt).getTime() < now) delete store.sessions[token];
-  }
+function publicProfile(row: UserRow): PublicProfile {
+  const progress = parseProgress(row.progress);
+  return {
+    username: row.display_name,
+    bio: row.bio,
+    avatar: row.avatar,
+    ratings: progress.ratings,
+    solved: progress.solved.length,
+  };
 }
 
-function startSession(store: Store, username: string): string {
-  pruneSessions(store);
+async function startSession(username: string): Promise<string> {
   const token = randomBytes(32).toString("hex");
-  store.sessions[token] = {
-    username,
-    expiresAt: new Date(Date.now() + SESSION_DAYS * 86_400_000).toISOString(),
-  };
+  const expiresAt = new Date(Date.now() + SESSION_DAYS * 86_400_000).toISOString();
+  await db()`delete from sessions where expires_at < now()`;
+  await db()`insert into sessions (token, username, expires_at)
+            values (${token}, ${key(username)}, ${expiresAt})`;
   return token;
 }
 
@@ -99,72 +83,113 @@ export async function signUp(username: string, password: string): Promise<AuthRe
   if (password.length < MIN_PASSWORD_LENGTH) {
     return { ok: false, error: `Passwords need at least ${MIN_PASSWORD_LENGTH} characters.` };
   }
-  const store = load();
-  if (store.users[key(username)]) return { ok: false, error: "That username is taken." };
+  await ready();
 
   const salt = randomBytes(16).toString("hex");
-  const user: UserRecord = {
-    username,
-    salt,
-    hash: hashPassword(password, salt),
-    createdAt: new Date().toISOString(),
-    progress: emptyProgress(),
-  };
-  store.users[key(username)] = user;
-  const token = startSession(store, user.username);
-  save(store);
-  await setSessionCookie(token);
-  return { ok: true, user: { username: user.username }, progress: user.progress };
+  const progress = emptyProgress();
+  const inserted = await db()`
+    insert into users (username, display_name, salt, hash, progress)
+    values (${key(username)}, ${username}, ${salt}, ${hashPassword(password, salt)},
+            ${JSON.stringify(progress)}::jsonb)
+    on conflict (username) do nothing
+    returning display_name`;
+  if (inserted.length === 0) return { ok: false, error: "That username is taken." };
+
+  await setSessionCookie(await startSession(username));
+  return { ok: true, user: { username }, progress };
 }
 
 export async function signIn(username: string, password: string): Promise<AuthResult> {
-  const store = load();
-  const user = store.users[key(username)];
+  await ready();
   const failure = { ok: false as const, error: "Wrong username or password." };
+  const rows = (await db()`select * from users where username = ${key(username)}`) as UserRow[];
+  const user = rows[0];
   if (!user) return failure;
+
   const expected = Buffer.from(user.hash, "hex");
   const actual = Buffer.from(hashPassword(password, user.salt), "hex");
   if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) return failure;
 
-  const token = startSession(store, user.username);
-  save(store);
-  await setSessionCookie(token);
-  return { ok: true, user: { username: user.username }, progress: user.progress };
+  await setSessionCookie(await startSession(user.username));
+  return {
+    ok: true,
+    user: { username: user.display_name },
+    progress: parseProgress(user.progress),
+  };
 }
 
 export async function signOut() {
   const jar = await cookies();
   const token = jar.get(SESSION_COOKIE)?.value;
   if (token) {
-    const store = load();
-    if (store.sessions[token]) {
-      delete store.sessions[token];
-      save(store);
-    }
+    await ready();
+    await db()`delete from sessions where token = ${token}`;
   }
   await setSessionCookie(null);
 }
 
-async function currentRecord(store: Store): Promise<UserRecord | null> {
+async function currentRow(): Promise<UserRow | null> {
   const jar = await cookies();
   const token = jar.get(SESSION_COOKIE)?.value;
   if (!token) return null;
-  const session = store.sessions[token];
-  if (!session || new Date(session.expiresAt).getTime() < Date.now()) return null;
-  return store.users[key(session.username)] ?? null;
+  await ready();
+  const rows = (await db()`
+    select users.* from sessions
+    join users on users.username = sessions.username
+    where sessions.token = ${token} and sessions.expires_at > now()`) as UserRow[];
+  return rows[0] ?? null;
 }
 
 /** The signed-in user and their saved progress, or null for guests. */
 export async function currentUser(): Promise<{ user: PublicUser; progress: Progress } | null> {
-  const user = await currentRecord(load());
-  return user ? { user: { username: user.username }, progress: user.progress } : null;
+  const row = await currentRow();
+  if (!row) return null;
+  return { user: { username: row.display_name }, progress: parseProgress(row.progress) };
 }
 
 export async function saveProgress(value: unknown): Promise<PublicUser | null> {
-  const store = load();
-  const user = await currentRecord(store);
-  if (!user) return null;
-  user.progress = parseProgress(value);
-  save(store);
-  return { username: user.username };
+  const row = await currentRow();
+  if (!row) return null;
+  const progress = parseProgress(value);
+  await db()`update users set progress = ${JSON.stringify(progress)}::jsonb
+            where username = ${row.username}`;
+  return { username: row.display_name };
 }
+
+/** The signed-in player's own profile, editable fields included. */
+export async function currentProfile(): Promise<PublicProfile | null> {
+  const row = await currentRow();
+  return row ? publicProfile(row) : null;
+}
+
+export async function findProfile(username: string): Promise<PublicProfile | null> {
+  await ready();
+  const rows = (await db()`select * from users where username = ${key(username)}`) as UserRow[];
+  return rows[0] ? publicProfile(rows[0]) : null;
+}
+
+export async function updateProfile(fields: {
+  bio?: string;
+  avatar?: string;
+}): Promise<PublicProfile | null> {
+  const row = await currentRow();
+  if (!row) return null;
+  const bio = (fields.bio ?? row.bio).slice(0, MAX_BIO_LENGTH);
+  const avatar = fields.avatar ?? row.avatar;
+  await db()`update users set bio = ${bio}, avatar = ${avatar} where username = ${row.username}`;
+  return publicProfile({ ...row, bio, avatar });
+}
+
+/** Usernames matching a prefix, for the friend search box. */
+export async function searchUsers(term: string, limit = 8): Promise<string[]> {
+  await ready();
+  const needle = `${term.toLowerCase().replace(/[%_\\]/g, "\\$&")}%`;
+  const rows = (await db()`
+    select display_name from users
+    where username like ${needle} order by username limit ${limit}`) as {
+    display_name: string;
+  }[];
+  return rows.map((row) => row.display_name);
+}
+
+export { key as usernameKey };

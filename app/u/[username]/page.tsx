@@ -1,0 +1,30 @@
+import Link from "next/link";
+import AccountMenu from "@/components/AccountMenu";
+import ProfileView from "@/components/ProfileView";
+
+export const dynamic = "force-dynamic";
+
+export default async function PublicProfilePage({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}) {
+  const { username } = await params;
+  return (
+    <main className="mm-page">
+      <header className="mm-header">
+        <Link className="mm-logo" href="/" aria-label="MathMatch home">
+          <span className="mm-swords" aria-hidden="true">
+            ⚔
+          </span>
+          MathMatch
+        </Link>
+        <AccountMenu className="mm-nav" />
+      </header>
+
+      <div className="mm-sheet">
+        <ProfileView username={decodeURIComponent(username)} />
+      </div>
+    </main>
+  );
+}

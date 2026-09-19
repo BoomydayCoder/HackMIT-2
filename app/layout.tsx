@@ -3,6 +3,7 @@ import "katex/dist/katex.min.css";
 import "./globals.css";
 import AccountSession from "@/components/AccountSession";
 import Arena from "@/components/Arena";
+import TabBar from "@/components/TabBar";
 
 export const metadata: Metadata = {
   title: "MathMatch",
@@ -18,6 +19,7 @@ export default function RootLayout({
         <Arena />
         <AccountSession />
         {children}
+        <TabBar />
       </body>
     </html>
   );
