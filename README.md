@@ -32,8 +32,9 @@ pnpm install
 cp .env.example .env.local
 ```
 
-Open `.env.local` and set `OPENAI_API_KEY` to an OpenAI API key. Keep this file
-private; it is gitignored and must not be committed. Then start the app:
+Open `.env.local` and set `OPENAI_API_KEY` to an OpenAI API key, and
+`DEEPGRAM_API_KEY` to a Deepgram key if you want to dictate proofs. Keep this
+file private; it is gitignored and must not be committed. Then start the app:
 
 ```bash
 pnpm dev
@@ -52,6 +53,15 @@ pnpm build
 ## Grading
 
 The proof grader sends a selected problem and a student's proof to the OpenAI Chat Completions API, and only on an explicit submission. The model and rigor level are chosen in the UI; `gpt-4o-mini` is the default and `OPENAI_MODEL` overrides it. The browser submits proofs to `POST /api/grade` with `{ "problemId": "...", "proof": "...", "rigor": 3, "model": "gpt-4o-mini" }`, and proofs are scored out of 5, with 4 or better counting as solved.
+
+## Dictation
+
+The proof editor can take spoken proofs. The mic button records in the browser
+and posts the clip to `POST /api/transcribe`, which forwards it to Deepgram's
+`nova-3` model and returns the text to append to the proof box, so
+`DEEPGRAM_API_KEY` never leaves the server. Spoken mathematics transcribes
+loosely, so read the text back before grading. Without the key the rest of the
+app is unaffected and the mic button reports that dictation is unavailable.
 
 The AMC 8 2023 and IMO 2023 Shortlist sets have been removed; HARP is the only bundled problem source. `scripts/convert_amc8.py` and `scripts/extract_shortlist.py` remain if those sets are reinstated.
 
