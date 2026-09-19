@@ -73,12 +73,6 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
       )
     : suggestion.upcoming;
   const outOfCards = !card;
-  const remaining = pool.filter(
-    (entry) =>
-      topics.includes(entry.topic) &&
-      !solved.includes(entry.id) &&
-      !seen.includes(entry.id),
-  ).length;
 
   /** Tapping a topic filters the deck; the last selected topic can't be turned off. */
   const toggleTopic = useCallback((topic: string) => {
@@ -156,7 +150,6 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
         </div>
         <h2 className="mm-name">
           {getProfile(matched).name}
-          <span className="mm-age">{matched.level}</span>
         </h2>
         <p className="mm-source">
           {matched.set} · Problem {matched.number}
@@ -215,7 +208,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
     <section className="mm-deck">
       <div className="mm-meter">
         <span className="mm-count">
-          {solved.length} solved · {remaining} left
+          {solved.length} solved
         </span>
       </div>
 
@@ -260,9 +253,8 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
             </div>
             <h2 className="mm-name">
               {getProfile(card).name}
-              <span className="mm-age">{card.level}</span>
             </h2>
-            <p className="mm-bio">{card.bio}</p>
+            <p className="mm-bio">{getProfile(card).bio}</p>
             <div className="mm-tags">
               <span>
                 {card.set} · #{card.number}

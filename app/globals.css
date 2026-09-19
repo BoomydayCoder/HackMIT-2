@@ -68,8 +68,6 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .card-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }
 .problem-card h3 { margin: 40px 0 11px; font-size: 25px; letter-spacing: -.04em; }
 .card-name { line-height: 1.15; }
-.card-age { font-size: 20px; font-weight: 400; color: var(--muted); letter-spacing: 0; white-space: nowrap; }
-.card-age::before { content: ","; margin-right: 6px; color: var(--ink); }
 .problem-card .card-tagline { margin: 0 0 8px; color: var(--ink); font-size: 14px; font-style: italic; }
 .problem-card p { max-width: 33em; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
 .card-arrow { position: absolute; right: 22px; bottom: 20px; color: var(--accent); font-size: 22px; }
@@ -164,8 +162,6 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-card-body { width: 100%; padding: 26px; background: linear-gradient(to top, rgba(0,0,0,.72), transparent); }
 .mm-card-top-row { display: flex; align-items: center; justify-content: space-between; }
 .mm-card h2 { margin: 14px 0 6px; font-size: 30px; font-weight: 700; letter-spacing: -.02em; }
-.mm-age { margin-left: 8px; font-size: 22px; font-weight: 400; color: rgba(255,255,255,.7); letter-spacing: 0; white-space: nowrap; }
-.mm-age::before { content: ","; margin-right: 6px; color: inherit; }
 .mm-source { margin: -10px 0 18px; color: rgba(255,255,255,.55); font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
 .mm-chip { display: inline-block; padding: 5px 12px; border-radius: 999px; background: rgba(255,255,255,.14); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .mm-elo { font-size: 15px; font-weight: 800; background: var(--mm-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
