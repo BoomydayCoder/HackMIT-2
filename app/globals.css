@@ -195,7 +195,7 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-meter { display: flex; align-items: center; justify-content: flex-end; padding: 6px 4px 10px; }
 .mm-count { color: var(--muted); font-size: 13px; font-style: italic; }
 
-.mm-ratings { display: flex; gap: 6px; padding: 0 4px 6px; }
+.mm-ratings { position: relative; z-index: 5; display: flex; gap: 6px; padding: 0 4px 6px; }
 .mm-rating { display: inline-flex; align-items: center; gap: 5px; flex: 1; justify-content: center; padding: 7px 4px; border: 1px solid var(--mm-edge); border-radius: 3px; background: rgba(250, 241, 220, .55); color: var(--muted); font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: color .15s, background .15s, border-color .15s; }
 .mm-rating:hover { color: var(--ink); }
 .mm-rating-on { background: rgba(184, 134, 59, .28); border-color: rgba(120, 80, 30, .7); color: var(--ink); box-shadow: 1px 2px 0 rgba(72, 54, 33, .25); }
