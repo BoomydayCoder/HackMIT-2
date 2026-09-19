@@ -11,6 +11,7 @@ import {
 } from "react";
 import MathText from "@/components/Math";
 import type { DeckCard } from "@/lib/problems";
+import { getProfile } from "@/lib/profiles";
 import {
   parseSolved,
   readPinned,
@@ -153,7 +154,13 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
           <span className="mm-chip">{matched.topic}</span>
           <span className="mm-elo">{matched.elo}</span>
         </div>
-        <h2>{matched.set}</h2>
+        <h2 className="mm-name">
+          {getProfile(matched).name}
+          <span className="mm-age">{matched.level}</span>
+        </h2>
+        <p className="mm-source">
+          {matched.set} · Problem {matched.number}
+        </p>
         <div className="mm-statement">
           <MathText text={matched.statement} />
         </div>
@@ -251,10 +258,15 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
               <span className="mm-chip">{card.topic}</span>
               <span className="mm-elo">{card.elo}</span>
             </div>
-            <h2>{card.set}</h2>
+            <h2 className="mm-name">
+              {getProfile(card).name}
+              <span className="mm-age">{card.level}</span>
+            </h2>
             <p className="mm-bio">{card.bio}</p>
             <div className="mm-tags">
-              <span>Problem {card.number}</span>
+              <span>
+                {card.set} · #{card.number}
+              </span>
               <span>Proof required</span>
               {pinnedCard && <span className="mm-tag-on">Your match — unsolved</span>}
             </div>
