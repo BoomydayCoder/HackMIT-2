@@ -78,6 +78,8 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
 
   /** Flashes the chips of topics whose rating climbed since the deck last showed it. */
   useEffect(() => {
+    // The chips are hidden while a duel is in progress, so hold the gain until they are back.
+    if (matched || pinnedCard) return;
     const previous = parseRatings(window.localStorage.getItem(RATINGS_SEEN_KEY) ?? "{}");
     window.localStorage.setItem(RATINGS_SEEN_KEY, ratingsRaw);
     const climbed = TOPICS.filter(
@@ -90,7 +92,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
       window.cancelAnimationFrame(flash);
       window.clearTimeout(clear);
     };
-  }, [ratings, ratingsRaw]);
+  }, [ratings, ratingsRaw, matched, pinnedCard]);
 
   /** Tapping a topic filters the deck; the last selected topic can't be turned off. */
   const toggleTopic = useCallback((topic: string) => {
