@@ -94,7 +94,7 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
     }
   }
 
-  /** Surrender: the solution is revealed, the match ends and the rating pays for it. */
+  /** Yielding: the solution is revealed, the duel ends and the rating pays for it. */
   function giveUp() {
     if (markRated(problemId)) setRating(recordGiveUp(topic));
     markRetired(problemId);
@@ -195,14 +195,14 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
           {confirmingGiveUp ? (
             <>
               <span>
-                The solution is revealed and the match ends. It costs more of your
-                {` ${topic} `}rating than passing on a card ever would.
+                The solution is revealed and the duel is lost. It costs more of your
+                {` ${topic} `}rating than fleeing a card ever would.
               </span>
               <button className="give-up-button" type="button" onClick={giveUp}>
                 Yes, show me the solution
               </button>
               <button type="button" onClick={() => setConfirmingGiveUp(false)}>
-                Keep trying
+                Keep fighting
               </button>
             </>
           ) : (
@@ -211,7 +211,7 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
               type="button"
               onClick={() => setConfirmingGiveUp(true)}
             >
-              Give up &amp; view solution
+              Yield &amp; view solution
             </button>
           )}
         </div>
@@ -220,12 +220,12 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
       {gaveUp && (
         <section className="result-panel" aria-live="polite">
           <div className="solved-panel">
-            <strong>You gave up.</strong>{" "}
+            <strong>You yielded.</strong>{" "}
             {rating === null
               ? "Already rated \u2014 your rating stands."
               : `Your ${topic} rating is now ${rating}.`}
             <button type="button" onClick={() => router.push("/match")}>
-              Back to the deck
+              Back to the arena
             </button>
           </div>
           <h3>Official solution</h3>
@@ -253,7 +253,7 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
             <div className="verdict-badge">{result.verdict}</div>
           </div>
           <div className="solved-panel">
-            <strong>{solvedThis ? "Solved." : "Not solved yet."}</strong>{" "}
+            <strong>{solvedThis ? "Victory." : "Still standing."}</strong>{" "}
             {rating !== null
               ? `Your ${topic} rating is now ${rating}.`
               : solvedThis
@@ -261,11 +261,11 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
                 : "That attempt was free. Revise it and grade again."}
             {solvedThis ? (
               <button type="button" onClick={() => router.push("/match")}>
-                Back to the deck
+                Back to the arena
               </button>
             ) : (
               <span className="stuck-note">
-                Revise and grade again, or give up to see the solution.
+                Revise and grade again, or yield to see the solution.
               </span>
             )}
           </div>

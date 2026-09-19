@@ -6,13 +6,13 @@ export default function AccountPage() {
     <main className="mm-page">
       <header className="mm-header">
         <Link className="mm-logo" href="/" aria-label="MathMatch home">
-          <span className="mm-flame" aria-hidden="true">
-            ♥
+          <span className="mm-swords" aria-hidden="true">
+            ⚔
           </span>
           MathMatch
         </Link>
         <Link className="mm-nav" href="/match">
-          Back to the deck
+          Back to the arena
         </Link>
       </header>
 
