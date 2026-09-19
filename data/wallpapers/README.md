@@ -1,12 +1,20 @@
 # MathMatch wallpapers
 
-## Current direction: whimsical meadow
+## Current choice: HackMIT 2026 arena
+
+![HackMIT 2026 arena](hackmit-2026-arena.png)
+
+`hackmit-2026-arena.png` is the user-selected mathematical duelling wallpaper, with sketch-style HackMIT 2026 emblems on both upper flags and no MAA branding. The original supplied PNG is preserved byte-for-byte. Use this asset for the game background. This upload does not change the app UI.
+
+Logo reference: https://hackmit.org/assets/logo.svg. Wallpaper edited with built-in imagegen; the flags are illustrated adaptations of the logo.
+
+## Earlier concept: whimsical meadow
 
 ![Whimsical meadow](whimsical-meadow.png)
 
 `whimsical-meadow.png` is the revised wallpaper: simple wonky hills, oversized flowers, a little path, a crooked flag, sun and clouds. Broad flat colours and loose outlines, a quiet cream centre, no mathematical props or characters. 1672 × 941 RGB PNG. Original generated file preserved without postprocessing.
 
-The earlier `notebook-world.png` is retained as a superseded concept; use the meadow for the revised direction.
+Both `notebook-world.png` and `whimsical-meadow.png` are earlier concepts. Use `hackmit-2026-arena.png` for the current direction.
 
 ## For Devin
 
