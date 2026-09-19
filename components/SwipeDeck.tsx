@@ -150,6 +150,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
         </div>
         <h2 className="mm-name">
           {getProfile(matched).name}
+          <span className="mm-level">Level: {matched.level}</span>
         </h2>
         <p className="mm-source">
           {matched.set} · Problem {matched.number}
@@ -253,6 +254,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
             </div>
             <h2 className="mm-name">
               {getProfile(card).name}
+              <span className="mm-level">Level: {card.level}</span>
             </h2>
             <p className="mm-bio">{getProfile(card).bio}</p>
             <div className="mm-tags">
