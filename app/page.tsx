@@ -17,8 +17,8 @@ export default function Home() {
           A place to practice, reflect, and grow with a community of problem solvers.
         </p>
         <div className="hero-actions">
-          <Link className="cta-link" href="/problems">
-            Browse the problem library{" "}
+          <Link className="cta-link" href="/match">
+            Start matching{" "}
             <span aria-hidden="true">→</span>
           </Link>
           <div className="status">The first version is taking shape.</div>
