@@ -1,12 +1,9 @@
 import Link from "next/link";
 import AccountMenu from "@/components/AccountMenu";
+import Math from "@/components/Math";
+import { excerpt } from "@/lib/latex";
 import { PROBLEMS, SETS, type Problem } from "@/lib/problems";
 import { getProfile } from "@/lib/profiles";
-
-function excerpt(statement: string) {
-  const plain = statement.replace(/\s+/g, " ").trim();
-  return plain.length > 140 ? `${plain.slice(0, 140)}…` : plain;
-}
 
 function ProblemCard({ problem }: { problem: Problem }) {
   const meta = `${problem.set} · #${problem.number}`;
@@ -29,7 +26,9 @@ function ProblemCard({ problem }: { problem: Problem }) {
         </span>
       </h3>
       <p className="card-tagline">{profile.bio}</p>
-      <p>{excerpt(problem.statement)}</p>
+      <p>
+        <Math text={excerpt(problem.statement)} />
+      </p>
       <span className="card-arrow" aria-hidden="true">
         →
       </span>
