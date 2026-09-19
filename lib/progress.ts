@@ -1,6 +1,7 @@
 export const PASS_SCORE = 5; // out of 7
 
 const SOLVED_KEY = "mathmatch:solved";
+const PINNED_KEY = "mathmatch:pinned";
 
 const listeners = new Set<() => void>();
 
@@ -29,9 +30,26 @@ export function parseSolved(raw: string): string[] {
   }
 }
 
+/**
+ * The problem you last matched with: it stays at the front of the deck until
+ * you solve it or pass on it.
+ */
+export function readPinned(): string {
+  if (typeof window === "undefined") return "";
+  return window.localStorage.getItem(PINNED_KEY) ?? "";
+}
+
+export function writePinned(problemId: string) {
+  if (typeof window === "undefined") return;
+  if (problemId) window.localStorage.setItem(PINNED_KEY, problemId);
+  else window.localStorage.removeItem(PINNED_KEY);
+  notifyProgress();
+}
+
 /** Records a solve; returns false if the problem had already been solved. */
 export function markSolved(problemId: string): boolean {
   const solved = parseSolved(readSolvedRaw());
+  if (readPinned() === problemId) writePinned("");
   if (solved.includes(problemId)) return false;
   window.localStorage.setItem(SOLVED_KEY, JSON.stringify([...solved, problemId]));
   notifyProgress();

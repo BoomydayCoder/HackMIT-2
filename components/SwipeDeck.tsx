@@ -13,8 +13,10 @@ import MathText from "@/components/Math";
 import type { DeckCard } from "@/lib/problems";
 import {
   parseSolved,
+  readPinned,
   readSolvedRaw,
   subscribeProgress,
+  writePinned,
 } from "@/lib/progress";
 import {
   parseRatings,
@@ -46,6 +48,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   const [topics, setTopics] = useState<string[]>([...TOPICS]);
   const solvedRaw = useSyncExternalStore(subscribeProgress, readSolvedRaw, () => "[]");
   const ratingsRaw = useSyncExternalStore(subscribeProgress, readRatingsRaw, () => "{}");
+  const pinned = useSyncExternalStore(subscribeProgress, readPinned, () => "");
   const [matched, setMatched] = useState<DeckCard | null>(null);
   const [drag, setDrag] = useState<Drag>({ x: 0, y: 0 });
   const [flyOut, setFlyOut] = useState<"left" | "right" | null>(null);
@@ -53,10 +56,21 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
 
   const ratings = useMemo(() => parseRatings(ratingsRaw), [ratingsRaw]);
   const solved = useMemo(() => parseSolved(solvedRaw), [solvedRaw]);
-  const { card, upcoming } = useMemo(
+  const suggestion = useMemo(
     () => pickCards(pool, ratings, [...solved, ...seen], turn, topics),
     [pool, ratings, solved, seen, turn, topics],
   );
+  // A match you haven't solved yet stays at the front of the deck.
+  const pinnedCard = useMemo(
+    () => pool.find((entry) => entry.id === pinned && !solved.includes(entry.id)) ?? null,
+    [pool, pinned, solved],
+  );
+  const card = pinnedCard ?? suggestion.card;
+  const upcoming = pinnedCard
+    ? [suggestion.card, ...suggestion.upcoming].filter(
+        (entry): entry is DeckCard => entry !== null && entry.id !== pinnedCard.id,
+      )
+    : suggestion.upcoming;
   const outOfCards = !card;
   const remaining = pool.filter(
     (entry) =>
@@ -83,19 +97,21 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
       setFlyOut(null);
       setDrag({ x: 0, y: 0 });
       setTurn((value) => value + 1);
-      setSeen((value) => [...value, swiped.id]);
       if (direction === "right") setMatched(swiped);
+      else setSeen((value) => [...value, swiped.id]);
     }, 260);
   }, []);
 
   const pass = useCallback(() => {
     if (!card || matched || flyOut) return;
+    if (card.id === pinned) writePinned("");
     recordPass(card.topic);
     advance("left", card);
-  }, [card, matched, flyOut, advance]);
+  }, [card, matched, flyOut, pinned, advance]);
 
   const match = useCallback(() => {
     if (!card || matched || flyOut) return;
+    writePinned(card.id);
     advance("right", card);
   }, [card, matched, flyOut, advance]);
 
@@ -240,6 +256,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
             <div className="mm-tags">
               <span>Problem {card.number}</span>
               <span>Proof required</span>
+              {pinnedCard && <span className="mm-tag-on">Your match — unsolved</span>}
             </div>
           </div>
         </article>

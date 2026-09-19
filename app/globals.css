@@ -166,6 +166,7 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-bio { margin: 0; color: rgba(255,255,255,.78); font-size: 16px; line-height: 1.5; }
 .mm-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; color: rgba(255,255,255,.6); font-size: 12px; }
 .mm-tags span { padding: 5px 10px; border: 1px solid rgba(255,255,255,.2); border-radius: 999px; }
+.mm-tags .mm-tag-on { border-color: rgba(253,38,125,.55); background: rgba(253,38,125,.16); color: #fff; }
 
 .mm-stamp { position: absolute; top: 26px; padding: 6px 12px; border: 3px solid currentColor; border-radius: 8px; font-size: 22px; font-weight: 800; letter-spacing: .06em; opacity: 0; transition: opacity .12s ease; }
 .mm-stamp-like { left: 22px; color: #2bd68a; transform: rotate(-14deg); }
