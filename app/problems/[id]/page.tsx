@@ -17,11 +17,11 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
   return (
     <main className="page">
       <header className="header">
-        <Link className="wordmark" href="/" aria-label="rigor.ai home">
-          rigor<span>.</span>ai
+        <Link className="wordmark" href="/" aria-label="MathMatch home">
+          Math<span>♥</span>Match
         </Link>
-        <Link className="back-link" href="/problems">
-          All problems
+        <Link className="back-link" href="/match">
+          Back to the deck
         </Link>
       </header>
 
@@ -51,8 +51,8 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
       </div>
 
       <footer className="footer">
-        <span>rigor.ai</span>
-        <span>Made for HackMIT</span>
+        <span>MathMatch</span>
+        <span>Problems from HARP (Yue et al., 2024)</span>
       </footer>
     </main>
   );

@@ -32,20 +32,20 @@ export default function ProblemsPage() {
   return (
     <main className="page">
       <header className="header">
-        <Link className="wordmark" href="/" aria-label="rigor.ai home">
-          rigor<span>.</span>ai
+        <Link className="wordmark" href="/" aria-label="MathMatch home">
+          Math<span>♥</span>Match
         </Link>
-        <Link className="back-link" href="/">
-          Back home
+        <Link className="back-link" href="/match">
+          Back to the deck
         </Link>
       </header>
 
       <section className="listing-intro">
         <div className="eyebrow">Problem library</div>
-        <h1>Choose a problem.</h1>
+        <h1>Every problem in the deck.</h1>
         <p className="intro">
-          Pick a problem, write the proof you believe in, and get a focused
-          read from an AI grader trained on olympiad standards.
+          Browse past the swiping: pick a problem, write the proof you believe
+          in, and get a focused read from an AI grader.
         </p>
       </section>
 
@@ -78,8 +78,8 @@ export default function ProblemsPage() {
       )}
 
       <footer className="footer">
-        <span>rigor.ai</span>
-        <span>Made for HackMIT</span>
+        <span>MathMatch</span>
+        <span>Problems from HARP (Yue et al., 2024)</span>
       </footer>
     </main>
   );

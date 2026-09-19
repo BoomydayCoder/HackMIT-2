@@ -1,38 +1,60 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import MathText from "@/components/Math";
 import type { DeckCard } from "@/lib/problems";
 
 const STARTING_LIFELINES = 5;
+const MAX_LIFELINES = 10;
+const SWIPE_THRESHOLD = 110;
+
+const TOPIC_GLYPHS: Record<string, string> = {
+  algebra: "∑",
+  combinatorics: "⚄",
+  geometry: "△",
+  "number theory": "ℤ",
+};
 
 type SwipeDeckProps = {
   cards: DeckCard[];
 };
 
+type Drag = { x: number; y: number };
+
 export default function SwipeDeck({ cards }: SwipeDeckProps) {
   const [index, setIndex] = useState(0);
   const [lifelines, setLifelines] = useState(STARTING_LIFELINES);
-  const [matched, setMatched] = useState(false);
-  const [leaving, setLeaving] = useState<"pass" | "match" | null>(null);
+  const [matched, setMatched] = useState<DeckCard | null>(null);
+  const [drag, setDrag] = useState<Drag>({ x: 0, y: 0 });
+  const [flyOut, setFlyOut] = useState<"left" | "right" | null>(null);
+  const origin = useRef<Drag | null>(null);
 
   const card = cards[index];
+  const upcoming = cards.slice(index + 1, index + 4);
   const outOfCards = index >= cards.length;
-  const canPass = lifelines > 0 && !matched && !outOfCards;
+  const canPass = lifelines > 0;
+
+  const advance = useCallback((direction: "left" | "right", swiped: DeckCard) => {
+    setFlyOut(direction);
+    window.setTimeout(() => {
+      setFlyOut(null);
+      setDrag({ x: 0, y: 0 });
+      setIndex((value) => value + 1);
+      if (direction === "right") setMatched(swiped);
+    }, 260);
+  }, []);
 
   const pass = useCallback(() => {
-    if (lifelines <= 0 || matched || outOfCards) return;
-    setLeaving("pass");
+    if (!card || matched || flyOut || lifelines <= 0) return;
     setLifelines((value) => value - 1);
-    setIndex((value) => value + 1);
-  }, [lifelines, matched, outOfCards]);
+    advance("left", card);
+  }, [card, matched, flyOut, lifelines, advance]);
 
   const match = useCallback(() => {
-    if (matched || outOfCards) return;
-    setLeaving("match");
-    setMatched(true);
-  }, [matched, outOfCards]);
+    if (!card || matched || flyOut) return;
+    advance("right", card);
+  }, [card, matched, flyOut, advance]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -43,80 +65,146 @@ export default function SwipeDeck({ cards }: SwipeDeckProps) {
     return () => window.removeEventListener("keydown", onKey);
   }, [pass, match]);
 
-  useEffect(() => {
-    if (!leaving) return;
-    const timer = window.setTimeout(() => setLeaving(null), 220);
-    return () => window.clearTimeout(timer);
-  }, [leaving]);
+  function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    if (flyOut) return;
+    origin.current = { x: event.clientX, y: event.clientY };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }
 
-  if (outOfCards) {
+  function onPointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    if (!origin.current) return;
+    setDrag({
+      x: event.clientX - origin.current.x,
+      y: event.clientY - origin.current.y,
+    });
+  }
+
+  function onPointerUp() {
+    if (!origin.current) return;
+    origin.current = null;
+    if (drag.x > SWIPE_THRESHOLD) match();
+    else if (drag.x < -SWIPE_THRESHOLD && canPass) pass();
+    else setDrag({ x: 0, y: 0 });
+  }
+
+  if (matched) {
     return (
-      <div className="deck-empty">
-        <h2>That&apos;s the whole deck.</h2>
-        <button className="deck-button" type="button" onClick={() => setIndex(0)}>
-          Start over
-        </button>
-      </div>
+      <section className="mm-detail">
+        <div className="mm-detail-head">
+          <span className="mm-chip">{matched.topic}</span>
+          <span className="mm-elo">{matched.elo}</span>
+        </div>
+        <h2>{matched.set}</h2>
+        <div className="mm-statement">
+          <MathText text={matched.statement} />
+        </div>
+        <div className="mm-detail-actions">
+          <Link className="mm-btn mm-btn-primary" href={`/problems/${matched.id}`}>
+            Write a proof
+          </Link>
+          <button className="mm-btn" type="button" onClick={() => setMatched(null)}>
+            Back to deck
+          </button>
+        </div>
+      </section>
     );
   }
 
+  if (outOfCards) {
+    return (
+      <section className="mm-empty">
+        <h2>You&apos;ve seen everyone.</h2>
+        <p>Come back later, or run the deck again.</p>
+        <button className="mm-btn mm-btn-primary" type="button" onClick={() => setIndex(0)}>
+          Start over
+        </button>
+      </section>
+    );
+  }
+
+  const rotation = drag.x / 18;
+  const liking = drag.x > 60;
+  const noping = drag.x < -60;
+
   return (
-    <div className="deck">
-      <div className="deck-status">
-        <span className="lifelines" aria-label={`${lifelines} lifelines left`}>
+    <section className="mm-deck">
+      <div className="mm-meter">
+        <span className="mm-hearts" aria-label={`${lifelines} of ${MAX_LIFELINES} lifelines`}>
           {"♥".repeat(lifelines)}
-          <span className="lifelines-spent">{"♡".repeat(Math.max(0, 5 - lifelines))}</span>
+          <span className="mm-hearts-spent">{"♥".repeat(Math.max(0, STARTING_LIFELINES - lifelines))}</span>
         </span>
-        <span className="deck-progress">
+        <span className="mm-count">
           {index + 1} / {cards.length}
         </span>
       </div>
 
-      <article className={`deck-card${leaving ? ` deck-card-${leaving}` : ""}`} key={card.id}>
-        <div className="deck-card-elo">{card.elo}</div>
-        <h2>{card.topic}</h2>
-        <p className="deck-card-bio">{card.bio}</p>
-        <div className="deck-card-meta">{card.set}</div>
+      <div className="mm-stack">
+        {upcoming
+          .slice()
+          .reverse()
+          .map((next, position) => (
+            <article
+              className="mm-card mm-card-behind"
+              key={next.id}
+              style={{
+                transform: `translateY(${(upcoming.length - position) * -12}px) scale(${
+                  1 - (upcoming.length - position) * 0.04
+                })`,
+              }}
+              aria-hidden="true"
+            >
+              <span className="mm-watermark">{TOPIC_GLYPHS[next.topic] ?? "∞"}</span>
+            </article>
+          ))}
 
-        {matched ? (
-          <div className="deck-card-statement">
-            <MathText text={card.statement} />
-            <Link className="deck-button deck-button-solve" href={`/problems/${card.id}`}>
-              Write a proof →
-            </Link>
+        <article
+          className={`mm-card mm-card-top${flyOut ? ` mm-fly-${flyOut}` : ""}`}
+          style={flyOut ? undefined : { transform: `translate(${drag.x}px, ${drag.y}px) rotate(${rotation}deg)` }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
+        >
+          <span className={`mm-stamp mm-stamp-like${liking ? " mm-stamp-on" : ""}`}>MATCH</span>
+          <span className={`mm-stamp mm-stamp-nope${noping ? " mm-stamp-on" : ""}`}>PASS</span>
+
+          <span className="mm-watermark">{TOPIC_GLYPHS[card.topic] ?? "∞"}</span>
+
+          <div className="mm-card-body">
+            <div className="mm-card-top-row">
+              <span className="mm-chip">{card.topic}</span>
+              <span className="mm-elo">{card.elo}</span>
+            </div>
+            <h2>{card.set}</h2>
+            <p className="mm-bio">{card.bio}</p>
+            <div className="mm-tags">
+              <span>Problem {card.number}</span>
+              <span>Proof required</span>
+            </div>
           </div>
-        ) : null}
-      </article>
+        </article>
+      </div>
 
-      {matched ? (
-        <div className="deck-actions">
-          <button
-            className="deck-button"
-            type="button"
-            onClick={() => {
-              setMatched(false);
-              setIndex((value) => value + 1);
-            }}
-          >
-            Back to deck
-          </button>
-        </div>
-      ) : (
-        <div className="deck-actions">
-          <button className="deck-button deck-pass" type="button" onClick={pass} disabled={!canPass}>
-            ✕ Pass
-          </button>
-          <button className="deck-button deck-match" type="button" onClick={match}>
-            ♥ Try this
-          </button>
-        </div>
-      )}
+      <div className="mm-actions">
+        <button
+          className="mm-round mm-round-nope"
+          type="button"
+          onClick={pass}
+          disabled={!canPass}
+          aria-label="Pass"
+        >
+          ✕
+        </button>
+        <button className="mm-round mm-round-like" type="button" onClick={match} aria-label="Match">
+          ♥
+        </button>
+      </div>
 
-      {lifelines === 0 && !matched ? (
-        <p className="deck-note">No lifelines left — solve a problem to earn one back.</p>
-      ) : (
-        <p className="deck-note">Left arrow passes (costs a lifeline), right arrow matches.</p>
-      )}
-    </div>
+      <p className="mm-hint">
+        {canPass
+          ? "Drag the card, or use ← to pass and → to match."
+          : "Out of lifelines — match a problem and solve it to earn one back."}
+      </p>
+    </section>
   );
 }

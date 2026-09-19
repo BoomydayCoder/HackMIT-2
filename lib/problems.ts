@@ -25,5 +25,15 @@ export function getProblem(id: string): Problem | undefined {
 }
 
 export function getDeck(): DeckCard[] {
-  return PROBLEMS.map(({ solution: _solution, answer: _answer, ...card }) => card);
+  return PROBLEMS.map((problem) => ({
+    id: problem.id,
+    number: problem.number,
+    set: problem.set,
+    topic: problem.topic,
+    elo: problem.elo,
+    bio: problem.bio,
+    statement: problem.statement,
+    proposer: problem.proposer,
+    sourceUrl: problem.sourceUrl,
+  }));
 }
