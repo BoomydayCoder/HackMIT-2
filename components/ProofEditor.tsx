@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import Math from "@/components/Math";
 import { useDictation } from "@/lib/dictation";
-import { markGraded, markSolved } from "@/lib/progress";
-import { recordGrade } from "@/lib/rating";
+import { markRated, markRetired, markSolved } from "@/lib/progress";
+import { recordGiveUp, recordSolve } from "@/lib/rating";
 import {
   DEFAULT_MODEL,
   DEFAULT_RIGOR,
@@ -44,6 +44,8 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
   const [result, setResult] = useState<GradeResult | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [confirmingGiveUp, setConfirmingGiveUp] = useState(false);
+  const [gaveUp, setGaveUp] = useState(false);
 
   const appendTranscript = useCallback((text: string) => {
     setProof((current) =>
@@ -74,8 +76,13 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
 
       const graded = data as GradeResult;
       setResult(graded);
-      if (graded.score >= PASS_SCORE) markSolved(problemId);
-      if (markGraded(problemId)) setRating(recordGrade(topic, elo, graded.score));
+      setConfirmingGiveUp(false);
+      // Only a pass settles the rating; a failing grade costs nothing so the
+      // proof can be revised and regraded.
+      if (graded.score >= PASS_SCORE) {
+        markSolved(problemId);
+        if (markRated(problemId)) setRating(recordSolve(topic, elo, graded.score));
+      }
     } catch (gradingError) {
       setError(
         gradingError instanceof Error
@@ -86,6 +93,16 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
       setLoading(false);
     }
   }
+
+  /** Surrender: the solution is revealed, the match ends and the rating pays for it. */
+  function giveUp() {
+    if (markRated(problemId)) setRating(recordGiveUp(topic));
+    markRetired(problemId);
+    setGaveUp(true);
+    setConfirmingGiveUp(false);
+  }
+
+  const solvedThis = (result?.score ?? 0) >= PASS_SCORE;
 
   return (
     <div className="proof-editor">
@@ -173,6 +190,51 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
         {loading ? "Reading your proof…" : "Grade my proof"}
       </button>
 
+      {!gaveUp && !solvedThis && (
+        <div className="give-up-row">
+          {confirmingGiveUp ? (
+            <>
+              <span>
+                The solution is revealed and the match ends. It costs more of your
+                {` ${topic} `}rating than passing on a card ever would.
+              </span>
+              <button className="give-up-button" type="button" onClick={giveUp}>
+                Yes, show me the solution
+              </button>
+              <button type="button" onClick={() => setConfirmingGiveUp(false)}>
+                Keep trying
+              </button>
+            </>
+          ) : (
+            <button
+              className="give-up-button"
+              type="button"
+              onClick={() => setConfirmingGiveUp(true)}
+            >
+              Give up &amp; view solution
+            </button>
+          )}
+        </div>
+      )}
+
+      {gaveUp && (
+        <section className="result-panel" aria-live="polite">
+          <div className="solved-panel">
+            <strong>You gave up.</strong>{" "}
+            {rating === null
+              ? "Already rated \u2014 your rating stands."
+              : `Your ${topic} rating is now ${rating}.`}
+            <button type="button" onClick={() => router.push("/match")}>
+              Back to the deck
+            </button>
+          </div>
+          <h3>Official solution</h3>
+          <div className="solution-copy">
+            <Math text={solution} />
+          </div>
+        </section>
+      )}
+
       {error && <div className="error-panel">{error}</div>}
 
       {result && (
@@ -191,13 +253,21 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
             <div className="verdict-badge">{result.verdict}</div>
           </div>
           <div className="solved-panel">
-            <strong>{result.score >= PASS_SCORE ? "Solved." : "Not solved yet."}</strong>{" "}
-            {rating === null
-              ? "Already graded \u2014 your rating stands."
-              : `Your ${topic} rating is now ${rating}.`}
-            <button type="button" onClick={() => router.push("/match")}>
-              Back to the deck
-            </button>
+            <strong>{solvedThis ? "Solved." : "Not solved yet."}</strong>{" "}
+            {rating !== null
+              ? `Your ${topic} rating is now ${rating}.`
+              : solvedThis
+                ? "Already rated \u2014 your rating stands."
+                : "That attempt was free. Revise it and grade again."}
+            {solvedThis ? (
+              <button type="button" onClick={() => router.push("/match")}>
+                Back to the deck
+              </button>
+            ) : (
+              <span className="stuck-note">
+                Revise and grade again, or give up to see the solution.
+              </span>
+            )}
           </div>
           <p className="result-summary">{result.summary}</p>
           <h3>Feedback</h3>
@@ -216,12 +286,14 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
               </ul>
             </>
           )}
-          <details className="official-solution">
-            <summary>Show official solution</summary>
-            <div className="solution-copy">
-              <Math text={solution} />
-            </div>
-          </details>
+          {solvedThis && (
+            <details className="official-solution">
+              <summary>Show official solution</summary>
+              <div className="solution-copy">
+                <Math text={solution} />
+              </div>
+            </details>
+          )}
         </section>
       )}
     </div>

@@ -243,6 +243,13 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
   cursor: pointer;
 }
 
+.give-up-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 12px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.give-up-row span { flex: 1; min-width: 220px; }
+.give-up-row button { padding: 9px 15px; border: 1px solid #cbd9d1; border-radius: 999px; background: #fcfdf9; color: var(--muted); cursor: pointer; font: inherit; font-weight: 700; }
+.give-up-row button:hover { border-color: #c8443a; color: #8b3a2f; }
+.give-up-row .give-up-button { border-color: #e5bcb5; background: #fff4f1; color: #8b3a2f; }
+.stuck-note { margin-left: auto; color: var(--muted); font-size: 13px; }
+
 /* Accounts */
 .mm-header-links, .header-links { display: flex; align-items: center; gap: 18px; }
 .account-menu { display: inline-flex; align-items: center; gap: 10px; }

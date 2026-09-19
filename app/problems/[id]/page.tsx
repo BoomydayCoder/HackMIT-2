@@ -24,9 +24,7 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
           Math<span>♥</span>Match
         </Link>
         <nav className="header-links">
-          <Link className="back-link" href="/match">
-            Back to the deck
-          </Link>
+          <span className="back-link">Solve it or give up to leave</span>
           <AccountMenu className="back-link" />
         </nav>
       </header>

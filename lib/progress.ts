@@ -1,5 +1,6 @@
 const SOLVED_KEY = "mathmatch:solved";
-const GRADED_KEY = "mathmatch:graded";
+const RETIRED_KEY = "mathmatch:retired";
+const RATED_KEY = "mathmatch:graded";
 const PINNED_KEY = "mathmatch:pinned";
 export const RATINGS_KEY = "mathmatch:ratings";
 
@@ -21,6 +22,12 @@ export function readSolvedRaw(): string {
   return window.localStorage.getItem(SOLVED_KEY) ?? "[]";
 }
 
+/** Raw JSON of the ids you gave up on; they leave the deck like a solve does. */
+export function readRetiredRaw(): string {
+  if (typeof window === "undefined") return "[]";
+  return window.localStorage.getItem(RETIRED_KEY) ?? "[]";
+}
+
 export function parseSolved(raw: string): string[] {
   try {
     const parsed: unknown = JSON.parse(raw);
@@ -31,8 +38,8 @@ export function parseSolved(raw: string): string[] {
 }
 
 /**
- * The problem you last matched with: it stays at the front of the deck until
- * you solve it or pass on it.
+ * The problem you last matched with: the deck serves nothing else until you
+ * solve it or give up on it.
  */
 export function readPinned(): string {
   if (typeof window === "undefined") return "";
@@ -55,15 +62,24 @@ export function markSolved(problemId: string) {
   notifyProgress();
 }
 
+/** Records a surrender, taking the problem out of the deck and off the pin. */
+export function markRetired(problemId: string) {
+  const retired = parseSolved(readRetiredRaw());
+  if (readPinned() === problemId) writePinned("");
+  if (retired.includes(problemId)) return;
+  window.localStorage.setItem(RETIRED_KEY, JSON.stringify([...retired, problemId]));
+  notifyProgress();
+}
+
 /**
- * Records that a problem has been graded; returns false once it has, so a
- * problem can be regraded but only ever moves your rating once.
+ * Records that a problem has settled your rating; returns false once it has,
+ * so a problem can only ever move your rating once.
  */
-export function markGraded(problemId: string): boolean {
+export function markRated(problemId: string): boolean {
   if (typeof window === "undefined") return false;
-  const graded = parseSolved(window.localStorage.getItem(GRADED_KEY) ?? "[]");
-  if (graded.includes(problemId)) return false;
-  window.localStorage.setItem(GRADED_KEY, JSON.stringify([...graded, problemId]));
+  const rated = parseSolved(window.localStorage.getItem(RATED_KEY) ?? "[]");
+  if (rated.includes(problemId)) return false;
+  window.localStorage.setItem(RATED_KEY, JSON.stringify([...rated, problemId]));
   notifyProgress();
   return true;
 }
@@ -71,13 +87,14 @@ export function markGraded(problemId: string): boolean {
 /** Everything that makes up a player's progress, in the shape the account API stores. */
 export type Progress = {
   solved: string[];
+  retired: string[];
   graded: string[];
   pinned: string;
   ratings: Record<string, number>;
 };
 
 export function emptyProgress(): Progress {
-  return { solved: [], graded: [], pinned: "", ratings: {} };
+  return { solved: [], retired: [], graded: [], pinned: "", ratings: {} };
 }
 
 export function parseProgress(value: unknown): Progress {
@@ -87,6 +104,7 @@ export function parseProgress(value: unknown): Progress {
   const ids = (list: unknown) =>
     Array.isArray(list) ? list.filter((id): id is string => typeof id === "string") : [];
   progress.solved = ids(record.solved);
+  progress.retired = ids(record.retired);
   progress.graded = ids(record.graded);
   if (typeof record.pinned === "string") progress.pinned = record.pinned;
   if (record.ratings && typeof record.ratings === "object") {
@@ -107,7 +125,8 @@ export function readProgress(): Progress {
   }
   return {
     solved: parseSolved(readSolvedRaw()),
-    graded: parseSolved(window.localStorage.getItem(GRADED_KEY) ?? "[]"),
+    retired: parseSolved(readRetiredRaw()),
+    graded: parseSolved(window.localStorage.getItem(RATED_KEY) ?? "[]"),
     pinned: readPinned(),
     ratings: parseProgress({ ratings }).ratings,
   };
@@ -117,7 +136,8 @@ export function readProgress(): Progress {
 export function writeProgress(progress: Progress) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(SOLVED_KEY, JSON.stringify(progress.solved));
-  window.localStorage.setItem(GRADED_KEY, JSON.stringify(progress.graded));
+  window.localStorage.setItem(RETIRED_KEY, JSON.stringify(progress.retired));
+  window.localStorage.setItem(RATED_KEY, JSON.stringify(progress.graded));
   if (progress.pinned) window.localStorage.setItem(PINNED_KEY, progress.pinned);
   else window.localStorage.removeItem(PINNED_KEY);
   window.localStorage.setItem(RATINGS_KEY, JSON.stringify(progress.ratings));
@@ -129,13 +149,14 @@ export function clearProgress() {
 }
 
 /**
- * Combines what this browser has done with what an account has saved: solves
- * and grades are unioned, saved ratings win over local ones, and the local pin
- * is kept if there is one.
+ * Combines what this browser has done with what an account has saved: solves,
+ * surrenders and grades are unioned, saved ratings win over local ones, and
+ * the local pin is kept if there is one.
  */
 export function mergeProgress(local: Progress, saved: Progress): Progress {
   return {
     solved: [...new Set([...saved.solved, ...local.solved])],
+    retired: [...new Set([...saved.retired, ...local.retired])],
     graded: [...new Set([...saved.graded, ...local.graded])],
     pinned: local.pinned || saved.pinned,
     ratings: { ...local.ratings, ...saved.ratings },
