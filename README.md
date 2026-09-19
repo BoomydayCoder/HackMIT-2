@@ -9,13 +9,14 @@ full problem, then write a proof and have it graded.
 - `data/harp-deck.json` holds a 100-problem pool sampled across HARP difficulty
   levels 1–9; each card's Elo comes from its stored HARP level and contest.
 - You carry a separate Elo per topic (algebra, combinatorics, geometry, number
-  theory), stored in the browser. A graded proof moves that topic's rating by
-  how well it scored — 5/5 earns the full gain, 3/5 is par, below that costs
-  you — and passing on a card nudges it down a little. Only the first grading
-  of a problem counts.
+  theory), stored in the browser. A passing proof earns that topic's rating by
+  how well it scored (5/5 the full gain, 4/5 half of it), passing on a card
+  nudges it down a little, and failing grades are free. Only the first outcome
+  on a problem counts.
 - Cards are served one at a time, closest to your rating in the topics you have
-  selected in the top bar. A match you have not solved stays at the front of the
-  deck until you solve it or pass on it.
+  selected in the top bar. Matching is binding: the deck serves nothing else
+  until you pass the problem or take "Give up & view solution", which reveals
+  the official solution and costs more rating than passing on a card.
 - Regenerate the pool with `python3 scripts/build_harp_deck.py 100 mixed`
   (`easy` and `proof` modes are also available).
 

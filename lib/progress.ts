@@ -1,6 +1,6 @@
 const SOLVED_KEY = "mathmatch:solved";
 const RETIRED_KEY = "mathmatch:retired";
-const GRADED_KEY = "mathmatch:graded";
+const RATED_KEY = "mathmatch:graded";
 const PINNED_KEY = "mathmatch:pinned";
 
 const listeners = new Set<() => void>();
@@ -71,13 +71,13 @@ export function markRetired(problemId: string) {
 }
 
 /**
- * Records that a problem has been graded; returns false once it has, so a
- * problem can be regraded but only ever moves your rating once.
+ * Records that a problem has settled your rating; returns false once it has,
+ * so a problem can only ever move your rating once.
  */
-export function markGraded(problemId: string): boolean {
+export function markRated(problemId: string): boolean {
   if (typeof window === "undefined") return false;
-  const graded = parseSolved(window.localStorage.getItem(GRADED_KEY) ?? "[]");
-  if (graded.includes(problemId)) return false;
-  window.localStorage.setItem(GRADED_KEY, JSON.stringify([...graded, problemId]));
+  const rated = parseSolved(window.localStorage.getItem(RATED_KEY) ?? "[]");
+  if (rated.includes(problemId)) return false;
+  window.localStorage.setItem(RATED_KEY, JSON.stringify([...rated, problemId]));
   return true;
 }
