@@ -143,9 +143,7 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-nav:hover { color: #fff; }
 
 .mm-deck, .mm-detail, .mm-empty { width: min(440px, 100%); margin: auto 0; }
-.mm-meter { display: flex; align-items: center; justify-content: space-between; padding: 6px 4px 14px; }
-.mm-hearts { color: var(--mm-pink); font-size: 18px; letter-spacing: 3px; }
-.mm-hearts-spent { color: rgba(255,255,255,.18); }
+.mm-meter { display: flex; align-items: center; justify-content: flex-end; padding: 6px 4px 14px; }
 .mm-count { color: rgba(255,255,255,.5); font-size: 13px; font-weight: 600; }
 
 .mm-ratings { display: flex; gap: 6px; padding: 0 4px 12px; }

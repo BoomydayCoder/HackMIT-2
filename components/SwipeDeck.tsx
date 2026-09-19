@@ -12,14 +12,10 @@ import {
 import MathText from "@/components/Math";
 import type { DeckCard } from "@/lib/problems";
 import {
-  MAX_LIFELINES,
   parseSolved,
-  readLifelines,
   readSolvedRaw,
-  STARTING_LIFELINES,
   subscribeProgress,
-  writeLifelines,
-} from "@/lib/lifelines";
+} from "@/lib/progress";
 import {
   parseRatings,
   pickCards,
@@ -49,11 +45,6 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   const [seen, setSeen] = useState<string[]>([]);
   const solvedRaw = useSyncExternalStore(subscribeProgress, readSolvedRaw, () => "[]");
   const ratingsRaw = useSyncExternalStore(subscribeProgress, readRatingsRaw, () => "{}");
-  const lifelines = useSyncExternalStore(
-    subscribeProgress,
-    readLifelines,
-    () => STARTING_LIFELINES,
-  );
   const [matched, setMatched] = useState<DeckCard | null>(null);
   const [drag, setDrag] = useState<Drag>({ x: 0, y: 0 });
   const [flyOut, setFlyOut] = useState<"left" | "right" | null>(null);
@@ -66,7 +57,6 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
     [pool, ratings, solved, seen, turn],
   );
   const outOfCards = !card;
-  const canPass = lifelines > 0;
 
   const advance = useCallback((direction: "left" | "right", swiped: DeckCard) => {
     setFlyOut(direction);
@@ -80,11 +70,10 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   }, []);
 
   const pass = useCallback(() => {
-    if (!card || matched || flyOut || lifelines <= 0) return;
-    writeLifelines(lifelines - 1);
+    if (!card || matched || flyOut) return;
     recordPass(card.topic);
     advance("left", card);
-  }, [card, matched, flyOut, lifelines, advance]);
+  }, [card, matched, flyOut, advance]);
 
   const match = useCallback(() => {
     if (!card || matched || flyOut) return;
@@ -118,7 +107,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
     if (!origin.current) return;
     origin.current = null;
     if (drag.x > SWIPE_THRESHOLD) match();
-    else if (drag.x < -SWIPE_THRESHOLD && canPass) pass();
+    else if (drag.x < -SWIPE_THRESHOLD) pass();
     else setDrag({ x: 0, y: 0 });
   }
 
@@ -164,12 +153,6 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   return (
     <section className="mm-deck">
       <div className="mm-meter">
-        <span className="mm-hearts" aria-label={`${lifelines} of ${MAX_LIFELINES} lifelines`}>
-          {"♥".repeat(lifelines)}
-          <span className="mm-hearts-spent">
-            {"♥".repeat(Math.max(0, STARTING_LIFELINES - lifelines))}
-          </span>
-        </span>
         <span className="mm-count">
           {solved.length} solved · {pool.length - solved.length - seen.length} left
         </span>
@@ -239,7 +222,6 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
           className="mm-round mm-round-nope"
           type="button"
           onClick={pass}
-          disabled={!canPass}
           aria-label="Pass"
         >
           ✕
@@ -250,9 +232,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
       </div>
 
       <p className="mm-hint">
-        {canPass
-          ? "Drag the card, or use ← to pass and → to match."
-          : "Out of lifelines — match a problem and solve it to earn one back."}
+        Drag the card, or use ← to pass and → to match.
       </p>
     </section>
   );

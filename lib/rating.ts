@@ -1,4 +1,4 @@
-import { notifyProgress, subscribeProgress } from "@/lib/lifelines";
+import { notifyProgress, subscribeProgress } from "@/lib/progress";
 
 export const TOPICS = ["algebra", "combinatorics", "geometry", "number theory"] as const;
 export const STARTING_RATING = 1000;

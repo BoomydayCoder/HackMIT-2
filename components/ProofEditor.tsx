@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Math from "@/components/Math";
-import { awardLifeline, MAX_LIFELINES, PASS_SCORE } from "@/lib/lifelines";
+import { markSolved, PASS_SCORE } from "@/lib/progress";
 import { recordSolve } from "@/lib/rating";
 import {
   DEFAULT_MODEL,
@@ -35,7 +35,6 @@ type GradeResult = {
 export default function ProofEditor({ problemId, topic, elo, solution }: ProofEditorProps) {
   const router = useRouter();
   const [proof, setProof] = useState("");
-  const [lifelines, setLifelines] = useState<number | null>(null);
   const [rating, setRating] = useState<number | null>(null);
   const [rigor, setRigor] = useState<RigorLevel>(DEFAULT_RIGOR);
   const [model, setModel] = useState<ModelId>(DEFAULT_MODEL);
@@ -64,8 +63,7 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
 
       const graded = data as GradeResult;
       setResult(graded);
-      if (graded.score >= PASS_SCORE) {
-        setLifelines(awardLifeline(problemId));
+      if (graded.score >= PASS_SCORE && markSolved(problemId)) {
         setRating(recordSolve(topic, elo));
       }
     } catch (gradingError) {
@@ -163,12 +161,9 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
           {result.score >= PASS_SCORE && (
             <div className="solved-panel">
               <strong>Solved.</strong>{" "}
-              {lifelines === null
-                ? `Already credited \u2014 no extra lifeline.`
-                : lifelines >= MAX_LIFELINES
-                  ? `Lifelines are full at ${MAX_LIFELINES}.`
-                  : `+1 lifeline \u2014 you now have ${lifelines}.`}{" "}
-              {rating !== null && `Your ${topic} rating is now ${rating}.`}
+              {rating === null
+                ? "Already credited \u2014 no extra rating."
+                : `Your ${topic} rating is now ${rating}.`}
               <button type="button" onClick={() => router.push("/match")}>
                 Back to the deck
               </button>
