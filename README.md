@@ -4,14 +4,27 @@ The Next.js starter for rigor.ai, an Olympiad practice app built for HackMIT.
 
 ## Run locally
 
-Install Node.js 20.9 or later and pnpm 11. Then:
+Install [Node.js 20.9 or later](https://nodejs.org/) and Git. The repository
+uses pnpm 11 through Corepack. To run the current proof-grader branch:
 
 ```bash
+git clone https://github.com/BoomydayCoder/HackMIT-2.git
+cd HackMIT-2
+git checkout devin/1789840437-imo-2023-proof-grader
+corepack enable
 pnpm install
+cp .env.example .env.local
+```
+
+Open `.env.local` and set `OPENAI_API_KEY` to an OpenAI API key. Keep this file
+private; it is gitignored and must not be committed. Then start the app:
+
+```bash
 pnpm dev
 ```
 
-Open http://localhost:3000.
+Open http://localhost:3000/problems. If the feature branch has been merged
+into `main`, omit the `git checkout` command.
 
 ## Checks
 
