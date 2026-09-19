@@ -1,3 +1,4 @@
+import { MAX_SCORE } from "@/lib/grader";
 import { notifyProgress, subscribeProgress } from "@/lib/progress";
 
 export const TOPICS = ["algebra", "combinatorics", "geometry", "number theory"] as const;
@@ -7,6 +8,9 @@ const RATINGS_KEY = "mathmatch:ratings";
 const PASS_PENALTY = 8;
 const MIN_SOLVE_GAIN = 20;
 const MAX_SOLVE_GAIN = 90;
+/** A score of 3/5 is par: below it the grade costs rating, above it earns some. */
+const PAR_SCORE = 3;
+const MAX_GRADE_LOSS = 30;
 
 export type Ratings = Record<string, number>;
 
@@ -43,11 +47,20 @@ function write(topic: string, value: number) {
   return ratings[topic];
 }
 
-/** A solve is worth a lot, and worth more the further the problem sits above you. */
-export function recordSolve(topic: string, problemElo: number): number {
+/**
+ * A graded proof moves the topic rating by how well it scored: full marks earn
+ * the whole solve gain (itself larger the further the problem sits above you),
+ * par leaves you where you were, and a bad proof costs you.
+ */
+export function recordGrade(topic: string, problemElo: number, score: number): number {
   const current = ratingFor(parseRatings(readRatingsRaw()), topic);
-  const gain = Math.min(MAX_SOLVE_GAIN, Math.max(MIN_SOLVE_GAIN, 40 + (problemElo - current) / 6));
-  return write(topic, current + gain);
+  const marks = Math.min(MAX_SCORE, Math.max(0, score));
+  const delta =
+    marks >= PAR_SCORE
+      ? Math.min(MAX_SOLVE_GAIN, Math.max(MIN_SOLVE_GAIN, 40 + (problemElo - current) / 6)) *
+        ((marks - PAR_SCORE) / (MAX_SCORE - PAR_SCORE))
+      : -MAX_GRADE_LOSS * ((PAR_SCORE - marks) / PAR_SCORE);
+  return write(topic, current + delta);
 }
 
 /** A pass nudges the topic rating down so the deck drifts towards easier problems. */

@@ -3,12 +3,14 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Math from "@/components/Math";
-import { markSolved, PASS_SCORE } from "@/lib/progress";
-import { recordSolve } from "@/lib/rating";
+import { markGraded, markSolved } from "@/lib/progress";
+import { recordGrade } from "@/lib/rating";
 import {
   DEFAULT_MODEL,
   DEFAULT_RIGOR,
+  MAX_SCORE,
   MODELS,
+  PASS_SCORE,
   RIGOR_LABELS,
   RIGOR_LEVELS,
   type ModelId,
@@ -63,9 +65,8 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
 
       const graded = data as GradeResult;
       setResult(graded);
-      if (graded.score >= PASS_SCORE && markSolved(problemId)) {
-        setRating(recordSolve(topic, elo));
-      }
+      if (graded.score >= PASS_SCORE) markSolved(problemId);
+      if (markGraded(problemId)) setRating(recordGrade(topic, elo, graded.score));
     } catch (gradingError) {
       setError(
         gradingError instanceof Error
@@ -147,10 +148,10 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
         <section className="result-panel" aria-live="polite">
           <div className="result-heading">
             <div>
-              <div className="result-kicker">IMO score</div>
+              <div className="result-kicker">Score</div>
               <div className="score">
                 {result.score}
-                <span>/7</span>
+                <span>/{MAX_SCORE}</span>
               </div>
               <div className="result-kicker-line">
                 Graded at rigor {RIGOR_LABELS[result.rigor].name} · {result.model}
@@ -158,17 +159,15 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
             </div>
             <div className="verdict-badge">{result.verdict}</div>
           </div>
-          {result.score >= PASS_SCORE && (
-            <div className="solved-panel">
-              <strong>Solved.</strong>{" "}
-              {rating === null
-                ? "Already credited \u2014 no extra rating."
-                : `Your ${topic} rating is now ${rating}.`}
-              <button type="button" onClick={() => router.push("/match")}>
-                Back to the deck
-              </button>
-            </div>
-          )}
+          <div className="solved-panel">
+            <strong>{result.score >= PASS_SCORE ? "Solved." : "Not solved yet."}</strong>{" "}
+            {rating === null
+              ? "Already graded \u2014 your rating stands."
+              : `Your ${topic} rating is now ${rating}.`}
+            <button type="button" onClick={() => router.push("/match")}>
+              Back to the deck
+            </button>
+          </div>
           <p className="result-summary">{result.summary}</p>
           <h3>Feedback</h3>
           <ul className="feedback-list">

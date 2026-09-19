@@ -1,6 +1,5 @@
-export const PASS_SCORE = 5; // out of 7
-
 const SOLVED_KEY = "mathmatch:solved";
+const GRADED_KEY = "mathmatch:graded";
 const PINNED_KEY = "mathmatch:pinned";
 
 const listeners = new Set<() => void>();
@@ -46,12 +45,23 @@ export function writePinned(problemId: string) {
   notifyProgress();
 }
 
-/** Records a solve; returns false if the problem had already been solved. */
-export function markSolved(problemId: string): boolean {
+/** Records a solve, taking the problem out of the deck and off the pin. */
+export function markSolved(problemId: string) {
   const solved = parseSolved(readSolvedRaw());
   if (readPinned() === problemId) writePinned("");
-  if (solved.includes(problemId)) return false;
+  if (solved.includes(problemId)) return;
   window.localStorage.setItem(SOLVED_KEY, JSON.stringify([...solved, problemId]));
   notifyProgress();
+}
+
+/**
+ * Records that a problem has been graded; returns false once it has, so a
+ * problem can be regraded but only ever moves your rating once.
+ */
+export function markGraded(problemId: string): boolean {
+  if (typeof window === "undefined") return false;
+  const graded = parseSolved(window.localStorage.getItem(GRADED_KEY) ?? "[]");
+  if (graded.includes(problemId)) return false;
+  window.localStorage.setItem(GRADED_KEY, JSON.stringify([...graded, problemId]));
   return true;
 }
