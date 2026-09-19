@@ -18,7 +18,8 @@ export default function Home() {
         </p>
         <div className="hero-actions">
           <Link className="cta-link" href="/problems">
-            Try the proof grader <span aria-hidden="true">→</span>
+            Try AMC 8 2023 or the IMO shortlist{" "}
+            <span aria-hidden="true">→</span>
           </Link>
           <div className="status">The first version is taking shape.</div>
         </div>

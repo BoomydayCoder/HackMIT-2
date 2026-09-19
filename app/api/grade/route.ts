@@ -76,12 +76,25 @@ export async function POST(request: Request) {
   }
 
   const model = process.env.OPENAI_MODEL ?? "gpt-4o-mini";
-  const userMessage = `PROBLEM STATEMENT
+  const officialAnswer = problem.answer
+    ? `OFFICIAL ANSWER
+---
+Official answer: ${problem.answer}
+---
+
+`
+    : "";
+  const userMessage = `PROBLEM SET
+---
+Problem set: ${problem.set}
+---
+
+PROBLEM STATEMENT
 ---
 ${problem.statement}
 ---
 
-OFFICIAL SOLUTION
+${officialAnswer}OFFICIAL SOLUTION
 ---
 ${problem.solution}
 ---

@@ -1,17 +1,30 @@
-import problems from "@/data/imo-2023-shortlist.json";
+import imoProblems from "@/data/imo-2023-shortlist.json";
+import amc8Problems from "@/data/amc8-2023.json";
 
-export type ShortlistProblem = {
+export type Problem = {
   id: string;
   number: string;
-  topic: "algebra" | "combinatorics" | "geometry" | "number theory";
+  set: "IMO 2023 Shortlist" | "AMC 8 2023";
+  topic: string;
   statement: string;
   solution: string;
+  answer?: string;
   proposer: string;
   sourceUrl: string;
 };
 
-export const PROBLEMS: ShortlistProblem[] = problems as ShortlistProblem[];
+export type ShortlistProblem = Problem;
 
-export function getProblem(id: string): ShortlistProblem | undefined {
+const imo = imoProblems as Omit<Problem, "set">[];
+const amc8 = amc8Problems as Problem[];
+
+export const PROBLEMS: Problem[] = [
+  ...imo.map((problem) => ({ ...problem, set: "IMO 2023 Shortlist" as const })),
+  ...amc8,
+];
+
+export const SETS = ["AMC 8 2023", "IMO 2023 Shortlist"] as const;
+
+export function getProblem(id: string): Problem | undefined {
   return PROBLEMS.find((problem) => problem.id === id);
 }

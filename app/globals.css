@@ -53,6 +53,11 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .listing-intro { padding: 46px 0 70px; }
 .listing-intro h1, .problem-header h1 { margin: 18px 0 20px; font-size: clamp(52px, 8vw, 92px); }
 .topic-groups { display: grid; gap: 58px; padding-bottom: 90px; }
+.set-group > .topic-heading { margin-bottom: 10px; }
+.set-subtitle { max-width: 620px; margin: 0 0 25px; color: var(--muted); font-size: 15px; line-height: 1.5; }
+.topic-groups .topic-groups { gap: 34px; padding: 12px 0 0; }
+.topic-heading-nested { margin-bottom: 14px; border-bottom: 0; padding-bottom: 0; }
+.topic-heading-nested h3 { margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -.02em; text-transform: capitalize; }
 .topic-heading { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; border-bottom: 1px solid #dfe5dd; padding-bottom: 13px; }
 .topic-letter { color: var(--accent); font-size: 14px; font-weight: 800; }
 .topic-heading h2 { margin: 0; font-size: 25px; letter-spacing: -.04em; text-transform: capitalize; }

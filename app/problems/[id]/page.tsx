@@ -27,7 +27,9 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
 
       <div className="problem-header">
         <div className="eyebrow">
-          IMO 2023 shortlist · {problem.topic}
+          {problem.set === "AMC 8 2023"
+            ? problem.set
+            : `${problem.set} · ${problem.topic}`}
         </div>
         <h1>Problem {problem.number}</h1>
         <a
@@ -36,7 +38,7 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
           target="_blank"
           rel="noreferrer"
         >
-          Official shortlist source ↗
+          Source ↗
         </a>
       </div>
 
