@@ -6,6 +6,8 @@ export const RATINGS_KEY = "mathmatch:ratings";
 export const REVIEWS_KEY = "mathmatch:reviews";
 
 export const MAX_STARS = 5;
+/** Ratings as the deck last showed them, so a gain earned elsewhere can be celebrated on return. */
+export const RATINGS_SEEN_KEY = "mathmatch:ratings-seen";
 
 const listeners = new Set<() => void>();
 
