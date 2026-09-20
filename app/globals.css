@@ -476,3 +476,131 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-duel-foe figcaption { font-size: 12px; font-weight: 700; text-align: center; color: var(--mm-blade); }
 .mm-duel-cardbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .mm-duel-cardbar button { padding: 6px 13px; border: 1px solid var(--mm-edge); border-radius: 999px; background: rgba(184, 134, 59, .25); color: var(--ink); cursor: pointer; font: inherit; font-size: 13px; font-weight: 700; }
+
+/* ---------------------------------------------------------------------------
+   Phones: the keep folds to one column.
+   --------------------------------------------------------------------------- */
+
+/* Long statements scroll inside their own line rather than widening the page. */
+.math-inline { display: inline-block; max-width: 100%; overflow-x: auto; overflow-y: hidden; vertical-align: bottom; }
+.math-display, .katex-display { overflow-x: auto; overflow-y: hidden; }
+
+@media (max-width: 760px) {
+  html { -webkit-text-size-adjust: 100%; }
+
+  .page { padding: 0 18px calc(84px + env(safe-area-inset-bottom)); }
+  .header { flex-wrap: wrap; gap: 6px 16px; padding: 18px 0 12px; }
+  .wordmark { font-size: 21px; }
+  .header-links, .mm-header-links { flex-wrap: wrap; gap: 8px 16px; }
+  .back-link, .source-link, .mm-nav { display: inline-flex; align-items: center; min-height: 44px; }
+  .footer { flex-wrap: wrap; gap: 8px; }
+
+  h1 { margin: 18px 0; font-size: clamp(38px, 12vw, 62px); }
+  .listing-intro h1, .problem-header h1 { margin: 12px 0 16px; font-size: clamp(30px, 9vw, 48px); }
+  .intro { font-size: 17px; }
+  .hero { padding: 36px 0 48px; }
+  .hero-actions { gap: 12px; }
+  .cta-link, .status { min-height: 44px; }
+
+  .listing-intro { padding: 18px 0 40px; }
+  .topic-groups { gap: 34px; padding-bottom: 50px; }
+  .problem-header { padding: 18px 0 32px; }
+  .problem-grid, .workspace { grid-template-columns: minmax(0, 1fr); }
+  .problem-card { min-width: 0; min-height: 0; padding: 18px; }
+  .problem-card h3 { margin: 22px 0 10px; font-size: 21px; }
+  .problem-card p, .card-tagline { overflow-x: auto; }
+  .card-arrow { right: 16px; bottom: 14px; }
+
+  .workspace { gap: 18px; padding-bottom: 40px; }
+  .statement-card { padding: 18px 16px; }
+  .statement-copy { padding-top: 26px; font-size: 17px; line-height: 1.65; }
+  .proof-editor { padding: 16px 14px; }
+  .proof-editor textarea { min-height: 220px; padding: 13px; font-size: 16px; }
+  .rigor-heading p { max-width: none; }
+  .model-control select { min-height: 44px; font-size: 16px; }
+  .grade-button { min-height: 48px; }
+  .mic-button { min-height: 44px; }
+  .give-up-row span { min-width: 0; }
+  .give-up-row button { min-height: 44px; }
+  .similar-problems a { min-height: 44px; align-items: center; }
+  .star { font-size: 32px; padding: 2px 4px; }
+  .score { font-size: 48px; }
+
+  /* Header, sheets and tabs on the arena pages. */
+  .mm-page { padding: 0 14px calc(92px + env(safe-area-inset-bottom)); }
+  .mm-header { flex-wrap: wrap; gap: 4px 12px; padding: 14px 0 8px; }
+  .mm-logo { min-height: 44px; font-size: 22px; }
+  .wordmark { min-height: 44px; display: inline-flex; align-items: center; }
+  .mm-rating { min-height: 44px; }
+  .mm-swords { font-size: 18px; }
+  .mm-sheet { padding: 18px 15px; gap: 20px; }
+  .mm-sheet h1 { font-size: 25px; }
+  .mm-tab { min-width: 92px; min-height: 48px; justify-content: center; padding: 6px 8px; }
+  .mm-btn { min-height: 44px; }
+
+  /* Battle lobby. */
+  .mm-tier-hero { padding: 16px 18px; }
+  .mm-tier-hero strong { font-size: 22px; }
+  .mm-custom summary { display: flex; align-items: center; min-height: 44px; padding: 10px 14px; }
+  .mm-tier-list { grid-template-columns: 1fr; }
+  .mm-tier { min-height: 44px; }
+  .mm-friend-list li { flex-wrap: wrap; overflow-wrap: anywhere; }
+  .mm-friend-list button { min-height: 40px; }
+  .mm-duel-actions { margin-left: auto; }
+  .mm-search { min-height: 44px; font-size: 16px; }
+
+  /* Profile. */
+  .mm-profile-head { gap: 14px; }
+  .mm-avatar { width: 72px; height: 72px; font-size: 26px; }
+  .mm-overall strong { font-size: 24px; }
+  .mm-field textarea { font-size: 16px; }
+  .mm-subelos li { grid-template-columns: 84px minmax(0, 1fr) 44px; gap: 8px; font-size: 12px; }
+  .mm-avatars button { width: 54px; height: 54px; }
+  .mm-leaderboard li { grid-template-columns: 20px 28px minmax(0, 1fr) auto auto; gap: 6px; padding: 7px 10px; font-size: 14px; }
+  .mm-leaderboard a, .mm-leaderboard li > strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mm-leaderboard a, .mm-friend-list a { display: inline-flex; align-items: center; min-height: 40px; }
+  .mm-rank-avatar { width: 28px; height: 28px; font-size: 13px; }
+  .mm-rank-solved { font-size: 11px; white-space: nowrap; }
+  .mm-history li { grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; font-size: 13px; overflow-wrap: anywhere; }
+
+  /* Duel board and the card you are writing on. */
+  .mm-duel-head { flex-wrap: wrap; gap: 10px; }
+  .mm-duel-middle { flex: 1 0 100%; order: -1; }
+  .mm-duel-score { flex: 1 1 0; min-width: 0; }
+  .mm-duel-score em { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mm-duel-score strong { flex: 0 0 auto; width: 34px; height: 34px; font-size: 18px; }
+  .mm-duel-resign { min-height: 44px; }
+  .mm-duel-statement { flex-direction: column; align-items: center; gap: 10px; }
+  .mm-duel-foe { flex: 0 0 auto; width: 132px; }
+  .mm-duel-cardbar { flex-wrap: wrap; }
+  .mm-duel-cardbar button { min-height: 40px; }
+  .solved-panel button { min-height: 40px; }
+}
+
+@media (max-width: 480px) {
+  .mm-duel-board { gap: 12px 8px; }
+  .mm-duel-slot .mm-tcard { transform: none; }
+  .mm-tcard-art { height: 92px; }
+  .mm-tcard-art img { height: 82px; }
+  .mm-tcard-name { font-size: 12px; }
+  .mm-tab { min-width: 84px; padding: 6px 4px; letter-spacing: .08em; }
+  .mm-tabs { gap: 4px; }
+}
+
+/* Tablet-width and landscape-phone widths: keep the desktop grids from forcing
+   a wider layout viewport than the screen. */
+@media (max-width: 1080px) {
+  .problem-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); }
+  .problem-card { min-width: 0; }
+  .card-tagline, .problem-card p { min-width: 0; overflow-x: auto; }
+}
+
+/* Landscape phones: the tab bar lies flat so the page keeps its height. */
+@media (max-height: 480px) and (orientation: landscape) {
+  .mm-tabs { gap: 10px; padding: 4px 10px calc(4px + env(safe-area-inset-bottom)); }
+  .mm-tab { flex-direction: row; gap: 8px; min-height: 40px; padding: 6px 12px; }
+  .mm-tab svg { width: 18px; height: 18px; }
+  .mm-page { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
+  .page { padding-bottom: calc(56px + env(safe-area-inset-bottom)); }
+  .mm-header { padding: 8px 0 4px; }
+}
