@@ -13,7 +13,26 @@ type Profile = {
   solved: number;
 };
 
-type Payload = { profile?: Profile; friend?: string; isSelf?: boolean; error?: string };
+type Tally = { won: number; lost: number; drawn: number };
+
+type Duel = {
+  id: string;
+  them: string;
+  yours: number;
+  theirs: number;
+  delta: number;
+  outcome: "won" | "lost" | "drawn";
+  at: string;
+};
+
+type Payload = {
+  profile?: Profile;
+  record?: Tally;
+  history?: Duel[];
+  friend?: string;
+  isSelf?: boolean;
+  error?: string;
+};
 
 const MAX_BIO = 240;
 
@@ -66,6 +85,9 @@ export default function ProfileView({ username }: { username?: string }) {
 
   const { profile, isSelf } = state;
   const portrait = avatarFor(profile.avatar);
+  const record = state.record ?? { won: 0, lost: 0, drawn: 0 };
+  const fought = record.won + record.lost + record.drawn;
+  const history = state.history ?? [];
 
   return (
     <section className="mm-profile">
@@ -83,8 +105,10 @@ export default function ProfileView({ username }: { username?: string }) {
             <strong>{overall(profile.ratings)}</strong> overall
           </p>
           <p className="mm-count">
-            {profile.solved} problem{profile.solved === 1 ? "" : "s"} taken · win rate — (no duels
-            yet)
+            {profile.solved} problem{profile.solved === 1 ? "" : "s"} taken ·{" "}
+            {fought === 0
+              ? "no duels fought"
+              : `${Math.round((record.won / fought) * 100)}% of ${fought} duel${fought === 1 ? "" : "s"} won (${record.won}–${record.lost}–${record.drawn})`}
           </p>
         </div>
       </header>
@@ -119,6 +143,28 @@ export default function ProfileView({ username }: { username?: string }) {
           );
         })}
       </ul>
+
+      {history.length > 0 && (
+        <>
+          <h2 className="control-label">Duels fought</h2>
+          <ul className="mm-history">
+            {history.map((duel) => (
+              <li key={duel.id} className={`is-${duel.outcome}`}>
+                <span>
+                  {duel.outcome === "drawn" ? "Drew" : duel.outcome === "won" ? "Beat" : "Lost to"}{" "}
+                  <strong>{duel.them}</strong>
+                </span>
+                <span className="mm-history-score">
+                  {duel.yours}–{duel.theirs}
+                </span>
+                <span className="mm-history-delta">
+                  {duel.delta > 0 ? `+${duel.delta}` : duel.delta}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
       {isSelf && (
         <>

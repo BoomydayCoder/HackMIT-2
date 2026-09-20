@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server";
-import { saveProgress } from "@/lib/accounts";
+import { currentUser, saveProgress } from "@/lib/accounts";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+/** The saved progress, so a client can pick up a rating change made server-side. */
+export async function GET() {
+  const session = await currentUser();
+  if (!session) return NextResponse.json({ error: "Sign in to load progress." }, { status: 401 });
+  return NextResponse.json({ progress: session.progress });
+}
 
 export async function PUT(request: Request) {
   let body: unknown;
