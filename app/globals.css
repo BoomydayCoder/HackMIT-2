@@ -476,3 +476,34 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-duel-foe figcaption { font-size: 12px; font-weight: 700; text-align: center; color: var(--mm-blade); }
 .mm-duel-cardbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .mm-duel-cardbar button { padding: 6px 13px; border: 1px solid var(--mm-edge); border-radius: 999px; background: rgba(184, 134, 59, .25); color: var(--ink); cursor: pointer; font: inherit; font-size: 13px; font-weight: 700; }
+
+/* Swipe discoverability: a standing instruction, lit edge gutters and a first-visit nudge. */
+.mm-meter { justify-content: space-between; gap: 12px; }
+.mm-guide { display: flex; align-items: center; gap: 8px; margin: 0; color: var(--muted); font-size: 12px; font-style: italic; letter-spacing: .04em; white-space: nowrap; }
+.mm-guide-flee { color: var(--mm-blade); font-weight: 700; font-style: normal; }
+.mm-guide-fight { color: #7a5a1f; font-weight: 700; font-style: normal; }
+.mm-guide-sep { opacity: .55; }
+
+.mm-gutter { position: absolute; top: 0; bottom: 0; z-index: 3; display: grid; width: 38px; place-items: center; font-size: 19px; pointer-events: none; transition: opacity .12s ease; }
+.mm-gutter-nope { left: 0; border-radius: 4px 0 0 4px; background: linear-gradient(to right, rgba(140, 47, 42, .22), rgba(140, 47, 42, 0)); color: var(--mm-blade); }
+.mm-gutter-like { right: 0; border-radius: 0 4px 4px 0; background: linear-gradient(to left, rgba(184, 134, 59, .3), rgba(184, 134, 59, 0)); color: #7a5a1f; }
+
+.mm-grabme { position: absolute; bottom: -13px; left: 50%; z-index: 5; padding: 5px 13px; border: 1px solid var(--mm-edge); border-radius: 999px; background: rgba(250, 241, 220, .92); box-shadow: 1px 2px 0 rgba(72, 54, 33, .22); color: var(--mm-blade); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; pointer-events: none; transform: translateX(-50%); animation: mm-grabme-pulse 2.6s ease-in-out infinite; }
+.mm-card-nudge { animation: mm-nudge-rock 3.2s ease-in-out .7s infinite; }
+.mm-deck-hint { margin-top: 10px; font-size: 12px; }
+
+@keyframes mm-nudge-rock {
+  0%, 62%, 100% { transform: translateX(0) rotate(0deg); }
+  70% { transform: translateX(-26px) rotate(-1.6deg); }
+  80% { transform: translateX(26px) rotate(1.6deg); }
+  90% { transform: translateX(0) rotate(0deg); }
+}
+
+@keyframes mm-grabme-pulse {
+  0%, 100% { opacity: .75; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mm-card-nudge, .mm-grabme { animation: none; }
+}

@@ -21,6 +21,7 @@ import {
   readRetiredRaw,
   readReviewsRaw,
   readSolvedRaw,
+  notifyProgress,
   subscribeProgress,
   writePinned,
 } from "@/lib/progress";
@@ -35,6 +36,14 @@ import {
 } from "@/lib/rating";
 
 const SWIPE_THRESHOLD = 110;
+/** Where the FIGHT/FLEE stamps start bleeding through as you drag. */
+const STAMP_ONSET = 18;
+/** Remembers that this browser has already swiped once, so the nudge retires. */
+const SWIPED_KEY = "mathmatch:swiped";
+
+const readSwiped = () => window.localStorage.getItem(SWIPED_KEY) ?? "";
+/** Server-side the nudge stays off, so the first paint matches the markup. */
+const readSwipedServer = () => "1";
 
 const TOPIC_GLYPHS: Record<string, string> = {
   algebra: "∑",
@@ -62,7 +71,15 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   const [risen, setRisen] = useState<string[]>([]);
   const [drag, setDrag] = useState<Drag>({ x: 0, y: 0 });
   const [flyOut, setFlyOut] = useState<"left" | "right" | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const hasSwiped =
+    useSyncExternalStore(subscribeProgress, readSwiped, readSwipedServer) === "1";
   const origin = useRef<Drag | null>(null);
+
+  const rememberSwipe = useCallback(() => {
+    window.localStorage.setItem(SWIPED_KEY, "1");
+    notifyProgress();
+  }, []);
 
   const ratings = useMemo(() => parseRatings(ratingsRaw), [ratingsRaw]);
   const reviews = useMemo(() => parseReviews(reviewsRaw), [reviewsRaw]);
@@ -126,15 +143,17 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
 
   const pass = useCallback(() => {
     if (!card || matched || pinnedCard || flyOut) return;
+    rememberSwipe();
     recordPass(card.topic);
     advance("left", card);
-  }, [card, matched, pinnedCard, flyOut, advance]);
+  }, [card, matched, pinnedCard, flyOut, advance, rememberSwipe]);
 
   const match = useCallback(() => {
     if (!card || matched || pinnedCard || flyOut) return;
+    rememberSwipe();
     writePinned(card.id);
     advance("right", card);
-  }, [card, matched, pinnedCard, flyOut, advance]);
+  }, [card, matched, pinnedCard, flyOut, advance, rememberSwipe]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -148,6 +167,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
     if (flyOut) return;
     origin.current = { x: event.clientX, y: event.clientY };
+    setDragging(true);
     event.currentTarget.setPointerCapture(event.pointerId);
   }
 
@@ -160,6 +180,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   }
 
   function onPointerUp() {
+    setDragging(false);
     if (!origin.current) return;
     origin.current = null;
     if (drag.x > SWIPE_THRESHOLD) match();
@@ -233,12 +254,22 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   }
 
   const rotation = drag.x / 18;
-  const liking = drag.x > 60;
-  const noping = drag.x < -60;
+  /** 0 → 1 as the card travels toward its commit threshold, per direction. */
+  const lean = (distance: number) =>
+    Math.min(1, Math.max(0, (distance - STAMP_ONSET) / (SWIPE_THRESHOLD - STAMP_ONSET)));
+  const liking = lean(drag.x);
+  const noping = lean(-drag.x);
+  // The card only rocks for a player who has never swiped, and only while it rests.
+  const nudging = !hasSwiped && !dragging && !flyOut && drag.x === 0 && drag.y === 0;
 
   return (
     <section className="mm-deck">
       <div className="mm-meter">
+        <p className="mm-guide">
+          <span className="mm-guide-flee">⟵ drag left to flee</span>
+          <span className="mm-guide-sep">·</span>
+          <span className="mm-guide-fight">drag right to fight ⟶</span>
+        </p>
         <span className="mm-count">
           {solved.length} won
         </span>
@@ -264,15 +295,40 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
           ))}
 
         <article
-          className={`mm-card mm-card-top${flyOut ? ` mm-fly-${flyOut}` : ""}`}
-          style={flyOut ? undefined : { transform: `translate(${drag.x}px, ${drag.y}px) rotate(${rotation}deg)` }}
+          className={`mm-card mm-card-top${flyOut ? ` mm-fly-${flyOut}` : ""}${
+            nudging ? " mm-card-nudge" : ""
+          }`}
+          style={
+            flyOut || nudging
+              ? undefined
+              : { transform: `translate(${drag.x}px, ${drag.y}px) rotate(${rotation}deg)` }
+          }
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         >
-          <span className={`mm-stamp mm-stamp-like${liking ? " mm-stamp-on" : ""}`}>FIGHT</span>
-          <span className={`mm-stamp mm-stamp-nope${noping ? " mm-stamp-on" : ""}`}>FLEE</span>
+          <span className="mm-stamp mm-stamp-like" style={{ opacity: liking }}>
+            FIGHT
+          </span>
+          <span className="mm-stamp mm-stamp-nope" style={{ opacity: noping }}>
+            FLEE
+          </span>
+
+          <span
+            className="mm-gutter mm-gutter-nope"
+            style={{ opacity: 0.4 + noping * 0.6 }}
+            aria-hidden="true"
+          >
+            ⚑
+          </span>
+          <span
+            className="mm-gutter mm-gutter-like"
+            style={{ opacity: 0.4 + liking * 0.6 }}
+            aria-hidden="true"
+          >
+            ⚔
+          </span>
 
           <div className="mm-card-body">
             <div className="mm-card-top-row">
@@ -300,6 +356,12 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
             </div>
           </div>
         </article>
+
+        {!hasSwiped && !dragging && !flyOut && (
+          <span className="mm-grabme" aria-hidden="true">
+            ✋ drag me
+          </span>
+        )}
       </div>
 
       <div className="mm-actions">
@@ -326,6 +388,10 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
           <span className="mm-call-label">Fight →</span>
         </div>
       </div>
+
+      <p className="mm-hint mm-deck-hint">
+        Drag the card, tap a button, or press ← / → on your keyboard.
+      </p>
     </section>
   );
 }
