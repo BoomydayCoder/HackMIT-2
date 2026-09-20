@@ -522,8 +522,10 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
   .mic-button { min-height: 44px; }
   .give-up-row span { min-width: 0; }
   .give-up-row button { min-height: 44px; }
-  .similar-problems a { min-height: 44px; align-items: center; }
-  .star { font-size: 32px; padding: 2px 4px; }
+  .similar-problems a { flex-wrap: wrap; align-items: center; min-height: 44px; }
+  .similar-problems a > * { min-width: 0; }
+  .similar-problems a span { white-space: normal; overflow-wrap: anywhere; }
+  .star { min-width: 44px; min-height: 44px; font-size: 32px; padding: 2px 4px; }
   .score { font-size: 48px; }
 
   /* Header, sheets and tabs on the arena pages. */
@@ -603,4 +605,34 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
   .mm-page { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
   .page { padding-bottom: calc(56px + env(safe-area-inset-bottom)); }
   .mm-header { padding: 8px 0 4px; }
+}
+
+/* Training grounds: the whole duel — chips, card and both calls — stays inside the window. */
+@media (min-width: 521px) {
+  .mm-page-fit:has(.mm-deck) { height: 100svh; overflow: hidden; padding-bottom: calc(74px + env(safe-area-inset-bottom)); }
+  .mm-page-fit:has(.mm-deck) .mm-header { flex: none; padding: 14px 0 4px; }
+  .mm-page-fit .mm-deck { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; margin: 0; }
+  .mm-page-fit .mm-meter { flex: none; padding: 2px 4px 4px; }
+  .mm-page-fit .mm-ratings { flex: none; }
+  .mm-page-fit .mm-stack { flex: 1 1 auto; height: auto; min-height: 240px; }
+  .mm-page-fit .mm-actions { flex: none; margin-top: 10px; }
+  .mm-page-fit .mm-card-art { min-height: 64px; margin: 6px 0 10px; }
+  .mm-page-fit .mm-footer { flex: none; padding-top: 8px; }
+}
+@media (min-width: 521px) {
+  .mm-page-fit .mm-card { overflow: hidden; }
+  .mm-page-fit .mm-bio { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+}
+
+/* Short windows: trim the trimmings so the card keeps its shape and the calls keep their place. */
+@media (min-width: 521px) and (max-height: 760px) {
+  .mm-page-fit:has(.mm-deck) .mm-header { padding: 10px 0 2px; }
+  .mm-page-fit:has(.mm-deck) .mm-footer { display: none; }
+  .mm-page-fit .mm-card-body { padding: 12px 18px 14px; }
+  .mm-page-fit .mm-card h2 { margin-top: 5px; font-size: 21px; }
+  .mm-page-fit .mm-bio { -webkit-line-clamp: 2; font-size: 13px; line-height: 1.45; }
+  .mm-page-fit .mm-tags { margin-top: 8px; }
+  .mm-page-fit .mm-stack { min-height: 196px; }
+  .mm-page-fit .mm-actions { margin-top: 8px; }
+  .mm-page-fit .mm-round { width: 58px; height: 58px; font-size: 24px; }
 }
