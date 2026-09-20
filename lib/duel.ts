@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { usernameKey } from "@/lib/accounts";
-import { characterFor } from "@/lib/characters";
+import { challengerName, characterFor } from "@/lib/characters";
 import { db, ready } from "@/lib/db";
 import { getProblem, PROBLEMS, type Problem } from "@/lib/problems";
 import { parseProgress } from "@/lib/progress";
@@ -21,7 +21,7 @@ function portraitFor(cardId: string, topic: string): Portrait | null {
   const character = characterFor(cardId, topic);
   if (!character) return null;
   return {
-    name: character.name,
+    name: challengerName(cardId, topic),
     alt: character.alt,
     src: character.image.src,
     width: character.image.width,

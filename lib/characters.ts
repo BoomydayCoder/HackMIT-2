@@ -128,11 +128,104 @@ export function avatarFor(key: string): AvatarChoice | null {
   return avatarChoices().find((choice) => choice.key === key) ?? null;
 }
 
+function hash(value: string, seed: number): number {
+  let out = seed;
+  for (const code of value) out = (out * 31 + code.charCodeAt(0)) >>> 0;
+  return out;
+}
+
 /** Picks one of the topic's characters at random, but stably: a problem keeps its opponent. */
 export function characterFor(problemId: string, topic: string): Character | null {
   const roster = CHARACTERS[topic];
   if (!roster?.length) return null;
-  let hash = 0;
-  for (const code of problemId) hash = (hash * 31 + code.charCodeAt(0)) >>> 0;
-  return roster[hash % roster.length];
+  return roster[hash(problemId, 0) % roster.length];
+}
+
+const RANKS = [
+  "Sir",
+  "Dame",
+  "Baron",
+  "Margrave",
+  "Warden",
+  "Herald",
+  "Marshal",
+  "Abbot",
+  "Reeve",
+  "Viscount",
+  "Squire",
+  "Bailiff",
+];
+
+const NAMES = [
+  "Alphege",
+  "Berengar",
+  "Cuthbert",
+  "Drogo",
+  "Eudoxia",
+  "Fulke",
+  "Godric",
+  "Hildred",
+  "Isembard",
+  "Jocelyn",
+  "Kenelm",
+  "Leofric",
+  "Mordrake",
+  "Nesta",
+  "Osbert",
+  "Peregrin",
+  "Quennel",
+  "Rowena",
+  "Sigeric",
+  "Thaddeus",
+  "Ulric",
+  "Verity",
+  "Wulfstan",
+  "Ysolde",
+];
+
+const EPITHETS: Record<string, string[]> = {
+  algebra: [
+    "of the Vanishing Root",
+    "of the Crooked Polynomial",
+    "of the Broken Symmetry",
+    "of the Iron Identity",
+    "of the Nested Radical",
+    "of the Long Substitution",
+  ],
+  combinatorics: [
+    "of the Crowded Dovecote",
+    "of the Counted Host",
+    "of the Tangled Lattice",
+    "of the Double Count",
+    "of the Overlapping Nets",
+    "of the Endless Committee",
+  ],
+  geometry: [
+    "of the Cyclic Quadrilateral",
+    "of the Bent Compass",
+    "of the Tangent Line",
+    "of the Concurrent Cevians",
+    "of the Inscribed Circle",
+    "of the Shifted Midpoint",
+  ],
+  "number theory": [
+    "of the Stubborn Remainder",
+    "of the Hidden Prime",
+    "of the Twelfth Modulus",
+    "of the Unpaired Divisor",
+    "of the Locked Factor",
+    "of the Wandering Clock",
+  ],
+};
+
+/**
+ * The opponent's name, drawn from the problem itself rather than from the
+ * portrait, so two problems sharing a portrait still face different foes.
+ */
+export function challengerName(problemId: string, topic: string): string {
+  const epithets = EPITHETS[topic] ?? ["of the Unknown Art"];
+  const rank = RANKS[hash(problemId, 7) % RANKS.length];
+  const name = NAMES[hash(problemId, 101) % NAMES.length];
+  const epithet = epithets[hash(problemId, 1009) % epithets.length];
+  return `${rank} ${name} ${epithet}`;
 }
