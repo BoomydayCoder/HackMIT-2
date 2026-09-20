@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { usernameKey } from "@/lib/accounts";
+import { characterFor } from "@/lib/characters";
 import { db, ready } from "@/lib/db";
 import { getProblem, PROBLEMS, type Problem } from "@/lib/problems";
 import { parseProgress } from "@/lib/progress";
@@ -13,9 +14,25 @@ export const DUEL_RIGOR = 4 as const;
 
 export type DuelStatus = "pending" | "active" | "finished" | "declined";
 
+/** The portrait on a card face: flavour only, and it gives no difficulty away. */
+export type Portrait = { name: string; alt: string; src: string; width: number; height: number };
+
+function portraitFor(cardId: string, topic: string): Portrait | null {
+  const character = characterFor(cardId, topic);
+  if (!character) return null;
+  return {
+    name: character.name,
+    alt: character.alt,
+    src: character.image.src,
+    width: character.image.width,
+    height: character.image.height,
+  };
+}
+
 export type BoardCard = {
   index: number;
   topic: string;
+  character: Portrait | null;
   /** Display name of the claimer, or null while the card is still open. */
   claimedBy: string | null;
   claimedAt: string | null;
@@ -211,9 +228,11 @@ export async function boardFor(id: string, username: string): Promise<DuelView |
           : names[yours > theirs ? me : them] ?? null,
     cards: cardIds(duel.cards).map((cardId, index) => {
       const claim = claims.find((row) => row.card === cardId);
+      const topic = getProblem(cardId)?.topic ?? "";
       return {
         index,
-        topic: getProblem(cardId)?.topic ?? "",
+        topic,
+        character: portraitFor(cardId, topic),
         claimedBy: claim ? names[claim.username] ?? claim.username : null,
         claimedAt: claim?.claimed_at ?? null,
         attempts: attempts.find((row) => row.card === cardId)?.used ?? 0,
@@ -227,6 +246,7 @@ export type DuelCard = {
   index: number;
   statement: string;
   topic: string;
+  character: Portrait | null;
   attemptsLeft: number;
   claimedBy: string | null;
   open: boolean;
@@ -262,6 +282,7 @@ export async function cardFor(
     index,
     statement: problem.statement,
     topic: problem.topic,
+    character: portraitFor(cardId, problem.topic),
     attemptsLeft: Math.max(0, MAX_ATTEMPTS - (used[0]?.used ?? 0)),
     claimedBy: claim ? names[claim.username] ?? claim.username : null,
     open: status === "active" && !claim,

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import Math from "@/components/Math";
@@ -11,6 +12,7 @@ export type DuelCard = {
   index: number;
   statement: string;
   topic: string;
+  character: { name: string; alt: string; src: string; width: number; height: number } | null;
   attemptsLeft: number;
   claimedBy: string | null;
   open: boolean;
@@ -97,8 +99,22 @@ export default function DuelProof({ initial }: { initial: DuelCard }) {
         </span>
       </div>
 
-      <div className="solution-copy">
-        <Math text={card.statement} />
+      <div className="mm-duel-statement">
+        {card.character && (
+          <figure className="mm-duel-foe">
+            <Image
+              src={card.character.src}
+              alt={card.character.alt}
+              width={card.character.width}
+              height={card.character.height}
+              sizes="200px"
+            />
+            <figcaption>{card.character.name}</figcaption>
+          </figure>
+        )}
+        <div className="solution-copy">
+          <Math text={card.statement} />
+        </div>
       </div>
 
       {!locked && (
