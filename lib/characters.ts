@@ -115,6 +115,19 @@ const CHARACTERS: Record<string, Character[]> = {
   ],
 };
 
+export type AvatarChoice = Character & { key: string; topic: string };
+
+/** Every portrait, keyed so a player can wear one as their profile picture. */
+export function avatarChoices(): AvatarChoice[] {
+  return Object.entries(CHARACTERS).flatMap(([topic, roster]) =>
+    roster.map((character, index) => ({ ...character, topic, key: `${topic}/${index}` })),
+  );
+}
+
+export function avatarFor(key: string): AvatarChoice | null {
+  return avatarChoices().find((choice) => choice.key === key) ?? null;
+}
+
 /** Picks one of the topic's characters at random, but stably: a problem keeps its opponent. */
 export function characterFor(problemId: string, topic: string): Character | null {
   const roster = CHARACTERS[topic];

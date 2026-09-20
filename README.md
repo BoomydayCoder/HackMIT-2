@@ -66,9 +66,12 @@ pnpm install
 cp .env.example .env.local
 ```
 
-Open `.env.local` and set `OPENAI_API_KEY` to an OpenAI API key, and
-`DEEPGRAM_API_KEY` to a Deepgram key if you want to dictate proofs. Keep this
-file private; it is gitignored and must not be committed. Then start the app:
+Open `.env.local` and set `OPENAI_API_KEY` to an OpenAI API key,
+`DEEPGRAM_API_KEY` to a Deepgram key if you want to dictate proofs, and
+`DATABASE_URL` to a Postgres connection string (a free [Neon](https://neon.tech)
+database is enough). Accounts, progress and friendships live there, and the
+schema is created on first use. Keep this file private; it is gitignored and
+must not be committed. Then start the app:
 
 ```bash
 pnpm dev

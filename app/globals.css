@@ -355,3 +355,86 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
   .rating-gain-value, .rating-gain-delta, .mm-rating-up { animation: none; }
   .rating-gain-delta { opacity: 1; }
 }
+
+/* The three halls: training ground, lists, and your own quarters. */
+.mm-tabs { position: fixed; bottom: 0; left: 0; right: 0; z-index: 20; display: flex; justify-content: center; gap: clamp(10px, 6vw, 60px); padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); border-top: 1px solid var(--mm-edge); background: rgba(243, 231, 204, .92); backdrop-filter: blur(3px); }
+.mm-tab { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 14px; border-radius: 4px; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; transition: color .15s, background .15s; }
+.mm-tab svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.mm-tab:hover { color: var(--ink); }
+.mm-tab-on { background: rgba(184, 134, 59, .24); color: var(--mm-blade); box-shadow: 1px 2px 0 rgba(72, 54, 33, .2); }
+.mm-page { padding-bottom: 96px; }
+
+/* Profile and allies both sit on one parchment sheet. */
+.mm-sheet { width: min(620px, 100%); margin: 8px 0 auto; display: grid; gap: 26px; padding: 26px; border: 1px solid var(--mm-edge); border-radius: 5px; background: rgba(250, 241, 220, .8); box-shadow: 2px 3px 0 rgba(72, 54, 33, .12); }
+.mm-sheet h1 { margin: 0; font-size: 30px; letter-spacing: -.02em; }
+.mm-lists { gap: 14px; }
+.mm-profile { display: grid; gap: 16px; }
+.mm-profile-head { display: flex; align-items: center; gap: 18px; }
+.mm-avatar { display: grid; width: 96px; height: 96px; flex: 0 0 auto; place-items: center; overflow: hidden; border: 1px solid var(--mm-edge); border-radius: 50%; background: rgba(236, 220, 184, .6); font-size: 34px; color: var(--mm-blade); }
+.mm-avatar img { width: 100%; height: 100%; object-fit: contain; }
+.mm-overall { margin: 4px 0 2px; color: var(--muted); font-size: 14px; }
+.mm-overall strong { color: var(--mm-blade); font-size: 28px; }
+.mm-field { display: grid; gap: 6px; }
+.mm-field textarea { min-height: 70px; resize: vertical; padding: 10px 12px; border: 1px solid var(--line); border-radius: 4px; outline: none; background: var(--field); color: var(--ink); font: inherit; font-size: 15px; }
+.mm-field textarea:focus { border-color: var(--mm-blade); }
+.mm-subelos { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
+.mm-subelos li { display: grid; grid-template-columns: 110px 1fr 52px; align-items: center; gap: 10px; font-size: 13px; text-transform: capitalize; }
+.mm-subelos strong { text-align: right; font-variant-numeric: tabular-nums; }
+.mm-bar { height: 9px; border: 1px solid var(--mm-card-edge); border-radius: 999px; background: rgba(236, 220, 184, .5); overflow: hidden; }
+.mm-bar span { display: block; height: 100%; background: var(--mm-grad); }
+.mm-avatars { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.mm-avatars button { display: grid; width: 58px; height: 58px; place-items: center; padding: 2px; border: 1px solid var(--mm-card-edge); border-radius: 4px; background: rgba(243, 231, 204, .5); cursor: pointer; }
+.mm-avatars button:hover { border-color: var(--mm-blade); }
+.mm-avatars .mm-avatar-on { border-color: var(--mm-blade); background: rgba(184, 134, 59, .3); box-shadow: 1px 2px 0 rgba(72, 54, 33, .2); }
+.mm-avatars img { width: 100%; height: 100%; object-fit: contain; }
+
+.mm-friends { display: grid; gap: 12px; border-top: 1px solid var(--mm-card-edge); padding-top: 20px; }
+.mm-search { padding: 10px 12px; border: 1px solid var(--line); border-radius: 4px; outline: none; background: var(--field); color: var(--ink); font: inherit; font-size: 15px; }
+.mm-search:focus { border-color: var(--mm-blade); }
+.mm-friend-list { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.mm-friend-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; border: 1px solid var(--mm-card-edge); border-radius: 3px; background: rgba(243, 231, 204, .45); font-size: 15px; }
+.mm-friend-list a:hover { color: var(--mm-blade); }
+.mm-friend-list button { padding: 6px 13px; border: 1px solid var(--mm-edge); border-radius: 999px; background: rgba(184, 134, 59, .25); color: var(--ink); cursor: pointer; font: inherit; font-size: 13px; font-weight: 700; }
+.mm-friend-list button:hover { background: rgba(184, 134, 59, .45); }
+.mm-duel-actions { display: flex; gap: 8px; }
+
+.mm-duel { gap: 18px; width: min(880px, 100%); }
+.mm-duel-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 6px; border-bottom: 1px solid var(--mm-card-edge); }
+.mm-duel-score { display: flex; align-items: center; gap: 10px; }
+.mm-duel-score em { font-size: 15px; font-style: normal; font-weight: 700; }
+.mm-duel-score strong { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid var(--mm-edge); border-radius: 50%; background: rgba(184, 134, 59, .22); color: var(--ink); font-size: 20px; }
+.mm-duel-score.is-right { flex-direction: row-reverse; }
+.mm-duel-middle { display: grid; justify-items: center; gap: 2px; }
+.mm-duel-rule { font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+.mm-duel-clock { padding: 4px 14px; border: 1px solid var(--mm-edge); border-radius: 999px; background: rgba(184, 134, 59, .2); font-size: 22px; font-variant-numeric: tabular-nums; font-weight: 700; }
+.mm-duel-clock.is-done { font-size: 15px; }
+.mm-duel-result { margin: 0; text-align: center; font-size: 18px; font-weight: 700; color: var(--mm-blade); }
+.mm-duel-board { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px 10px; margin: 0; padding: 4px 0 10px; list-style: none; }
+.mm-duel-slot { display: grid; align-items: stretch; }
+.mm-duel-slot:nth-child(3n+1) .mm-tcard { transform: rotate(-1.4deg); }
+.mm-duel-slot:nth-child(3n+2) .mm-tcard { transform: rotate(.8deg); }
+.mm-duel-slot:nth-child(5n+3) .mm-tcard { transform: rotate(2deg); }
+
+.mm-tcard { display: grid; align-content: start; gap: 7px; width: 100%; height: 100%; padding: 8px 8px 10px; border: 1px solid var(--mm-edge); border-radius: 8px; background: linear-gradient(170deg, rgba(247, 236, 209, .96), rgba(232, 214, 174, .96)); box-shadow: 2px 4px 0 rgba(72, 54, 33, .18); color: var(--ink); cursor: pointer; font: inherit; text-align: left; transition: transform .16s ease, box-shadow .16s ease; }
+.mm-tcard:hover:not(:disabled) { transform: translateY(-6px) rotate(0deg) scale(1.03); box-shadow: 3px 8px 0 rgba(72, 54, 33, .22); }
+.mm-tcard:disabled { cursor: default; }
+.mm-tcard-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.mm-tcard-no { display: grid; width: 22px; height: 22px; place-items: center; border: 1px solid var(--mm-edge); border-radius: 50%; background: rgba(184, 134, 59, .3); font-size: 12px; font-weight: 700; }
+.mm-tcard-topic { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--mm-blade); text-align: right; }
+.mm-tcard-art { position: relative; display: grid; height: 104px; place-items: center; overflow: hidden; border: 1px solid var(--mm-card-edge); border-radius: 5px; background: radial-gradient(circle at 50% 78%, rgba(184, 134, 59, .28), rgba(222, 202, 161, .85)); }
+.mm-tcard-art img { width: auto; max-width: 92%; height: 94px; object-fit: contain; }
+.mm-tcard-glyph { font-size: 44px; color: var(--mm-blade); opacity: .55; }
+.mm-tcard-seal { position: absolute; padding: 4px 12px; border: 2px solid var(--mm-blade); border-radius: 3px; background: rgba(250, 241, 220, .92); color: var(--mm-blade); font-size: 13px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; transform: rotate(-11deg); }
+.mm-tcard-name { min-height: 2.4em; font-size: 13px; font-weight: 700; line-height: 1.2; }
+.mm-tcard-foot { font-size: 11px; color: var(--muted); }
+.mm-tcard.is-mine { border-color: var(--mm-blade); box-shadow: 0 0 0 2px rgba(184, 134, 59, .45), 2px 4px 0 rgba(72, 54, 33, .18); }
+.mm-tcard.is-theirs { opacity: .62; }
+.mm-tcard.is-theirs .mm-tcard-art img { filter: grayscale(1); }
+@media (max-width: 640px) { .mm-duel-board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.mm-duel-statement { display: flex; align-items: flex-start; gap: 16px; }
+.mm-duel-foe { display: grid; flex: 0 0 132px; justify-items: center; gap: 4px; margin: 0; }
+.mm-duel-foe img { width: 100%; height: auto; object-fit: contain; }
+.mm-duel-foe figcaption { font-size: 12px; font-weight: 700; text-align: center; color: var(--mm-blade); }
+.mm-duel-cardbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.mm-duel-cardbar button { padding: 6px 13px; border: 1px solid var(--mm-edge); border-radius: 999px; background: rgba(184, 134, 59, .25); color: var(--ink); cursor: pointer; font: inherit; font-size: 13px; font-weight: 700; }
