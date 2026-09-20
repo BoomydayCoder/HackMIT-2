@@ -25,6 +25,7 @@ export type DuelView = {
   cards: BoardCard[];
   endsAt: string | null;
   winner: string | null;
+  resignedBy: string | null;
 };
 
 const PLACEHOLDER: Record<string, string> = {
@@ -65,6 +66,18 @@ export default function DuelBoard({ initial }: { initial: DuelView }) {
 
   const finished = board.status === "finished";
 
+  async function resign() {
+    if (!window.confirm("Resign this duel? Your opponent takes the win.")) return;
+    const response = await fetch(`/api/duel/${board.id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "resign" }),
+    });
+    if (!response.ok) return;
+    const data = (await response.json()) as { board?: DuelView };
+    if (data.board) setBoard(data.board);
+  }
+
   return (
     <div className="mm-sheet mm-duel">
       <header className="mm-duel-head">
@@ -88,7 +101,12 @@ export default function DuelBoard({ initial }: { initial: DuelView }) {
 
       {finished && (
         <p className="mm-duel-result">
-          {board.winner ? `${board.winner} takes the duel.` : "A draw — honours even."}
+          {board.resignedBy
+            ? `${board.resignedBy} resigned — ${board.winner} takes the duel.`
+            : board.winner
+              ? `${board.winner} takes the duel.`
+              : "A draw — honours even."}
+          <span className="mm-duel-reveal">Every solution is open now — pick a card to read it.</span>
         </p>
       )}
 
@@ -101,7 +119,7 @@ export default function DuelBoard({ initial }: { initial: DuelView }) {
               <button
                 type="button"
                 className={`mm-tcard${taken ? (mine ? " is-mine" : " is-theirs") : ""}`}
-                disabled={taken || finished}
+                disabled={taken && !finished}
                 onClick={() => router.push(`/battle/${board.id}/cards/${card.index}`)}
               >
                 <span className="mm-tcard-top">
@@ -128,15 +146,23 @@ export default function DuelBoard({ initial }: { initial: DuelView }) {
                     ? mine
                       ? "Claimed by you"
                       : `Claimed by ${card.claimedBy}`
-                    : card.attempts > 0
-                      ? `${3 - card.attempts} of 3 blows left`
-                      : "Strength unknown"}
+                    : finished
+                      ? "Unclaimed — read the solution"
+                      : card.attempts > 0
+                        ? `${3 - card.attempts} of 3 blows left`
+                        : "Strength unknown"}
                 </span>
               </button>
             </li>
           );
         })}
       </ul>
+
+      {board.status === "active" && (
+        <button className="mm-duel-resign" type="button" onClick={() => void resign()}>
+          Resign the duel
+        </button>
+      )}
     </div>
   );
 }

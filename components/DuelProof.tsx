@@ -16,6 +16,8 @@ export type DuelCard = {
   attemptsLeft: number;
   claimedBy: string | null;
   open: boolean;
+  solution: string | null;
+  source: string | null;
 };
 
 type Result = {
@@ -95,7 +97,9 @@ export default function DuelProof({ initial }: { initial: DuelCard }) {
         <span className="mm-count">
           {card.claimedBy
             ? `Claimed by ${card.claimedBy}`
-            : `${card.attemptsLeft} of 3 submissions left · ${RIGOR_LABELS[4].name} rigor`}
+            : card.solution
+              ? "Duel over — unclaimed"
+              : `${card.attemptsLeft} of 3 submissions left · ${RIGOR_LABELS[4].name} rigor`}
         </span>
       </div>
 
@@ -173,6 +177,16 @@ export default function DuelProof({ initial }: { initial: DuelCard }) {
             Back to the board
           </button>
         </div>
+      )}
+
+      {card.solution && (
+        <section className="solution-panel">
+          <h2>Official solution</h2>
+          {card.source && <p className="mm-source">{card.source}</p>}
+          <div className="solution-copy">
+            <Math text={card.solution} />
+          </div>
+        </section>
       )}
 
       {error && <div className="error-panel">{error}</div>}
