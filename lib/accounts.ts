@@ -1,6 +1,7 @@
 import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { db, ready } from "@/lib/db";
+import { overallOf } from "@/lib/duel-rating";
 import { emptyProgress, parseProgress, type Progress } from "@/lib/progress";
 
 const SESSION_COOKIE = "mathmatch_session";
@@ -178,6 +179,33 @@ export async function updateProfile(fields: {
   const avatar = fields.avatar ?? row.avatar;
   await db()`update users set bio = ${bio}, avatar = ${avatar} where username = ${row.username}`;
   return publicProfile({ ...row, bio, avatar });
+}
+
+/** A player's place in the hall, ranked by their overall rating. */
+export type Standing = {
+  rank: number;
+  username: string;
+  avatar: string;
+  overall: number;
+  solved: number;
+};
+
+/** Every player ordered by overall rating, highest first, ranks already filled in. */
+export async function standings(): Promise<Standing[]> {
+  await ready();
+  const rows = (await db()`select * from users`) as UserRow[];
+  return rows
+    .map((row) => {
+      const profile = publicProfile(row);
+      return {
+        username: profile.username,
+        avatar: profile.avatar,
+        overall: overallOf(profile.ratings),
+        solved: profile.solved,
+      };
+    })
+    .sort((a, b) => b.overall - a.overall || a.username.localeCompare(b.username))
+    .map((entry, index) => ({ rank: index + 1, ...entry }));
 }
 
 /** Usernames matching a prefix, for the friend search box. */

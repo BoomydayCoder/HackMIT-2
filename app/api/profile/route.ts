@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
-import { currentUser, findProfile, updateProfile } from "@/lib/accounts";
+import { currentUser, findProfile, standings, updateProfile } from "@/lib/accounts";
 import { historyFor, recordFor } from "@/lib/duel";
 import { friendState } from "@/lib/friends";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+/** Top of the hall shown on a profile; the player themself is appended if lower. */
+const LEADERBOARD_SIZE = 10;
 
 export async function GET(request: Request) {
   const username = new URL(request.url).searchParams.get("username");
@@ -16,8 +19,15 @@ export async function GET(request: Request) {
   if (!profile) return NextResponse.json({ error: "No such player." }, { status: 404 });
 
   const friend = session ? await friendState(session.user.username, profile.username) : "none";
+  const hall = await standings();
+  const mine = hall.find((entry) => entry.username === profile.username);
+  const board = hall.slice(0, LEADERBOARD_SIZE);
+  if (mine && !board.includes(mine)) board.push(mine);
+
   return NextResponse.json({
     profile,
+    leaderboard: board,
+    players: hall.length,
     record: await recordFor(profile.username),
     history: await historyFor(profile.username),
     friend,
