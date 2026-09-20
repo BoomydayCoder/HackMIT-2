@@ -384,7 +384,7 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-friend-list button:hover { background: rgba(184, 134, 59, .45); }
 .mm-duel-actions { display: flex; gap: 8px; }
 
-.mm-duel { gap: 18px; width: min(760px, 100%); }
+.mm-duel { gap: 18px; width: min(880px, 100%); }
 .mm-duel-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 6px; border-bottom: 1px solid var(--mm-card-edge); }
 .mm-duel-score { display: flex; align-items: center; gap: 10px; }
 .mm-duel-score em { font-size: 15px; font-style: normal; font-weight: 700; }
@@ -395,7 +395,7 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-duel-clock { padding: 4px 14px; border: 1px solid var(--mm-edge); border-radius: 999px; background: rgba(184, 134, 59, .2); font-size: 22px; font-variant-numeric: tabular-nums; font-weight: 700; }
 .mm-duel-clock.is-done { font-size: 15px; }
 .mm-duel-result { margin: 0; text-align: center; font-size: 18px; font-weight: 700; color: var(--mm-blade); }
-.mm-duel-board { display: grid; grid-template-columns: repeat(auto-fill, minmax(146px, 1fr)); gap: 16px 12px; margin: 0; padding: 4px 0 10px; list-style: none; }
+.mm-duel-board { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px 10px; margin: 0; padding: 4px 0 10px; list-style: none; }
 .mm-duel-slot { display: grid; align-items: stretch; }
 .mm-duel-slot:nth-child(3n+1) .mm-tcard { transform: rotate(-1.4deg); }
 .mm-duel-slot:nth-child(3n+2) .mm-tcard { transform: rotate(.8deg); }
@@ -407,8 +407,8 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-tcard-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .mm-tcard-no { display: grid; width: 22px; height: 22px; place-items: center; border: 1px solid var(--mm-edge); border-radius: 50%; background: rgba(184, 134, 59, .3); font-size: 12px; font-weight: 700; }
 .mm-tcard-topic { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--mm-blade); text-align: right; }
-.mm-tcard-art { position: relative; display: grid; height: 116px; place-items: center; overflow: hidden; border: 1px solid var(--mm-card-edge); border-radius: 5px; background: radial-gradient(circle at 50% 78%, rgba(184, 134, 59, .28), rgba(222, 202, 161, .85)); }
-.mm-tcard-art img { width: auto; max-width: 92%; height: 104px; object-fit: contain; }
+.mm-tcard-art { position: relative; display: grid; height: 104px; place-items: center; overflow: hidden; border: 1px solid var(--mm-card-edge); border-radius: 5px; background: radial-gradient(circle at 50% 78%, rgba(184, 134, 59, .28), rgba(222, 202, 161, .85)); }
+.mm-tcard-art img { width: auto; max-width: 92%; height: 94px; object-fit: contain; }
 .mm-tcard-glyph { font-size: 44px; color: var(--mm-blade); opacity: .55; }
 .mm-tcard-seal { position: absolute; padding: 4px 12px; border: 2px solid var(--mm-blade); border-radius: 3px; background: rgba(250, 241, 220, .92); color: var(--mm-blade); font-size: 13px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; transform: rotate(-11deg); }
 .mm-tcard-name { min-height: 2.4em; font-size: 13px; font-weight: 700; line-height: 1.2; }
@@ -416,6 +416,7 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-tcard.is-mine { border-color: var(--mm-blade); box-shadow: 0 0 0 2px rgba(184, 134, 59, .45), 2px 4px 0 rgba(72, 54, 33, .18); }
 .mm-tcard.is-theirs { opacity: .62; }
 .mm-tcard.is-theirs .mm-tcard-art img { filter: grayscale(1); }
+@media (max-width: 640px) { .mm-duel-board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 .mm-duel-statement { display: flex; align-items: flex-start; gap: 16px; }
 .mm-duel-foe { display: grid; flex: 0 0 132px; justify-items: center; gap: 4px; margin: 0; }

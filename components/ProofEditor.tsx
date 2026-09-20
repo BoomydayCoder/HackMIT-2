@@ -189,7 +189,7 @@ export default function ProofEditor({ problemId, topic, elo, solution }: ProofEd
         id="proof"
         value={proof}
         onChange={(event) => setProof(event.target.value)}
-        placeholder="Write your proof here… LaTeX $...$ ok"
+        placeholder="Write your proof here — the method is graded, not the answer. LaTeX $...$ ok"
         spellCheck={false}
       />
       <button

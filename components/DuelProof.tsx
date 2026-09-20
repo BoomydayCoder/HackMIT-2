@@ -144,7 +144,7 @@ export default function DuelProof({ initial }: { initial: DuelCard }) {
             id="proof"
             value={proof}
             onChange={(event) => setProof(event.target.value)}
-            placeholder="The key idea, the lemma, the construction… LaTeX $...$ ok"
+            placeholder="The key idea, the lemma, the construction — the answer alone claims nothing. LaTeX $...$ ok"
             spellCheck={false}
           />
           <button
