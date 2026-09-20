@@ -636,3 +636,22 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
   .mm-page-fit .mm-actions { margin-top: 8px; }
   .mm-page-fit .mm-round { width: 58px; height: 58px; font-size: 24px; }
 }
+
+/* Landscape phones: the viewport is too short for the fitted training deck, and
+   the width is past the portrait breakpoint, so the touch sizing is restated here. */
+@media (max-height: 480px) and (orientation: landscape) {
+  .mm-page-fit:has(.mm-deck) { height: auto; min-height: 100svh; overflow: visible; padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
+  .mm-page-fit .mm-stack { min-height: 210px; }
+  .mm-page-fit .mm-card { overflow: visible; }
+  .mm-page-fit .mm-bio { -webkit-line-clamp: 3; }
+
+  .star { min-width: 44px; min-height: 44px; }
+  .mm-nav, .back-link, .source-link, .similar-problems a { display: inline-flex; align-items: center; min-height: 44px; }
+  .mm-custom summary { display: flex; align-items: center; min-height: 44px; }
+  .mm-btn, .mm-tier, .mm-search, .mm-rating, .grade-button, .mic-button, .give-up-row button,
+  .mm-duel-resign, .mm-duel-cardbar button, .mm-friend-list button, .model-control select { min-height: 44px; }
+
+  .similar-problems a { display: flex; flex-wrap: wrap; }
+  .similar-problems a > * { min-width: 0; }
+  .similar-problems a span { white-space: normal; overflow-wrap: anywhere; }
+}
