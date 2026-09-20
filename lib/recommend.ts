@@ -11,8 +11,8 @@ import { TOPICS } from "@/lib/rating";
  * overlap of the key ideas of their solutions (`kinship`). Each rating counts
  * with a confidence of |stars - 3| / 2, so 1★ and 5★ are the loudest signals
  * and 3★ says nothing. A 5★ pulls kindred problems up; a 1★ pushes them down,
- * which is the same as pulling *unlike* problems up. The result is shrunk
- * toward 50% by a prior so a single 4★ moves it less than a 5★.
+ * which is the same as pulling *unlike* problems up. A single 4★ moves the
+ * number half as far as a 5★.
  *
  * Problem vectors (learned embeddings from `ml/train.py`, else hand-made
  * content features) remain for nearest-neighbour "If you like this one" lists.
@@ -21,8 +21,6 @@ import { TOPICS } from "@/lib/rating";
 export const TEXT_DIM = 64;
 export const NEUTRAL_STARS = 3;
 export const MAX_STARS = 5;
-/** Weight of the neutral prior, in units of rating confidence. */
-export const PRIOR_WEIGHT = 0.5;
 export const MAX_LEVEL = 9;
 export const ELO_SCALE = 2500;
 
@@ -137,23 +135,34 @@ export function confidence(stars: number): number {
 }
 
 /**
- * Taste affinity in [-1, 1]. For every rating, kinship with a liked problem
- * (or distance from a disliked one) counts as evidence for the candidate,
- * weighted by how decisive the rating was; the prior shrinks it toward 0.
+ * Taste affinity in [-1, 1]: a problem is for you if it resembles something
+ * you loved, or is clearly unlike something you hated, and does not resemble
+ * anything you hated. Each rating's kinship is scaled by its confidence, and
+ * the strongest single reason wins rather than an average, so a new decisive
+ * rating is never diluted by unrelated earlier ones.
+ *
+ *   pull  = max over liked     of confidence · kinship
+ *   dodge = max over disliked  of confidence · (1 - kinship)
+ *   push  = max over disliked  of confidence · kinship
+ *   affinity = max(pull, dodge) - push
  */
 export function affinity(problem: Matchable, taste: Taste | null): number {
   if (!taste) return 0;
-  let evidence = 0;
-  let total = PRIOR_WEIGHT;
+  let pull = 0;
+  let dodge = 0;
+  let push = 0;
   for (const entry of taste) {
     const weight = confidence(entry.stars);
     if (weight === 0) continue;
-    const alike = 2 * kinship(problem, entry.problem) - 1;
-    const direction = entry.stars > NEUTRAL_STARS ? 1 : -1;
-    evidence += weight * direction * alike;
-    total += weight;
+    const alike = kinship(problem, entry.problem);
+    if (entry.stars > NEUTRAL_STARS) {
+      pull = Math.max(pull, weight * alike);
+    } else {
+      dodge = Math.max(dodge, weight * (1 - alike));
+      push = Math.max(push, weight * alike);
+    }
   }
-  return evidence / total;
+  return Math.max(-1, Math.min(1, Math.max(pull, dodge) - push));
 }
 
 /** Affinity as a 0–100 match percentage; 50 is neutral. */
