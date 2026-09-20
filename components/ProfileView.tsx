@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { avatarChoices, avatarFor } from "@/lib/characters";
 import { STARTING_RATING, TOPICS } from "@/lib/rating";
@@ -25,8 +26,18 @@ type Duel = {
   at: string;
 };
 
+type Standing = {
+  rank: number;
+  username: string;
+  avatar: string;
+  overall: number;
+  solved: number;
+};
+
 type Payload = {
   profile?: Profile;
+  leaderboard?: Standing[];
+  players?: number;
   record?: Tally;
   history?: Duel[];
   friend?: string;
@@ -88,6 +99,8 @@ export default function ProfileView({ username }: { username?: string }) {
   const record = state.record ?? { won: 0, lost: 0, drawn: 0 };
   const fought = record.won + record.lost + record.drawn;
   const history = state.history ?? [];
+  const leaderboard = state.leaderboard ?? [];
+  const place = leaderboard.find((entry) => entry.username === profile.username);
 
   return (
     <section className="mm-profile">
@@ -105,6 +118,7 @@ export default function ProfileView({ username }: { username?: string }) {
             <strong>{overall(profile.ratings)}</strong> overall
           </p>
           <p className="mm-count">
+            {place ? `#${place.rank} of ${state.players ?? leaderboard.length} · ` : ""}
             {profile.solved} problem{profile.solved === 1 ? "" : "s"} taken ·{" "}
             {fought === 0
               ? "no duels fought"
@@ -163,6 +177,39 @@ export default function ProfileView({ username }: { username?: string }) {
               </li>
             ))}
           </ul>
+        </>
+      )}
+
+      {leaderboard.length > 0 && (
+        <>
+          <h2 className="control-label">Hall of champions</h2>
+          <ol className="mm-leaderboard">
+            {leaderboard.map((entry) => {
+              const standard = avatarFor(entry.avatar);
+              const you = entry.username === profile.username;
+              return (
+                <li key={entry.username} className={you ? "is-you" : undefined}>
+                  <span className="mm-rank">{entry.rank}</span>
+                  <span className="mm-rank-avatar">
+                    {standard ? (
+                      <Image src={standard.image} alt={standard.alt} width={32} height={32} />
+                    ) : (
+                      <span aria-hidden="true">⚔</span>
+                    )}
+                  </span>
+                  {you ? (
+                    <strong>{entry.username}</strong>
+                  ) : (
+                    <Link href={`/u/${entry.username}`}>{entry.username}</Link>
+                  )}
+                  <span className="mm-rank-solved">
+                    {entry.solved} solved
+                  </span>
+                  <strong className="mm-rank-elo">{entry.overall}</strong>
+                </li>
+              );
+            })}
+          </ol>
         </>
       )}
 
