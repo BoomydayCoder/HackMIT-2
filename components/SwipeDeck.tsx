@@ -288,6 +288,9 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
               {getProfile(card).name}
               <span className="mm-level">Level: {card.level}</span>
             </h2>
+            <div className="mm-card-art">
+              <Challenger key={card.id} id={card.id} topic={card.topic} className="mm-fighter" />
+            </div>
             <p className="mm-bio">{getProfile(card).bio}</p>
             <div className="mm-tags">
               <span>
@@ -297,9 +300,6 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
             </div>
           </div>
         </article>
-
-        {/* The challenger stands in the ring; the card is swiped behind them. */}
-        <Challenger key={card.id} id={card.id} topic={card.topic} className="mm-fighter" />
       </div>
 
       <div className="mm-actions">
