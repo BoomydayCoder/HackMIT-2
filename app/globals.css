@@ -454,6 +454,15 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-tcard.is-theirs .mm-tcard-art img { filter: grayscale(1); }
 @media (max-width: 640px) { .mm-duel-board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
+.mm-tier-hero { display: grid; gap: 6px; width: 100%; padding: 22px 24px; border: 2px solid var(--mm-blade); border-radius: 8px; background: rgba(184, 134, 59, .24); box-shadow: 2px 3px 0 rgba(72, 54, 33, .16); color: var(--ink); cursor: pointer; font: inherit; text-align: left; }
+.mm-tier-hero strong { font-size: 26px; letter-spacing: -.01em; }
+.mm-tier-hero span { font-size: 14px; color: var(--muted); }
+.mm-tier-hero:hover { background: rgba(184, 134, 59, .34); }
+.mm-tier-hero:not(.is-chosen) { border-color: var(--mm-card-edge); background: rgba(243, 231, 204, .45); }
+.mm-custom { border: 1px solid var(--mm-card-edge); border-radius: 6px; background: rgba(243, 231, 204, .35); }
+.mm-custom summary { padding: 9px 14px; cursor: pointer; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--mm-blade); }
+.mm-custom[open] summary { border-bottom: 1px solid var(--mm-card-edge); }
+.mm-custom .mm-tier-list { padding: 12px 14px; }
 .mm-tier-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
 .mm-tier { display: grid; gap: 4px; width: 100%; height: 100%; padding: 10px 12px; border: 1px solid var(--mm-edge); border-radius: 6px; background: rgba(247, 236, 209, .5); color: var(--ink); cursor: pointer; font: inherit; text-align: left; }
 .mm-tier strong { font-size: 15px; }
