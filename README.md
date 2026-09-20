@@ -6,7 +6,7 @@ and reveal the full problem, then write a proof and have it graded.
 
 ## How the arena works
 
-- `data/harp-deck.json` holds a 100-problem pool sampled across HARP difficulty
+- `data/harp-deck.json` holds a 500-problem pool sampled across HARP difficulty
   levels 1–9; each card's Elo comes from its stored HARP level and contest.
 - You carry a separate Elo per topic (algebra, combinatorics, geometry, number
   theory), stored in the browser. A passing proof earns that topic's rating by
@@ -17,8 +17,13 @@ and reveal the full problem, then write a proof and have it graded.
   selected in the top bar. Fighting is binding: the roster serves nothing else
   until you win the duel or take "Yield & view solution", which reveals the
   official solution and costs more rating than fleeing.
-- Regenerate the pool with `python3 scripts/build_harp_deck.py 100 mixed`
+- Regenerate the pool with `python3 scripts/build_harp_deck.py 500 mixed`
   (`easy` and `proof` modes are also available).
+- Duels come in three forms, defined in `lib/duel-tiers.ts`: a five-minute
+  Skirmish over six mostly AMC 8–10 cards (first to four), the fifteen-minute
+  Duel over ten cards with a couple of AIME and one olympiad (first to six),
+  and a ninety-minute Boss battle over four olympiad proofs (first to three).
+  Card ratings stay hidden until the duel settles.
 - Every problem page has a five-star rating. Ratings are saved with the rest of
   your progress (and to your account when signed in), and steer the deck: the
   nearest candidates to your Elo are re-ranked by how similar they are to the

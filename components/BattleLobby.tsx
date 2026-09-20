@@ -2,8 +2,15 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { DEFAULT_TIER, DUEL_TIERS, type DuelTierId } from "@/lib/duel-tiers";
 
-type Invite = { id: string; status: "pending" | "active"; them: string; incoming: boolean };
+type Invite = {
+  id: string;
+  status: "pending" | "active";
+  them: string;
+  incoming: boolean;
+  tier: string;
+};
 type FriendLink = { username: string; state: string };
 
 /** Challenge an ally, answer a challenge, or walk back into a running duel. */
@@ -13,6 +20,7 @@ export default function BattleLobby() {
   const [allies, setAllies] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState("");
+  const [tier, setTier] = useState<DuelTierId>(DEFAULT_TIER);
 
   useEffect(() => {
     let live = true;
@@ -52,7 +60,7 @@ export default function BattleLobby() {
     const response = await fetch("/api/duel", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username }),
+      body: JSON.stringify({ username, tier }),
     });
     const data = (await response.json()) as { duels?: Invite[]; error?: string };
     setBusy("");
@@ -97,6 +105,7 @@ export default function BattleLobby() {
                       ? " challenges you"
                       : " has not answered yet"
                     : null}
+                  <span className="mm-tier-tag">{duel.tier}</span>
                 </span>
                 <span className="mm-duel-actions">
                   {duel.status === "active" ? (
@@ -127,6 +136,25 @@ export default function BattleLobby() {
           </ul>
         </section>
       )}
+
+      <section className="mm-friends">
+        <h2 className="control-label">Form of combat</h2>
+        <ul className="mm-tier-list">
+          {DUEL_TIERS.map((option) => (
+            <li key={option.id}>
+              <button
+                type="button"
+                className={`mm-tier${option.id === tier ? " is-chosen" : ""}`}
+                aria-pressed={option.id === tier}
+                onClick={() => setTier(option.id)}
+              >
+                <strong>{option.name}</strong>
+                <span>{option.blurb}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <section className="mm-friends">
         <h2 className="control-label">Allies</h2>
