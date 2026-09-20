@@ -5,7 +5,7 @@ import { useMemo, useSyncExternalStore } from "react";
 import type { DeckCard } from "@/lib/problems";
 import { getProfile } from "@/lib/profiles";
 import { parseReviews, readReviewsRaw, subscribeProgress } from "@/lib/progress";
-import { matchPercent, recommend, tasteProfile } from "@/lib/recommend";
+import { matchPercent, recommend, sharedIdeas, tasteProfile } from "@/lib/recommend";
 
 type ForYouProps = {
   pool: DeckCard[];
@@ -30,19 +30,24 @@ export default function ForYou({ pool, limit = 3 }: ForYouProps) {
       ) : (
         <>
           <p className="star-rating-label">
-            Based on {reviewed} rating{reviewed === 1 ? "" : "s"}; changes as you rate.
+            Based on {reviewed} rating{reviewed === 1 ? "" : "s"}: subject, difficulty and shared key ideas. 1★ and 5★ steer
+            hardest.
           </p>
           <ul>
-            {picks.map((problem) => (
-              <li key={problem.id}>
-                <Link href={`/problems/${problem.id}`}>
-                  <strong>{getProfile(problem).name}</strong>
-                  <span>
-                    {problem.topic} · Level {problem.level} · {matchPercent(problem, taste)}% match
-                  </span>
-                </Link>
-              </li>
-            ))}
+            {picks.map((problem) => {
+              const shared = sharedIdeas(problem, taste).slice(0, 2);
+              return (
+                <li key={problem.id}>
+                  <Link href={`/problems/${problem.id}`}>
+                    <strong>{getProfile(problem).name}</strong>
+                    <span>
+                      {problem.topic} · Level {problem.level} · {matchPercent(problem, taste)}% match
+                      {shared.length > 0 && ` · ${shared.join(", ")}`}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </>
       )}
