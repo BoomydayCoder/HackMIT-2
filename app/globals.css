@@ -477,6 +477,36 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-duel-cardbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .mm-duel-cardbar button { padding: 6px 13px; border: 1px solid var(--mm-edge); border-radius: 999px; background: rgba(184, 134, 59, .25); color: var(--ink); cursor: pointer; font: inherit; font-size: 13px; font-weight: 700; }
 
+/* Training grounds: the whole duel — chips, card and both calls — stays inside the window. */
+@media (min-width: 521px) {
+  .mm-page-fit:has(.mm-deck) { height: 100svh; overflow: hidden; padding-bottom: calc(74px + env(safe-area-inset-bottom)); }
+  .mm-page-fit:has(.mm-deck) .mm-header { flex: none; padding: 14px 0 4px; }
+  .mm-page-fit .mm-deck { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; margin: 0; }
+  .mm-page-fit .mm-meter { flex: none; padding: 2px 4px 4px; }
+  .mm-page-fit .mm-ratings { flex: none; }
+  .mm-page-fit .mm-stack { flex: 1 1 auto; height: auto; min-height: 240px; }
+  .mm-page-fit .mm-actions { flex: none; margin-top: 10px; }
+  .mm-page-fit .mm-card-art { min-height: 64px; margin: 6px 0 10px; }
+  .mm-page-fit .mm-footer { flex: none; padding-top: 8px; }
+}
+@media (min-width: 521px) {
+  .mm-page-fit .mm-card { overflow: hidden; }
+  .mm-page-fit .mm-bio { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+}
+
+/* Short windows: trim the trimmings so the card keeps its shape and the calls keep their place. */
+@media (min-width: 521px) and (max-height: 760px) {
+  .mm-page-fit:has(.mm-deck) .mm-header { padding: 10px 0 2px; }
+  .mm-page-fit:has(.mm-deck) .mm-footer { display: none; }
+  .mm-page-fit .mm-card-body { padding: 12px 18px 14px; }
+  .mm-page-fit .mm-card h2 { margin-top: 5px; font-size: 21px; }
+  .mm-page-fit .mm-bio { -webkit-line-clamp: 2; font-size: 13px; line-height: 1.45; }
+  .mm-page-fit .mm-tags { margin-top: 8px; }
+  .mm-page-fit .mm-stack { min-height: 196px; }
+  .mm-page-fit .mm-actions { margin-top: 8px; }
+  .mm-page-fit .mm-round { width: 58px; height: 58px; font-size: 24px; }
+}
+
 /* Swipe discoverability: a standing instruction, lit edge gutters and a first-visit nudge. */
 .mm-meter { justify-content: space-between; gap: 12px; }
 .mm-guide { display: flex; align-items: center; gap: 8px; margin: 0; color: var(--muted); font-size: 12px; font-style: italic; letter-spacing: .04em; white-space: nowrap; }
@@ -507,3 +537,4 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 @media (prefers-reduced-motion: reduce) {
   .mm-card-nudge, .mm-grabme { animation: none; }
 }
+.mm-page-fit .mm-deck-hint { flex: none; margin-top: 6px; }

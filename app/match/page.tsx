@@ -5,7 +5,7 @@ import { getDeck } from "@/lib/problems";
 
 export default function MatchPage() {
   return (
-    <main className="mm-page">
+    <main className="mm-page mm-page-fit">
       <header className="mm-header">
         <Link className="mm-logo" href="/" aria-label="MathMatch home">
           <span className="mm-swords" aria-hidden="true">
