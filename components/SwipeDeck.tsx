@@ -315,21 +315,6 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
             FLEE
           </span>
 
-          <span
-            className="mm-gutter mm-gutter-nope"
-            style={{ opacity: 0.4 + noping * 0.6 }}
-            aria-hidden="true"
-          >
-            ⚑
-          </span>
-          <span
-            className="mm-gutter mm-gutter-like"
-            style={{ opacity: 0.4 + liking * 0.6 }}
-            aria-hidden="true"
-          >
-            ⚔
-          </span>
-
           <div className="mm-card-body">
             <div className="mm-card-top-row">
               <span className="mm-chip">{card.topic}</span>
@@ -359,7 +344,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
 
         {!hasSwiped && !dragging && !flyOut && (
           <span className="mm-grabme" aria-hidden="true">
-            ✋ drag me
+            ↔ drag me
           </span>
         )}
       </div>
