@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { type CSSProperties, useEffect, useState } from "react";
 import { parseProgress, writeProgress } from "@/lib/progress";
 
 export type Portrait = { name: string; alt: string; src: string; width: number; height: number };
@@ -31,6 +31,7 @@ export type DuelView = {
   winner: string | null;
   resignedBy: string | null;
   delta: number | null;
+  tier: { id: string; name: string; minutes: number; toWin: number };
 };
 
 const PLACEHOLDER: Record<string, string> = {
@@ -52,7 +53,10 @@ function useCountdown(endsAt: string | null) {
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 }
 
-/** The ten-card board, polled so claims vanish live from both sides. */
+/** Two rows of cards at any tier: a deck of six deals 3×2, ten deals 5×2. */
+const columnsFor = (cards: number) => Math.ceil(cards / 2);
+
+/** The card board, polled so claims vanish live from both sides. */
 export default function DuelBoard({ initial }: { initial: DuelView }) {
   const router = useRouter();
   const [board, setBoard] = useState(initial);
@@ -111,7 +115,7 @@ export default function DuelBoard({ initial }: { initial: DuelView }) {
             {finished ? "Duel over" : clock}
           </span>
           <span className="mm-duel-rule">
-            <span aria-hidden="true">⚔</span> first to six
+            <span aria-hidden="true">⚔</span> {board.tier.name} · first to {board.tier.toWin}
           </span>
         </span>
         <span className="mm-duel-score is-right">
@@ -135,7 +139,10 @@ export default function DuelBoard({ initial }: { initial: DuelView }) {
         </p>
       )}
 
-      <ul className="mm-duel-board">
+      <ul
+        className="mm-duel-board"
+        style={{ "--mm-columns": columnsFor(board.cards.length) } as CSSProperties}
+      >
         {board.cards.map((card) => {
           const taken = card.claimedBy !== null;
           const mine = card.claimedBy === board.you;

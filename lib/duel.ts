@@ -2,20 +2,13 @@ import { randomBytes } from "node:crypto";
 import { usernameKey } from "@/lib/accounts";
 import { characterFor } from "@/lib/characters";
 import { db, ready } from "@/lib/db";
-import {
-  applySpread,
-  CARDS_TO_WIN,
-  duelDelta,
-  overallOf,
-  spreadDelta,
-} from "@/lib/duel-rating";
-import { getProblem, PROBLEMS, type Problem } from "@/lib/problems";
+import { applySpread, duelDelta, overallOf, spreadDelta } from "@/lib/duel-rating";
+import { dealCards } from "@/lib/duel-deck";
+import { DEFAULT_TIER, type DuelTierId, tierOf } from "@/lib/duel-tiers";
+import { getProblem, type Problem } from "@/lib/problems";
 import { getProfile } from "@/lib/profiles";
 import { parseProgress } from "@/lib/progress";
 
-export const DUEL_CARDS = 10;
-export const DUEL_MINUTES = 15;
-export { CARDS_TO_WIN };
 export const MAX_ATTEMPTS = 3;
 /** Sketch: duels are about finding the idea, not writing it up. */
 export const DUEL_RIGOR = 4 as const;
@@ -67,6 +60,8 @@ export type DuelView = {
   resignedBy: string | null;
   /** What the duel did to your rating, once it has settled. */
   delta: number | null;
+  /** The tier this duel was fought at: its name, clock and win condition. */
+  tier: { id: DuelTierId; name: string; minutes: number; toWin: number };
 };
 
 type DuelRow = {
@@ -77,6 +72,7 @@ type DuelRow = {
   cards: unknown;
   ends_at: string | null;
   resigned_by: string | null;
+  tier: string | null;
 };
 
 type ClaimRow = { card: string; username: string; claimed_at: string };
@@ -89,43 +85,6 @@ type ResultRow = {
   opponent_delta: number;
 };
 
-const tier = (problem: Problem) =>
-  /USA[JM]MO/.test(problem.set) ? "olympiad" : /AIME/.test(problem.set) ? "aime" : "amc";
-
-function take<T>(pool: T[], count: number): T[] {
-  const picked: T[] = [];
-  for (let i = 0; i < count && pool.length > 0; i += 1) {
-    picked.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
-  }
-  return picked;
-}
-
-/**
- * Seven early-contest cards, two AIME and one olympiad, centred on the two
- * players but deliberately skewed easy so six claims are reachable inside the
- * clock. Ratings never leave this module: the board shows only the topic.
- */
-export function dealCards(centre: number): string[] {
-  const near = (problem: Problem) => Math.abs(problem.elo - centre);
-  const byTier = (name: string, span: number) =>
-    PROBLEMS.filter((problem) => tier(problem) === name && near(problem) <= span);
-
-  const amc = byTier("amc", 350);
-  const chosen = [
-    ...take(amc.length >= 7 ? amc : PROBLEMS.filter((p) => tier(p) === "amc"), 7),
-    ...take(
-      byTier("aime", 500).length >= 2
-        ? byTier("aime", 500)
-        : PROBLEMS.filter((p) => tier(p) === "aime"),
-      2,
-    ),
-    ...take(
-      PROBLEMS.filter((problem) => tier(problem) === "olympiad"),
-      1,
-    ),
-  ];
-  return chosen.sort(() => Math.random() - 0.5).map((problem) => problem.id);
-}
 
 async function overallRating(username: string): Promise<number> {
   const rows = (await db()`select progress from users where username = ${username}`) as {
@@ -136,8 +95,12 @@ async function overallRating(username: string): Promise<number> {
   return Math.round(ratings.reduce((sum, value) => sum + value, 0) / ratings.length);
 }
 
-/** Challenges someone; the deck is only dealt once they accept. */
-export async function challenge(from: string, to: string): Promise<string | null> {
+/** Challenges someone at a tier; the deck is only dealt once they accept. */
+export async function challenge(
+  from: string,
+  to: string,
+  tierId: DuelTierId = DEFAULT_TIER,
+): Promise<string | null> {
   const me = usernameKey(from);
   const them = usernameKey(to);
   if (me === them) return null;
@@ -152,8 +115,8 @@ export async function challenge(from: string, to: string): Promise<string | null
   if (existing[0]) return existing[0].id;
 
   const id = randomBytes(9).toString("hex");
-  await db()`insert into duels (id, challenger, opponent, status)
-             values (${id}, ${me}, ${them}, 'pending')`;
+  await db()`insert into duels (id, challenger, opponent, status, tier)
+             values (${id}, ${me}, ${them}, 'pending', ${tierOf(tierId).id})`;
   return id;
 }
 
@@ -168,9 +131,11 @@ export async function accept(id: string, username: string): Promise<boolean> {
   const centre = Math.round(
     ((await overallRating(duel.challenger)) + (await overallRating(duel.opponent))) / 2,
   );
-  const endsAt = new Date(Date.now() + DUEL_MINUTES * 60_000).toISOString();
+  const tier = tierOf(duel.tier);
+  const endsAt = new Date(Date.now() + tier.minutes * 60_000).toISOString();
   const started = await db()`
-    update duels set status = 'active', cards = ${JSON.stringify(dealCards(centre))}::jsonb,
+    update duels set status = 'active',
+                     cards = ${JSON.stringify(dealCards(tier, centre))}::jsonb,
                      ends_at = ${endsAt}
     where id = ${id} and status = 'pending'
     returning id`;
@@ -213,8 +178,9 @@ async function loadDuel(id: string): Promise<DuelRow | null> {
 async function settle(duel: DuelRow, claims: ClaimRow[]): Promise<DuelStatus> {
   if (duel.status !== "active") return duel.status;
   const expired = duel.ends_at !== null && new Date(duel.ends_at).getTime() <= Date.now();
+  const toWin = tierOf(duel.tier).toWin;
   const decided = [duel.challenger, duel.opponent].some(
-    (player) => claims.filter((claim) => claim.username === player).length >= CARDS_TO_WIN,
+    (player) => claims.filter((claim) => claim.username === player).length >= toWin,
   );
   if (!expired && !decided) return "active";
   const ended = await db()`update duels set status = 'finished', finished_at = now()
@@ -265,7 +231,13 @@ async function settleRatings(duel: DuelRow, claims: ClaimRow[]): Promise<void> {
     const mineRatings = progress[player]?.ratings ?? {};
     const theirRatings = progress[them]?.ratings ?? {};
     const { mine, theirs } = outcome(player);
-    const delta = duelDelta(overallOf(mineRatings), overallOf(theirRatings), mine, theirs);
+    const delta = duelDelta(
+      overallOf(mineRatings),
+      overallOf(theirRatings),
+      mine,
+      theirs,
+      tierOf(duel.tier).toWin,
+    );
     deltas[player] = delta;
 
     const claimed = claims
@@ -335,6 +307,7 @@ export async function boardFor(id: string, username: string): Promise<DuelView |
   const them = me === duel.challenger ? duel.opponent : duel.challenger;
   const names = await displayNames([duel.challenger, duel.opponent]);
   const finished = status === "finished";
+  const tier = tierOf(duel.tier);
   const result = finished
     ? ((await db()`select * from duel_results where duel_id = ${id}`) as ResultRow[])[0]
     : undefined;
@@ -351,6 +324,7 @@ export async function boardFor(id: string, username: string): Promise<DuelView |
     yours,
     theirs,
     endsAt: duel.ends_at,
+    tier: { id: tier.id, name: tier.name, minutes: tier.minutes, toWin: tier.toWin },
     delta: result ? (me === duel.challenger ? result.challenger_delta : result.opponent_delta) : null,
     resignedBy: duel.resigned_by ? names[duel.resigned_by] ?? duel.resigned_by : null,
     winner:
@@ -577,6 +551,7 @@ export type Invite = {
   status: DuelStatus;
   them: string;
   incoming: boolean;
+  tier: string;
 };
 
 /** Everything on this player's battle tab: invitations and a running duel. */
@@ -598,7 +573,13 @@ export async function invitesFor(username: string): Promise<Invite[]> {
                                where duel_id = ${row.id}`) as ClaimRow[];
     const status = await settle(row, claims);
     if (status !== "pending" && status !== "active") continue;
-    invites.push({ id: row.id, status, them: names[them] ?? them, incoming: row.opponent === me });
+    invites.push({
+      id: row.id,
+      status,
+      them: names[them] ?? them,
+      incoming: row.opponent === me,
+      tier: tierOf(row.tier).name,
+    });
   }
   return invites;
 }

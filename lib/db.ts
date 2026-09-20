@@ -52,6 +52,7 @@ const STATEMENTS = [
      finished_at timestamptz
    )`,
   `alter table duels add column if not exists resigned_by text`,
+  `alter table duels add column if not exists tier text not null default 'duel'`,
   `create index if not exists duels_players on duels (challenger, opponent, status)`,
   /** One row per card: the primary key is what makes a claim atomic. */
   `create table if not exists duel_claims (

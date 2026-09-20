@@ -1,8 +1,5 @@
 import { STARTING_RATING, TOPICS } from "@/lib/rating";
 
-/** Claim this many cards and the duel ends on the spot. */
-export const CARDS_TO_WIN = 6;
-
 /** A duel swings a rating about twice as hard as a training solve. */
 export const DUEL_K = 48;
 /** No single duel can move one school of arms further than this. */
@@ -14,14 +11,21 @@ export const overallOf = (ratings: Record<string, number>): number =>
   );
 
 /**
- * One pairwise Elo update on the mean rating, scaled by the margin so a 6–0
- * is worth half again as much as a 4–3.
+ * One pairwise Elo update on the mean rating, scaled by the margin so a
+ * clean sweep is worth half again as much as a one-card win. `toWin` is the
+ * tier's win condition, which sets what counts as a wide margin.
  */
-export function duelDelta(mine: number, theirs: number, yours: number, opponent: number): number {
+export function duelDelta(
+  mine: number,
+  theirs: number,
+  yours: number,
+  opponent: number,
+  toWin: number,
+): number {
   const expected = 1 / (1 + 10 ** ((theirs - mine) / 400));
   const actual = yours === opponent ? 0.5 : yours > opponent ? 1 : 0;
   const margin = Math.abs(yours - opponent);
-  const scale = margin <= 1 ? 1 : 1 + (0.5 * (margin - 1)) / (CARDS_TO_WIN - 1);
+  const scale = margin <= 1 ? 1 : 1 + (0.5 * (margin - 1)) / Math.max(1, toWin - 1);
   return Math.round(DUEL_K * scale * (actual - expected));
 }
 

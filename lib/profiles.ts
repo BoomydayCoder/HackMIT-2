@@ -1,3 +1,4 @@
+import generated from "@/data/problem-profiles.json";
 import type { DeckCard } from "@/lib/problems";
 
 /**
@@ -12,6 +13,9 @@ export type ProblemProfile = {
   /** Taunt: what the problem is about and what it takes, no spoilers. */
   bio: string;
 };
+
+/** Names and taunts written for the rest of the pool by scripts/name_problems.mjs. */
+const GENERATED = generated as Record<string, { name: string; bio: string }>;
 
 const NAMES: Record<string, string> = {
   "HARP-AJHSME-1985-20": "Four Tuesdays",
@@ -327,9 +331,10 @@ function fallbackName(problem: Pick<DeckCard, "topic" | "number">): string {
 export function getProfile(
   problem: Pick<DeckCard, "id" | "topic" | "number" | "level" | "bio">,
 ): ProblemProfile {
+  const generated = GENERATED[problem.id];
   return {
-    name: NAMES[problem.id] ?? fallbackName(problem),
+    name: NAMES[problem.id] ?? generated?.name ?? fallbackName(problem),
     level: problem.level,
-    bio: BIOS[problem.id] ?? problem.bio,
+    bio: BIOS[problem.id] ?? generated?.bio ?? problem.bio,
   };
 }
