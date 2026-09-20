@@ -278,7 +278,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
             <div className="mm-card-top-row">
               <span className="mm-chip">{card.topic}</span>
               {taste && (
-                <span className="mm-taste" title="Predicted from the problems you have rated; 50% is neutral">
+                <span className="mm-taste" title="Subject, difficulty and key-idea kinship with the problems you have rated; 50% is neutral">
                   ♥ {matchPercent(card, taste)}% your taste
                 </span>
               )}

@@ -70,7 +70,14 @@ export function recordGiveUp(topic: string): number {
   return write(topic, current - GIVE_UP_PENALTY);
 }
 
-type Rateable = { id: string; topic: string; elo: number; level: number; statement: string };
+type Rateable = {
+  id: string;
+  topic: string;
+  elo: number;
+  level: number;
+  statement: string;
+  keyIdeas: readonly string[];
+};
 
 const SHORTLIST = 5;
 const CANDIDATES = 12;

@@ -5,7 +5,7 @@ embedding per problem. Scorer: parameter-free kernel regression over the user's
 history: the similarity-weighted (clamped cosine) average of their labels,
 shrunk toward neutral by PRIOR_WEIGHT. Keeping the scorer parameter-free means
 the exported problem embeddings plug straight into lib/recommend.ts, whose
-`predictStars` is exactly this scorer (in stars rather than centred labels).
+`similarProblems` uses the same embeddings for nearest-neighbour lists.
 """
 
 import torch

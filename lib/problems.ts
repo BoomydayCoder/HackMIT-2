@@ -1,4 +1,5 @@
 import harpDeck from "@/data/harp-deck.json";
+import { extractKeyIdeas } from "@/lib/key-ideas";
 
 export type Problem = {
   id: string;
@@ -15,7 +16,8 @@ export type Problem = {
   sourceUrl: string;
 };
 
-export type DeckCard = Omit<Problem, "solution" | "answer">;
+/** A problem without its solution, plus the techniques the solution uses. */
+export type DeckCard = Omit<Problem, "solution" | "answer"> & { keyIdeas: string[] };
 
 export const PROBLEMS: Problem[] = harpDeck as Problem[];
 
@@ -37,5 +39,6 @@ export function getDeck(): DeckCard[] {
     statement: problem.statement,
     proposer: problem.proposer,
     sourceUrl: problem.sourceUrl,
+    keyIdeas: extractKeyIdeas(problem.solution),
   }));
 }
