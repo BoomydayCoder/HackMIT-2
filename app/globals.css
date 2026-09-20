@@ -409,6 +409,11 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-duel-clock { padding: 4px 14px; border: 1px solid var(--mm-edge); border-radius: 999px; background: rgba(184, 134, 59, .2); font-size: 22px; font-variant-numeric: tabular-nums; font-weight: 700; }
 .mm-duel-clock.is-done { font-size: 15px; }
 .mm-duel-result { margin: 0; text-align: center; font-size: 18px; font-weight: 700; color: var(--mm-blade); }
+.mm-duel-reveal { display: block; margin-top: 4px; font-size: 13px; font-weight: 500; color: var(--muted); }
+.mm-duel-resign { justify-self: center; padding: 8px 18px; border: 1px solid var(--mm-edge); border-radius: 4px; background: transparent; color: var(--mm-blade); cursor: pointer; font: inherit; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+.mm-duel-resign:hover { background: rgba(155, 42, 42, .1); }
+.solution-panel { margin-top: 20px; padding: 16px 18px; border: 1px solid var(--mm-edge); border-radius: 6px; background: rgba(247, 236, 209, .6); }
+.solution-panel h2 { margin: 0 0 4px; font-size: 18px; }
 .mm-duel-board { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px 10px; margin: 0; padding: 4px 0 10px; list-style: none; }
 .mm-duel-slot { display: grid; align-items: stretch; }
 .mm-duel-slot:nth-child(3n+1) .mm-tcard { transform: rotate(-1.4deg); }

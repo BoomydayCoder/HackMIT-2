@@ -50,6 +50,8 @@ export type DuelView = {
   cards: BoardCard[];
   endsAt: string | null;
   winner: string | null;
+  /** Display name of whoever resigned, or null if the duel ran its course. */
+  resignedBy: string | null;
 };
 
 type DuelRow = {
@@ -59,6 +61,7 @@ type DuelRow = {
   status: DuelStatus;
   cards: unknown;
   ends_at: string | null;
+  resigned_by: string | null;
 };
 
 type ClaimRow = { card: string; username: string; claimed_at: string };
@@ -150,6 +153,17 @@ export async function accept(id: string, username: string): Promise<boolean> {
   return started.length > 0;
 }
 
+/** Resignation ends the duel at once and hands the win to the other player. */
+export async function resign(id: string, username: string): Promise<boolean> {
+  const me = usernameKey(username);
+  await ready();
+  const rows = await db()`
+    update duels set status = 'finished', finished_at = now(), resigned_by = ${me}
+    where id = ${id} and status = 'active' and (challenger = ${me} or opponent = ${me})
+    returning id`;
+  return rows.length > 0;
+}
+
 export async function decline(id: string, username: string): Promise<void> {
   const me = usernameKey(username);
   await ready();
@@ -221,12 +235,15 @@ export async function boardFor(id: string, username: string): Promise<DuelView |
     yours,
     theirs,
     endsAt: duel.ends_at,
+    resignedBy: duel.resigned_by ? names[duel.resigned_by] ?? duel.resigned_by : null,
     winner:
       status !== "finished"
         ? null
-        : yours === theirs
-          ? null
-          : names[yours > theirs ? me : them] ?? null,
+        : duel.resigned_by
+          ? names[duel.resigned_by === me ? them : me] ?? null
+          : yours === theirs
+            ? null
+            : names[yours > theirs ? me : them] ?? null,
     cards: cardIds(duel.cards).map((cardId, index) => {
       const claim = claims.find((row) => row.card === cardId);
       const problem = getProblem(cardId);
@@ -251,6 +268,9 @@ export type DuelCard = {
   attemptsLeft: number;
   claimedBy: string | null;
   open: boolean;
+  /** The official solution, released only once the duel is over. */
+  solution: string | null;
+  source: string | null;
 };
 
 /**
@@ -287,6 +307,8 @@ export async function cardFor(
     attemptsLeft: Math.max(0, MAX_ATTEMPTS - (used[0]?.used ?? 0)),
     claimedBy: claim ? names[claim.username] ?? claim.username : null,
     open: status === "active" && !claim,
+    solution: status === "finished" ? problem.solution : null,
+    source: status === "finished" ? `${problem.set} · Problem ${problem.number}` : null,
   };
 }
 

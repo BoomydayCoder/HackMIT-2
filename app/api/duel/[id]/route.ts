@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/accounts";
-import { accept, boardFor, decline } from "@/lib/duel";
+import { accept, boardFor, decline, resign } from "@/lib/duel";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -36,6 +36,12 @@ export async function POST(request: Request, context: Context) {
   if (action === "decline") {
     await decline(id, session.user.username);
     return NextResponse.json({ board: null });
+  }
+  if (action === "resign") {
+    if (!(await resign(id, session.user.username))) {
+      return NextResponse.json({ error: "That duel is not running." }, { status: 409 });
+    }
+    return NextResponse.json({ board: await boardFor(id, session.user.username) });
   }
   if (action !== "accept") {
     return NextResponse.json({ error: "Unknown action." }, { status: 400 });
