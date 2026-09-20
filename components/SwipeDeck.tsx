@@ -14,14 +14,17 @@ import MathText from "@/components/Math";
 import type { DeckCard } from "@/lib/problems";
 import { getProfile } from "@/lib/profiles";
 import {
+  parseReviews,
   parseSolved,
   readPinned,
   RATINGS_SEEN_KEY,
   readRetiredRaw,
+  readReviewsRaw,
   readSolvedRaw,
   subscribeProgress,
   writePinned,
 } from "@/lib/progress";
+import { matchPercent, tasteProfile } from "@/lib/recommend";
 import {
   parseRatings,
   pickCards,
@@ -54,6 +57,7 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   const retiredRaw = useSyncExternalStore(subscribeProgress, readRetiredRaw, () => "[]");
   const ratingsRaw = useSyncExternalStore(subscribeProgress, readRatingsRaw, () => "{}");
   const pinned = useSyncExternalStore(subscribeProgress, readPinned, () => "");
+  const reviewsRaw = useSyncExternalStore(subscribeProgress, readReviewsRaw, () => "{}");
   const [matched, setMatched] = useState<DeckCard | null>(null);
   const [risen, setRisen] = useState<string[]>([]);
   const [drag, setDrag] = useState<Drag>({ x: 0, y: 0 });
@@ -61,12 +65,14 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
   const origin = useRef<Drag | null>(null);
 
   const ratings = useMemo(() => parseRatings(ratingsRaw), [ratingsRaw]);
+  const reviews = useMemo(() => parseReviews(reviewsRaw), [reviewsRaw]);
+  const taste = useMemo(() => tasteProfile(pool, reviews), [pool, reviews]);
   const solved = useMemo(() => parseSolved(solvedRaw), [solvedRaw]);
   const retired = useMemo(() => parseSolved(retiredRaw), [retiredRaw]);
   const settled = useMemo(() => [...solved, ...retired], [solved, retired]);
   const suggestion = useMemo(
-    () => pickCards(pool, ratings, [...settled, ...seen], turn, topics),
-    [pool, ratings, settled, seen, turn, topics],
+    () => pickCards(pool, ratings, [...settled, ...seen], turn, topics, reviews),
+    [pool, ratings, settled, seen, turn, topics, reviews],
   );
   // The match you are committed to: nothing else is served until it is settled.
   const pinnedCard = useMemo(
@@ -271,12 +277,20 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
           <div className="mm-card-body">
             <div className="mm-card-top-row">
               <span className="mm-chip">{card.topic}</span>
+              {taste && (
+                <span className="mm-taste" title="Predicted from the problems you have rated; 50% is neutral">
+                  ♥ {matchPercent(card, taste)}% your taste
+                </span>
+              )}
               <span className="mm-elo">{card.elo}</span>
             </div>
             <h2 className="mm-name">
               {getProfile(card).name}
               <span className="mm-level">Level: {card.level}</span>
             </h2>
+            <div className="mm-card-art">
+              <Challenger key={card.id} id={card.id} topic={card.topic} className="mm-fighter" />
+            </div>
             <p className="mm-bio">{getProfile(card).bio}</p>
             <div className="mm-tags">
               <span>
@@ -286,9 +300,6 @@ export default function SwipeDeck({ cards: pool }: SwipeDeckProps) {
             </div>
           </div>
         </article>
-
-        {/* The challenger stands in the ring; the card is swiped behind them. */}
-        <Challenger key={card.id} id={card.id} topic={card.topic} className="mm-fighter" />
       </div>
 
       <div className="mm-actions">

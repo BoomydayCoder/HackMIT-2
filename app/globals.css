@@ -98,6 +98,18 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .workspace { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: start; gap: 25px; padding-bottom: 90px; }
 .statement-card, .proof-editor { border: 1px solid var(--line); border-radius: 10px; background: rgba(253,247,232,.82); }
 .statement-card { padding: 30px; }
+.star-rating { margin-top: 24px; padding-top: 18px; border-top: 1px solid #dfe5dd; }
+.star-rating-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.star-rating-label { color: var(--muted); font-size: 13px; }
+.star-row { display: flex; gap: 4px; margin-top: 8px; }
+.star { padding: 0 2px; border: 0; background: none; color: #cbd9d1; font-size: 28px; line-height: 1; cursor: pointer; transition: color .12s, transform .12s; }
+.star:hover { transform: scale(1.12); color: #d9a441; }
+.star-on { color: #d9a441; }
+.similar-problems { margin-top: 22px; padding-top: 18px; border-top: 1px solid #dfe5dd; }
+.similar-problems ul { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.similar-problems a { display: flex; justify-content: space-between; gap: 12px; padding: 10px 12px; border: 1px solid #dfe5dd; border-radius: 8px; color: inherit; text-decoration: none; font-size: 14px; }
+.similar-problems a:hover { border-color: var(--accent); }
+.similar-problems a span { color: var(--muted); font-size: 12px; white-space: nowrap; }
 .card-label, .editor-label-row, .result-kicker { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
 .statement-copy { padding-top: 42px; font-size: 20px; line-height: 1.75; }
 .math-content { white-space: pre-wrap; }
@@ -183,21 +195,24 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-meter { display: flex; align-items: center; justify-content: flex-end; padding: 6px 4px 10px; }
 .mm-count { color: var(--muted); font-size: 13px; font-style: italic; }
 
-.mm-ratings { display: flex; gap: 6px; padding: 0 4px 6px; }
+.mm-ratings { position: relative; z-index: 5; display: flex; gap: 6px; padding: 0 4px 6px; }
 .mm-rating { display: inline-flex; align-items: center; gap: 5px; flex: 1; justify-content: center; padding: 7px 4px; border: 1px solid var(--mm-edge); border-radius: 3px; background: rgba(250, 241, 220, .55); color: var(--muted); font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: color .15s, background .15s, border-color .15s; }
 .mm-rating:hover { color: var(--ink); }
 .mm-rating-on { background: rgba(184, 134, 59, .28); border-color: rgba(120, 80, 30, .7); color: var(--ink); box-shadow: 1px 2px 0 rgba(72, 54, 33, .25); }
 .mm-rating-topic { font-size: 14px; opacity: .85; }
 
-/* The card is the quiet part: the challenger stands in front of it. */
+/* Trading card: name on top, the challenger's portrait framed below, bio underneath. */
 .mm-stack { position: relative; height: min(660px, 74svh); margin-top: 2px; }
-.mm-card { position: absolute; top: 0; right: 6%; left: 6%; display: flex; align-items: flex-start; border: 1px solid var(--mm-card-edge); border-radius: 4px; background: var(--mm-card); box-shadow: 2px 3px 0 rgba(72, 54, 33, .07); }
-.mm-card-behind { min-height: 150px; background: rgba(243, 231, 204, .22); border-color: rgba(94, 74, 48, .14); opacity: .8; transform-origin: top center; }
+.mm-card { position: absolute; top: 0; right: 6%; bottom: 0; left: 6%; display: flex; align-items: stretch; border: 1px solid var(--mm-card-edge); border-radius: 4px; background: var(--mm-card); box-shadow: 2px 3px 0 rgba(72, 54, 33, .07); }
+.mm-card-behind { background: rgba(243, 231, 204, .22); border-color: rgba(94, 74, 48, .14); opacity: .8; transform-origin: top center; }
 .mm-card-top { cursor: grab; touch-action: none; user-select: none; }
 .mm-card-top:active { cursor: grabbing; }
-.mm-card-body { position: relative; z-index: 2; width: 100%; padding: 16px 22px 18px; }
-.mm-card-top-row { display: flex; align-items: center; justify-content: space-between; }
-.mm-card h2 { margin: 9px 0 5px; font-size: 24px; font-weight: 700; letter-spacing: -.01em; }
+.mm-card-body { position: relative; z-index: 2; display: flex; flex-direction: column; width: 100%; min-height: 0; padding: 16px 22px 18px; }
+/* Trading-card art window: name above, bio below, the challenger framed between. */
+.mm-card-art { position: relative; flex: 1; min-height: 160px; margin: 6px 0 12px; overflow: hidden; border: 1px solid var(--mm-card-edge); border-radius: 3px; background: radial-gradient(ellipse at 50% 80%, rgba(184, 134, 59, .28), rgba(236, 220, 184, .35) 70%); }
+.mm-card-top-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mm-taste { flex: 1; text-align: center; color: var(--mm-blade); font-size: 11px; font-weight: 700; letter-spacing: .04em; white-space: nowrap; }
+.mm-card h2 { margin: 9px 0 0; font-size: 24px; font-weight: 700; letter-spacing: -.01em; }
 .mm-level { margin-left: 10px; font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; vertical-align: middle; }
 .mm-source { margin: -10px 0 18px; color: var(--muted); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
 .mm-chip { display: inline-block; padding: 4px 11px; border: 1px solid var(--mm-card-edge); border-radius: 2px; background: rgba(236, 220, 184, .5); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
@@ -207,10 +222,10 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 11px; color: var(--muted); font-size: 11px; }
 .mm-tags span { padding: 4px 10px; border: 1px dashed var(--mm-card-edge); border-radius: 2px; }
 
-/* Challenger portrait: life-size in the ring, the card hanging behind them. */
+/* Challenger portrait. */
 .mm-portrait { position: absolute; bottom: 0; left: 50%; z-index: 3; height: 74%; width: auto; aspect-ratio: 1; transform: translateX(-50%); pointer-events: none; animation: mm-bob 4.5s ease-in-out infinite; }
-/* Small enough to stand clear of the card, low enough to touch the ring. */
-.mm-fighter { height: 58%; bottom: -3%; z-index: 1; }
+.mm-fighter { height: 92%; bottom: 0; z-index: 1; }
+.mm-card-art .mm-watermark { top: 50%; transform: translate(-50%, -50%); }
 .mm-portrait img { width: 100%; height: 100%; object-fit: contain; object-position: bottom; filter: drop-shadow(0 12px 10px rgba(72, 54, 33, .35)); }
 .mm-portrait::after { content: ""; position: absolute; bottom: -10px; left: 50%; width: 55%; height: 26px; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(72, 54, 33, .28), transparent); }
 .mm-card-behind .mm-portrait { animation: none; }
@@ -231,8 +246,7 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-fly-left { transform: translate(-640px, 40px) rotate(-28deg); transition: transform .26s ease-in; }
 .mm-fly-right { transform: translate(640px, 40px) rotate(28deg); transition: transform .26s ease-in; }
 
-/* The two calls flank the challenger rather than sitting under their feet. */
-.mm-actions { display: flex; justify-content: space-between; padding: 0 26px 6px; margin-top: -96px; }
+.mm-actions { display: flex; justify-content: space-between; padding: 0 26px 6px; margin-top: 18px; }
 .mm-round { display: grid; width: 66px; height: 66px; place-items: center; border: 2px solid var(--mm-edge); border-radius: 50%; background: rgba(250, 241, 220, .9); box-shadow: 2px 4px 0 rgba(72, 54, 33, .25); color: var(--ink); cursor: pointer; font-size: 28px; transition: transform .15s ease, background .15s ease; }
 .mm-round:hover:not(:disabled) { transform: translateY(-2px) scale(1.06); background: #fdf6e6; }
 .mm-round:disabled { cursor: not-allowed; opacity: .4; }

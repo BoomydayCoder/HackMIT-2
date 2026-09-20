@@ -1,5 +1,6 @@
 import { MAX_SCORE, PASS_SCORE } from "@/lib/grader";
-import { notifyProgress, RATINGS_KEY, subscribeProgress } from "@/lib/progress";
+import { notifyProgress, RATINGS_KEY, type Reviews, subscribeProgress } from "@/lib/progress";
+import { affinity, tasteProfile } from "@/lib/recommend";
 
 export const TOPICS = ["algebra", "combinatorics", "geometry", "number theory"] as const;
 export const STARTING_RATING = 1000;
@@ -69,11 +70,18 @@ export function recordGiveUp(topic: string): number {
   return write(topic, current - GIVE_UP_PENALTY);
 }
 
-type Rateable = { id: string; topic: string; elo: number };
+type Rateable = { id: string; topic: string; elo: number; level: number; statement: string };
+
+const SHORTLIST = 5;
+const CANDIDATES = 12;
+/** How many rating points of Elo gap one full unit of taste affinity is worth. */
+const TASTE_WEIGHT = 150;
 
 /**
  * Serves the deck one card at a time: the closest problems to your rating in
  * each topic, cycling through the shortlist with `turn` so it isn't repetitive.
+ * Once you have reviewed problems, the nearest candidates are re-ranked so the
+ * ones most like what you liked come first.
  */
 export function pickCards<T extends Rateable>(
   cards: T[],
@@ -81,12 +89,17 @@ export function pickCards<T extends Rateable>(
   excluded: string[],
   turn: number,
   topics: readonly string[],
+  reviews: Reviews = {},
 ): { card: T | null; upcoming: T[] } {
   const gap = (entry: T) => Math.abs(entry.elo - ratingFor(ratings, entry.topic));
+  const taste = tasteProfile(cards, reviews);
+  const score = (entry: T) => gap(entry) - TASTE_WEIGHT * affinity(entry, taste);
   const shortlist = cards
     .filter((entry) => topics.includes(entry.topic) && !excluded.includes(entry.id))
     .sort((a, b) => gap(a) - gap(b) || a.id.localeCompare(b.id))
-    .slice(0, 5);
+    .slice(0, taste ? CANDIDATES : SHORTLIST)
+    .sort((a, b) => score(a) - score(b) || a.id.localeCompare(b.id))
+    .slice(0, SHORTLIST);
 
   if (shortlist.length === 0) return { card: null, upcoming: [] };
   const card = shortlist[turn % shortlist.length];

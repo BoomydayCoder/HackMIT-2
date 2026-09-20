@@ -19,6 +19,39 @@ and reveal the full problem, then write a proof and have it graded.
   official solution and costs more rating than fleeing.
 - Regenerate the pool with `python3 scripts/build_harp_deck.py 100 mixed`
   (`easy` and `proof` modes are also available).
+- Every problem page has a five-star rating. Ratings are saved with the rest of
+  your progress (and to your account when signed in), and steer the deck: the
+  nearest candidates to your Elo are re-ranked by how similar they are to the
+  problems you rated highly. Problem pages also list the closest problems in the
+  same space under "If you like this one".
+
+## Recommender
+
+`lib/recommend.ts` scores problems against a taste vector: the review-weighted
+sum of the vectors of problems you have rated, compared by cosine. A problem's
+vector is a learned embedding from `data/problem-embeddings.json` when the file
+has been trained, otherwise hand-made content features (topic, level, Elo and a
+hashed bag of words of the statement). `ml/features.py` mirrors those features
+exactly, so the deep model trains on the same inputs the browser uses.
+
+The training pipeline in `ml/` is a two-tower model in PyTorch: an MLP problem
+tower over the content features and a parameter-free user tower (label-weighted
+sum of history embeddings), so exported problem embeddings drop straight into
+the browser scorer without shipping a model. Labels come from star reviews
+(explicit) and solves/surrenders (weaker implicit signals) in
+`.data/accounts.json`.
+
+```bash
+pip install -r ml/requirements.txt
+python3 -m ml.dataset                  # how much signal is there?
+python3 -m ml.train --synthetic 60     # dry run padded with fake users
+python3 -m ml.train                    # train on real accounts, export embeddings
+```
+
+`ml.train` holds out one interaction per user (leave-one-out), reports sign
+accuracy and correlation against the untrained baseline, and writes
+`data/problem-embeddings.json`, which the app picks up on the next build. Ship
+the empty `{ "dim": 0, "problems": {} }` to fall back to content features.
 
 ## Run locally
 
