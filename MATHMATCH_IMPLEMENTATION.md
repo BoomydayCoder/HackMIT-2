@@ -17,7 +17,7 @@ This document is an implementation handoff. Its creation does not imply that the
 ### Confirmed by the project owner
 
 - The product is now called **MathMatch**, replacing rigor.ai.
-- It uses a Tinder-like interface featuring math problems.
+- It uses a card-deck interface featuring math problems: each problem is a monster card, and you swipe to fight or flee.
 - Swiping left skips a problem; swiping right opens a place to enter a proof.
 - AI grades the submitted proof.
 - Recommendations should adapt to the user's difficulty level and preferences.
@@ -28,7 +28,7 @@ This document is an implementation handoff. Its creation does not imply that the
 These are practical starting choices from the planning discussion, not separately approved requirements. Use them to make progress and surface meaningful tradeoffs in the PR.
 
 - Label left swipe **Pass** and right swipe **Try this**. A pass is not automatically a failure.
-- Treat the dating metaphor as matching people with problems. Do not build romantic matching, profiles for dating, or messaging between strangers.
+- Treat the matching metaphor as pairing people with problems. Do not build profiles for matching people with each other or messaging between strangers.
 - Begin with a curated subset of the existing data, with roughly 30–50 checked problems as a content target. A smaller verified set is acceptable for the first complete demo.
 - Use written text with LaTeX for the first editor. Handwriting recognition can follow later.
 - Use one consistent grading standard for adaptation. Keep existing model and rigor controls available only as advanced controls if retained.
