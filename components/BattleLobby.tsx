@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { DEFAULT_TIER, DUEL_TIERS, type DuelTierId } from "@/lib/duel-tiers";
+import { DEFAULT_TIER, DUEL_TIERS, type DuelTierId, tierOf } from "@/lib/duel-tiers";
 
 type Invite = {
   id: string;
@@ -21,6 +21,7 @@ export default function BattleLobby() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState("");
   const [tier, setTier] = useState<DuelTierId>(DEFAULT_TIER);
+  const [customOpen, setCustomOpen] = useState(false);
 
   useEffect(() => {
     let live = true;
@@ -86,6 +87,8 @@ export default function BattleLobby() {
   }
 
   const challenged = new Set(duels.map((duel) => duel.them.toLowerCase()));
+  const standard = tierOf(DEFAULT_TIER);
+  const alternatives = DUEL_TIERS.filter((option) => option.id !== DEFAULT_TIER);
 
   return (
     <>
@@ -139,25 +142,46 @@ export default function BattleLobby() {
 
       <section className="mm-friends">
         <h2 className="control-label">Form of combat</h2>
-        <ul className="mm-tier-list">
-          {DUEL_TIERS.map((option) => (
-            <li key={option.id}>
-              <button
-                type="button"
-                className={`mm-tier${option.id === tier ? " is-chosen" : ""}`}
-                aria-pressed={option.id === tier}
-                onClick={() => setTier(option.id)}
-              >
-                <strong>{option.name}</strong>
-                <span>{option.blurb}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
+        <button
+          type="button"
+          className={`mm-tier-hero${tier === DEFAULT_TIER ? " is-chosen" : ""}`}
+          aria-pressed={tier === DEFAULT_TIER}
+          onClick={() => {
+            setTier(DEFAULT_TIER);
+            setCustomOpen(false);
+          }}
+        >
+          <strong>{standard.name}</strong>
+          <span>{standard.blurb}</span>
+        </button>
+
+        <details
+          className="mm-custom"
+          open={customOpen}
+          onToggle={(event) => setCustomOpen(event.currentTarget.open)}
+        >
+          <summary>Custom duel</summary>
+          <ul className="mm-tier-list">
+            {alternatives.map((option) => (
+              <li key={option.id}>
+                <button
+                  type="button"
+                  className={`mm-tier${option.id === tier ? " is-chosen" : ""}`}
+                  aria-pressed={option.id === tier}
+                  onClick={() => setTier(option.id)}
+                >
+                  <strong>{option.name}</strong>
+                  <span>{option.blurb}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </details>
       </section>
 
       <section className="mm-friends">
         <h2 className="control-label">Allies</h2>
+        <p className="mm-count">Challenges are sent as a {tierOf(tier).name.toLowerCase()}.</p>
         <ul className="mm-friend-list">
           {allies.map((ally) => (
             <li key={ally}>
