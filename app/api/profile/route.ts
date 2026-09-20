@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { currentUser, findProfile, updateProfile } from "@/lib/accounts";
+import { historyFor, recordFor } from "@/lib/duel";
 import { friendState } from "@/lib/friends";
 
 export const runtime = "nodejs";
@@ -17,6 +18,8 @@ export async function GET(request: Request) {
   const friend = session ? await friendState(session.user.username, profile.username) : "none";
   return NextResponse.json({
     profile,
+    record: await recordFor(profile.username),
+    history: await historyFor(profile.username),
     friend,
     isSelf: session?.user.username.toLowerCase() === profile.username.toLowerCase(),
   });

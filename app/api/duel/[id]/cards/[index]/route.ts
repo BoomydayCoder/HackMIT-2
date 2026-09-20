@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/accounts";
 import {
+  ATTEMPT_COOLDOWN_MS,
   attemptsUsed,
   boardFor,
   cardFor,
@@ -63,6 +64,12 @@ export async function POST(request: Request, context: Context) {
   }
   if (state.claimed) {
     return NextResponse.json({ error: "This card has already been claimed." }, { status: 409 });
+  }
+  if (state.waitMs > 0) {
+    return NextResponse.json(
+      { error: `Catch your breath — ${Math.ceil(state.waitMs / 1000)}s before the next attempt.` },
+      { status: 429, headers: { "Retry-After": String(Math.ceil(ATTEMPT_COOLDOWN_MS / 1000)) } },
+    );
   }
   if (state.used >= MAX_ATTEMPTS) {
     return NextResponse.json(

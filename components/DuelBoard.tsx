@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { parseProgress, writeProgress } from "@/lib/progress";
 
 export type Portrait = { name: string; alt: string; src: string; width: number; height: number };
 
@@ -13,6 +14,9 @@ export type BoardCard = {
   claimedBy: string | null;
   claimedAt: string | null;
   attempts: number;
+  name: string | null;
+  elo: number | null;
+  source: string | null;
 };
 
 export type DuelView = {
@@ -26,6 +30,7 @@ export type DuelView = {
   endsAt: string | null;
   winner: string | null;
   resignedBy: string | null;
+  delta: number | null;
 };
 
 const PLACEHOLDER: Record<string, string> = {
@@ -65,6 +70,22 @@ export default function DuelBoard({ initial }: { initial: DuelView }) {
   }, [initial.id, board.status]);
 
   const finished = board.status === "finished";
+
+  // The duel moved the ratings server-side; pull them down so a later training
+  // save doesn't push this browser's pre-duel numbers back over them.
+  useEffect(() => {
+    if (!finished) return;
+    let live = true;
+    void fetch("/api/progress")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { progress?: unknown } | null) => {
+        if (live && data?.progress) writeProgress(parseProgress(data.progress));
+      })
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, [finished]);
 
   async function resign() {
     if (!window.confirm("Resign this duel? Your opponent takes the win.")) return;
@@ -106,7 +127,11 @@ export default function DuelBoard({ initial }: { initial: DuelView }) {
             : board.winner
               ? `${board.winner} takes the duel.`
               : "A draw — honours even."}
-          <span className="mm-duel-reveal">Every solution is open now — pick a card to read it.</span>
+          <span className="mm-duel-reveal">
+            {board.delta === null
+              ? "Every solution is open now — pick a card to read it."
+              : `${board.delta > 0 ? `+${board.delta}` : board.delta} rating, spread over the schools you fought in · every solution is open now.`}
+          </span>
         </p>
       )}
 
@@ -140,14 +165,17 @@ export default function DuelBoard({ initial }: { initial: DuelView }) {
                   )}
                   {taken && <span className="mm-tcard-seal">{mine ? "Yours" : "Taken"}</span>}
                 </span>
-                <span className="mm-tcard-name">{card.character?.name ?? "A hidden foe"}</span>
+                <span className="mm-tcard-name">
+                  {card.character?.name ?? "A hidden foe"}
+                  {card.elo !== null && <em className="mm-tcard-elo">{card.elo}</em>}
+                </span>
                 <span className="mm-tcard-foot">
                   {taken
                     ? mine
                       ? "Claimed by you"
                       : `Claimed by ${card.claimedBy}`
                     : finished
-                      ? "Unclaimed — read the solution"
+                      ? card.source ?? "Unclaimed — read the solution"
                       : card.attempts > 0
                         ? `${3 - card.attempts} of 3 blows left`
                         : "Strength unknown"}

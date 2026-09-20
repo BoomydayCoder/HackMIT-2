@@ -70,6 +70,16 @@ const STATEMENTS = [
      created_at timestamptz not null default now()
    )`,
   `create index if not exists duel_attempts_card on duel_attempts (duel_id, card, username)`,
+  /** Written once when a duel settles: the payout the profile and recap read back. */
+  `create table if not exists duel_results (
+     duel_id text primary key references duels(id) on delete cascade,
+     winner text,
+     challenger_score integer not null,
+     opponent_score integer not null,
+     challenger_delta integer not null,
+     opponent_delta integer not null,
+     settled_at timestamptz not null default now()
+   )`,
 ];
 
 let migrated: Promise<void> | undefined;

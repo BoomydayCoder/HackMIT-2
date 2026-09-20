@@ -414,6 +414,14 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-duel-resign:hover { background: rgba(155, 42, 42, .1); }
 .solution-panel { margin-top: 20px; padding: 16px 18px; border: 1px solid var(--mm-edge); border-radius: 6px; background: rgba(247, 236, 209, .6); }
 .solution-panel h2 { margin: 0 0 4px; font-size: 18px; }
+.mm-tcard-elo { display: block; margin-top: 2px; font-size: 11px; font-style: normal; letter-spacing: .06em; color: var(--mm-blade); }
+.mm-history { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.mm-history li { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; padding: 7px 12px; border: 1px solid var(--mm-edge); border-radius: 4px; background: rgba(247, 236, 209, .5); font-size: 14px; }
+.mm-history li.is-won { border-left: 3px solid var(--mm-gold); }
+.mm-history li.is-lost { border-left: 3px solid var(--mm-blade); }
+.mm-history-score { font-variant-numeric: tabular-nums; color: var(--muted); }
+.mm-history-delta { font-variant-numeric: tabular-nums; font-weight: 700; }
+.mm-history li.is-lost .mm-history-delta { color: var(--mm-blade); }
 .mm-duel-board { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px 10px; margin: 0; padding: 4px 0 10px; list-style: none; }
 .mm-duel-slot { display: grid; align-items: stretch; }
 .mm-duel-slot:nth-child(3n+1) .mm-tcard { transform: rotate(-1.4deg); }
