@@ -643,7 +643,8 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
   .mm-page-fit:has(.mm-deck) { height: auto; min-height: 100svh; overflow: visible; padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
   .mm-page-fit .mm-stack { min-height: 210px; }
   .mm-page-fit .mm-card { overflow: visible; }
-  .mm-page-fit .mm-bio { -webkit-line-clamp: 3; }
+  .mm-page-fit .mm-bio { display: block; overflow: visible; -webkit-line-clamp: none; font-size: 13px; line-height: 1.45; }
+  .mm-call-label { padding: 1px 7px; border-radius: 999px; background: rgba(250, 241, 220, .88); color: var(--ink); }
 
   .star { min-width: 44px; min-height: 44px; }
   .mm-nav, .back-link, .source-link, .similar-problems a { display: inline-flex; align-items: center; min-height: 44px; }
