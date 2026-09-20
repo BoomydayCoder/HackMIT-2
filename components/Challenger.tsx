@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { challengerName, characterFor } from "@/lib/characters";
+import { characterFor } from "@/lib/characters";
 
 const TOPIC_GLYPHS: Record<string, string> = {
   algebra: "∑",
@@ -20,7 +20,7 @@ export default function Challenger({ id, topic, className = "" }: ChallengerProp
   if (!character) return <span className="mm-watermark">{TOPIC_GLYPHS[topic] ?? "∞"}</span>;
   return (
     <span className={`mm-portrait ${className}`.trim()}>
-      <Image src={character.image} alt={character.alt} title={challengerName(id, topic)} sizes="320px" />
+      <Image src={character.image} alt={character.alt} sizes="320px" />
     </span>
   );
 }

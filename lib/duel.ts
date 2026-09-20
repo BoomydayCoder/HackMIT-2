@@ -1,8 +1,9 @@
 import { randomBytes } from "node:crypto";
 import { usernameKey } from "@/lib/accounts";
-import { challengerName, characterFor } from "@/lib/characters";
+import { characterFor } from "@/lib/characters";
 import { db, ready } from "@/lib/db";
 import { getProblem, PROBLEMS, type Problem } from "@/lib/problems";
+import { getProfile } from "@/lib/profiles";
 import { parseProgress } from "@/lib/progress";
 
 export const DUEL_CARDS = 10;
@@ -17,11 +18,11 @@ export type DuelStatus = "pending" | "active" | "finished" | "declined";
 /** The portrait on a card face: flavour only, and it gives no difficulty away. */
 export type Portrait = { name: string; alt: string; src: string; width: number; height: number };
 
-function portraitFor(cardId: string, topic: string): Portrait | null {
-  const character = characterFor(cardId, topic);
-  if (!character) return null;
+function portraitFor(problem: Problem | undefined): Portrait | null {
+  const character = problem ? characterFor(problem.id, problem.topic) : null;
+  if (!problem || !character) return null;
   return {
-    name: challengerName(cardId, topic),
+    name: getProfile(problem).name,
     alt: character.alt,
     src: character.image.src,
     width: character.image.width,
@@ -228,11 +229,11 @@ export async function boardFor(id: string, username: string): Promise<DuelView |
           : names[yours > theirs ? me : them] ?? null,
     cards: cardIds(duel.cards).map((cardId, index) => {
       const claim = claims.find((row) => row.card === cardId);
-      const topic = getProblem(cardId)?.topic ?? "";
+      const problem = getProblem(cardId);
       return {
         index,
-        topic,
-        character: portraitFor(cardId, topic),
+        topic: problem?.topic ?? "",
+        character: portraitFor(problem),
         claimedBy: claim ? names[claim.username] ?? claim.username : null,
         claimedAt: claim?.claimed_at ?? null,
         attempts: attempts.find((row) => row.card === cardId)?.used ?? 0,
@@ -282,7 +283,7 @@ export async function cardFor(
     index,
     statement: problem.statement,
     topic: problem.topic,
-    character: portraitFor(cardId, problem.topic),
+    character: portraitFor(problem),
     attemptsLeft: Math.max(0, MAX_ATTEMPTS - (used[0]?.used ?? 0)),
     claimedBy: claim ? names[claim.username] ?? claim.username : null,
     open: status === "active" && !claim,

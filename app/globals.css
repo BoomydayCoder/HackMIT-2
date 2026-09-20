@@ -411,7 +411,7 @@ h1 { max-width: 800px; margin: 26px 0; font-size: clamp(56px, 8vw, 116px); line-
 .mm-tcard-art img { width: auto; max-width: 92%; height: 94px; object-fit: contain; }
 .mm-tcard-glyph { font-size: 44px; color: var(--mm-blade); opacity: .55; }
 .mm-tcard-seal { position: absolute; padding: 4px 12px; border: 2px solid var(--mm-blade); border-radius: 3px; background: rgba(250, 241, 220, .92); color: var(--mm-blade); font-size: 13px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; transform: rotate(-11deg); }
-.mm-tcard-name { min-height: 3.6em; font-size: 13px; font-weight: 700; line-height: 1.2; }
+.mm-tcard-name { min-height: 2.4em; font-size: 13px; font-weight: 700; line-height: 1.2; }
 .mm-tcard-foot { font-size: 11px; color: var(--muted); }
 .mm-tcard.is-mine { border-color: var(--mm-blade); box-shadow: 0 0 0 2px rgba(184, 134, 59, .45), 2px 4px 0 rgba(72, 54, 33, .18); }
 .mm-tcard.is-theirs { opacity: .62; }
